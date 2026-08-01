@@ -1,0 +1,20 @@
+import type { Metadata } from "next";
+import { PanelProvider } from "@/components/panel/PanelProvider";
+import { PanelShell } from "@/components/panel/PanelShell";
+
+export const metadata: Metadata = {
+  title: "Panel zawodnika",
+  description: "Panel zawodnika CKS Slavia — wyniki, obecność, plany treningowe.",
+};
+
+export default function AthletePanelLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <PanelProvider>
+      <PanelShell>{children}</PanelShell>
+    </PanelProvider>
+  );
+}
