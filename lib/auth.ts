@@ -18,10 +18,10 @@ const TOKEN_KEY = "slavia_auth_token";
 const USER_KEY = "slavia_auth_user";
 
 export function getApiBaseUrl(): string {
-  return (
-    process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
-    "http://127.0.0.1:8080"
-  );
+  const raw = process.env.NEXT_PUBLIC_API_URL?.trim() ?? "";
+  // Zabezpieczenie przed wklejeniem całej linii KEY=value w Vercel UI.
+  const value = raw.replace(/^NEXT_PUBLIC_API_URL=/i, "").replace(/\/$/, "");
+  return value || "http://127.0.0.1:8080";
 }
 
 export function getStoredToken(): string | null {
