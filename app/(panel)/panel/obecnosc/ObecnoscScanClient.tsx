@@ -3,13 +3,8 @@
 import { FormEvent, useCallback, useEffect, useId, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Html5Qrcode } from "html5-qrcode";
+import type { AttendanceRecord } from "@/lib/api/generated/models";
 import { klubFetch } from "@/lib/klub-api";
-
-type AttendanceRecord = {
-  id: string;
-  checked_at: string;
-  display_name: string;
-};
 
 function extractToken(raw: string): string {
   try {

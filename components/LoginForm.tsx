@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useId, useRef, useState } from "react";
-import { hasAnyRole, loginRequest, storeSession } from "@/lib/auth";
+import { hasAnyRole, loginRequest, establishSession } from "@/lib/auth";
 import { STAFF_ROLES } from "@/lib/klub-nav";
 
 type FormState = "idle" | "submitting" | "error";
@@ -50,10 +50,19 @@ export function LoginForm() {
     try {
       const result = await loginRequest(trimmedEmail, password);
       if (!mountedRef.current) return;
-      storeSession(result.token, result.user);
-      const dest = hasAnyRole(result.user, STAFF_ROLES)
-        ? "/klub"
-        : "/panel";
+      await establishSession(
+        result.token,
+        result.user,
+        result.expires_in_hours,
+      );
+      if (!mountedRef.current) return;
+      const params = new URLSearchParams(window.location.search);
+      const next = params.get("next");
+      const safeNext =
+        next && next.startsWith("/") && !next.startsWith("//") ? next : null;
+      const dest =
+        safeNext ??
+        (hasAnyRole(result.user, STAFF_ROLES) ? "/klub" : "/panel");
       router.push(dest);
       router.refresh();
     } catch (err) {

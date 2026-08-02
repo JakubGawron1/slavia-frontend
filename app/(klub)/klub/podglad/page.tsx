@@ -1,18 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import type { PublicUser } from "@/lib/api/generated/models";
 import { klubFetch } from "@/lib/klub-api";
 import { ROLE_LABELS } from "@/lib/klub-nav";
 import type { Role } from "@/lib/auth";
 import { useKlub } from "@/components/klub/KlubProvider";
-
-type PublicUser = {
-  id: string;
-  email: string;
-  display_name: string;
-  roles: Role[];
-  is_active: boolean;
-};
 
 export default function PodgladPage() {
   const { viewAs, setViewAs, clearViewAs, setActiveRole } = useKlub();

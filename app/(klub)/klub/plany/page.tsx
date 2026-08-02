@@ -1,31 +1,12 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
+import type {
+  PlanExercise,
+  PublicUser,
+  TrainingPlan,
+} from "@/lib/api/generated/models";
 import { klubFetch } from "@/lib/klub-api";
-
-type PlanExercise = {
-  id: string;
-  name: string;
-  sets: number | null;
-  reps: string | null;
-  load_kg: number | null;
-  notes: string | null;
-};
-
-type TrainingPlan = {
-  id: string;
-  title: string;
-  description: string | null;
-  week_label: string | null;
-  exercises: PlanExercise[];
-  assigned_user_ids: string[];
-};
-
-type PublicUser = {
-  id: string;
-  display_name: string;
-  roles: string[];
-};
 
 function emptyEx(): PlanExercise {
   return {
@@ -69,6 +50,9 @@ export default function StaffPlansPage() {
       week_label: "",
       exercises: [emptyEx()],
       assigned_user_ids: [],
+      created_at: "",
+      created_by: "",
+      updated_at: "",
     });
   }
 

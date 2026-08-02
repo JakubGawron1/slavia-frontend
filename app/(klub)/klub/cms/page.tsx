@@ -1,24 +1,12 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
+import type {
+  CmsBlock,
+  CmsPage,
+  CmsStatus,
+} from "@/lib/api/generated/models";
 import { klubFetch } from "@/lib/klub-api";
-
-type CmsStatus = "draft" | "published";
-
-type CmsBlock = {
-  id: string;
-  type: string;
-  content: string;
-};
-
-type CmsPage = {
-  id: string;
-  slug: string;
-  title: string;
-  status: CmsStatus;
-  blocks: CmsBlock[];
-  updated_at: string;
-};
 
 function newBlock(type = "paragraph"): CmsBlock {
   return {
@@ -57,6 +45,7 @@ export default function CmsAdminPage() {
       title: "",
       status: "draft",
       blocks: [newBlock("heading"), newBlock("paragraph")],
+      created_at: "",
       updated_at: "",
     });
   }

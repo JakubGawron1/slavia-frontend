@@ -1,21 +1,13 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
+import type {
+  CompetitionResult,
+  ResultStatus,
+} from "@/lib/api/generated/models";
 import { klubFetch } from "@/lib/klub-api";
 
-type CompetitionResult = {
-  id: string;
-  event_name: string;
-  kind: string;
-  snatch_kg: number | null;
-  clean_jerk_kg: number | null;
-  total_kg: number | null;
-  status: string;
-  reviewer_note: string | null;
-  submitted_at: string;
-};
-
-const STATUS: Record<string, string> = {
+const STATUS: Record<ResultStatus, string> = {
   pending: "Oczekuje",
   accepted: "Zaakceptowany",
   rejected: "Odrzucony",
@@ -29,6 +21,9 @@ export default function WynikiPage() {
   const [eventName, setEventName] = useState("");
   const [snatch, setSnatch] = useState("");
   const [cj, setCj] = useState("");
+  const [bodyweight, setBodyweight] = useState("");
+  const [venue, setVenue] = useState("");
+  const [category, setCategory] = useState("");
 
   const load = useCallback(async () => {
     try {
@@ -55,11 +50,17 @@ export default function WynikiPage() {
           kind,
           snatch_kg: snatch ? Number(snatch) : null,
           clean_jerk_kg: cj ? Number(cj) : null,
+          bodyweight_kg: bodyweight ? Number(bodyweight) : null,
+          venue: venue.trim() || null,
+          category: category.trim() || null,
         },
       });
       setEventName("");
       setSnatch("");
       setCj("");
+      setBodyweight("");
+      setVenue("");
+      setCategory("");
       await load();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Nie udało się wysłać");
@@ -137,6 +138,30 @@ export default function WynikiPage() {
           value={cj}
           onChange={(e) => setCj(e.target.value)}
         />
+        {kind === "competition" ? (
+          <>
+            <input
+              className="border border-paper/20 bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand"
+              placeholder="Masa ciała na zawodach (kg)"
+              type="number"
+              step="0.1"
+              value={bodyweight}
+              onChange={(e) => setBodyweight(e.target.value)}
+            />
+            <input
+              className="border border-paper/20 bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand"
+              placeholder="Kategoria wagowa"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+            />
+            <input
+              className="border border-paper/20 bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand sm:col-span-2"
+              placeholder="Miejsce zawodów"
+              value={venue}
+              onChange={(e) => setVenue(e.target.value)}
+            />
+          </>
+        ) : null}
         <button
           type="submit"
           className="bg-brand px-4 py-2 font-display text-xs tracking-[0.12em] uppercase sm:col-span-2 sm:justify-self-start"

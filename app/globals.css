@@ -10,6 +10,418 @@
   --mist: #d8d4ce;
   --paper: #f7f5f2;
   --ink: #0e1014;
+  --panel-glow: rgba(200, 16, 46, 0.16);
+  --panel-shade-from: #0e1014;
+  --panel-shade-to: #161b22;
+}
+
+/* Panele: tokeny kolorów zależne od motywu konta */
+[data-panel-theme] {
+  color: var(--paper);
+  background-color: var(--ink);
+}
+
+[data-panel-theme] .panel-atmosphere {
+  background:
+    radial-gradient(
+      ellipse at var(--panel-glow-x, 15%) 0%,
+      var(--panel-glow) 0%,
+      transparent 42%
+    ),
+    linear-gradient(
+      var(--panel-shade-angle, 165deg),
+      var(--panel-shade-from) 0%,
+      var(--panel-shade-to) 100%
+    );
+}
+
+[data-panel-theme="classic"] {
+  --ink: #0e1014;
+  --paper: #f7f5f2;
+  --brand: #c8102e;
+  --brand-deep: #8f0b20;
+  --steel: #2a3038;
+  --steel-soft: #4a5560;
+  --mist: #d8d4ce;
+  --panel-glow: rgba(200, 16, 46, 0.16);
+  --panel-shade-from: #0e1014;
+  --panel-shade-to: #161b22;
+  --panel-glow-x: 15%;
+  --panel-shade-angle: 165deg;
+}
+
+[data-panel-theme="dawn"] {
+  --ink: #f3efe8;
+  --paper: #1a1814;
+  --brand: #b91c2c;
+  --brand-deep: #7f1d1d;
+  --steel: #cfc8be;
+  --steel-soft: #8a847a;
+  --mist: #e8e2d8;
+  --panel-glow: rgba(185, 28, 44, 0.14);
+  --panel-shade-from: #f3efe8;
+  --panel-shade-to: #e8e2d6;
+  --panel-glow-x: 20%;
+  --panel-shade-angle: 160deg;
+}
+
+[data-panel-theme="graphite"] {
+  --ink: #0c0e12;
+  --paper: #e8eaed;
+  --brand: #3d7ea6;
+  --brand-deep: #2a5a78;
+  --steel: #2a313a;
+  --steel-soft: #5a6570;
+  --mist: #c5ccd4;
+  --panel-glow: rgba(61, 126, 166, 0.18);
+  --panel-shade-from: #0c0e12;
+  --panel-shade-to: #151a22;
+  --panel-glow-x: 12%;
+  --panel-shade-angle: 170deg;
+}
+
+[data-panel-theme="forest"] {
+  --ink: #0c1210;
+  --paper: #e6ede8;
+  --brand: #2d8a5e;
+  --brand-deep: #1a5c3e;
+  --steel: #24302a;
+  --steel-soft: #4a6054;
+  --mist: #c5d4cb;
+  --panel-glow: rgba(45, 138, 94, 0.18);
+  --panel-shade-from: #0c1210;
+  --panel-shade-to: #121a16;
+  --panel-glow-x: 18%;
+  --panel-shade-angle: 155deg;
+}
+
+[data-panel-theme="arena"] {
+  --ink: #12100c;
+  --paper: #f2ebe0;
+  --brand: #c9a227;
+  --brand-deep: #8a6e1a;
+  --steel: #2e2a22;
+  --steel-soft: #6a614e;
+  --mist: #d8d0c0;
+  --panel-glow: rgba(201, 162, 39, 0.16);
+  --panel-shade-from: #12100c;
+  --panel-shade-to: #1a1610;
+  --panel-glow-x: 10%;
+  --panel-shade-angle: 168deg;
+}
+
+[data-panel-theme="mist"] {
+  --ink: #eef1f4;
+  --paper: #151a20;
+  --brand: #1e3a5f;
+  --brand-deep: #0f2438;
+  --steel: #c8d0d8;
+  --steel-soft: #6a7684;
+  --mist: #dfe5eb;
+  --panel-glow: rgba(30, 58, 95, 0.12);
+  --panel-shade-from: #eef1f4;
+  --panel-shade-to: #dfe5eb;
+  --panel-glow-x: 22%;
+  --panel-shade-angle: 158deg;
+}
+
+[data-panel-theme="ember"] {
+  --ink: #140e0c;
+  --paper: #f3ebe4;
+  --brand: #d2693c;
+  --brand-deep: #9a4a28;
+  --steel: #2c221c;
+  --steel-soft: #6e5848;
+  --mist: #d8c8b8;
+  --panel-glow: rgba(210, 105, 60, 0.18);
+  --panel-shade-from: #140e0c;
+  --panel-shade-to: #1c1410;
+  --panel-glow-x: 30%;
+  --panel-shade-angle: 150deg;
+}
+
+[data-panel-theme="slate"] {
+  --ink: #e8edf2;
+  --paper: #141820;
+  --brand: #3b5bdb;
+  --brand-deep: #2741a8;
+  --steel: #c5ced8;
+  --steel-soft: #6a7688;
+  --mist: #d5dde6;
+  --panel-glow: rgba(59, 91, 219, 0.12);
+  --panel-shade-from: #e8edf2;
+  --panel-shade-to: #d5dde6;
+  --panel-glow-x: 18%;
+  --panel-shade-angle: 165deg;
+}
+
+[data-panel-theme="sand"] {
+  --ink: #f0e6d8;
+  --paper: #1f1812;
+  --brand: #b85c38;
+  --brand-deep: #8a4024;
+  --steel: #d8c8b4;
+  --steel-soft: #8a7864;
+  --mist: #e4d5c2;
+  --panel-glow: rgba(184, 92, 56, 0.14);
+  --panel-shade-from: #f0e6d8;
+  --panel-shade-to: #e4d5c2;
+  --panel-glow-x: 25%;
+  --panel-shade-angle: 155deg;
+}
+
+[data-panel-theme="night"] {
+  --ink: #070b14;
+  --paper: #e6ebf4;
+  --brand: #8aa0c2;
+  --brand-deep: #5c7294;
+  --steel: #1a2230;
+  --steel-soft: #5a6a80;
+  --mist: #b8c4d4;
+  --panel-glow: rgba(138, 160, 194, 0.16);
+  --panel-shade-from: #070b14;
+  --panel-shade-to: #0e1420;
+  --panel-glow-x: 70%;
+  --panel-shade-angle: 200deg;
+}
+
+/* Eksperymentalne: tokeny + geometria */
+[data-panel-theme="capsule"] {
+  --ink: #ebe6df;
+  --paper: #1c1916;
+  --brand: #d64545;
+  --brand-deep: #9e2f2f;
+  --steel: #d4cdc3;
+  --steel-soft: #8f877c;
+  --mist: #f3efe9;
+  --panel-glow: rgba(214, 69, 69, 0.16);
+  --panel-shade-from: #ebe6df;
+  --panel-shade-to: #ddd5cb;
+  --panel-glow-x: 50%;
+  --panel-shade-angle: 180deg;
+  --panel-radius: 1.5rem;
+  --panel-radius-sm: 1rem;
+  --panel-radius-pill: 999px;
+  --panel-gap: 0.85rem;
+  --panel-elev: 0 18px 40px rgba(28, 25, 22, 0.1);
+}
+
+[data-panel-theme="studio"] {
+  --ink: #10141a;
+  --paper: #e9eef3;
+  --brand: #2bb3a0;
+  --brand-deep: #1a7a6c;
+  --steel: #222a34;
+  --steel-soft: #5a6878;
+  --mist: #c5d0dc;
+  --panel-glow: rgba(43, 179, 160, 0.2);
+  --panel-shade-from: #10141a;
+  --panel-shade-to: #171d26;
+  --panel-glow-x: 0%;
+  --panel-shade-angle: 120deg;
+  --panel-radius: 1.15rem;
+  --panel-radius-sm: 0.75rem;
+  --panel-radius-pill: 0.85rem;
+  --panel-gap: 0.75rem;
+  --panel-elev: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+[data-panel-theme="dock"] {
+  --ink: #0a0b10;
+  --paper: #f0f1f5;
+  --brand: #ff5a3d;
+  --brand-deep: #c43d26;
+  --steel: #1c1f2a;
+  --steel-soft: #6a7184;
+  --mist: #c8ccd8;
+  --panel-glow: rgba(255, 90, 61, 0.18);
+  --panel-shade-from: #0a0b10;
+  --panel-shade-to: #14161f;
+  --panel-glow-x: 80%;
+  --panel-shade-angle: 200deg;
+  --panel-radius: 1.35rem;
+  --panel-radius-sm: 0.9rem;
+  --panel-radius-pill: 999px;
+  --panel-gap: 0.65rem;
+  --panel-elev: 0 16px 36px rgba(0, 0, 0, 0.45);
+}
+
+[data-panel-theme="bloom"] {
+  --ink: #f6ecef;
+  --paper: #2a1820;
+  --brand: #c45a7a;
+  --brand-deep: #8f3d58;
+  --steel: #e0ced4;
+  --steel-soft: #8a6a74;
+  --mist: #efe0e6;
+  --panel-glow: rgba(196, 90, 122, 0.16);
+  --panel-shade-from: #f6ecef;
+  --panel-shade-to: #efe0e6;
+  --panel-glow-x: 40%;
+  --panel-shade-angle: 175deg;
+  --panel-radius: 1.75rem;
+  --panel-radius-sm: 1.1rem;
+  --panel-radius-pill: 999px;
+  --panel-gap: 1rem;
+  --panel-elev: 0 20px 44px rgba(42, 24, 32, 0.1);
+}
+
+[data-panel-theme="chalk"] {
+  --ink: #f4f2ea;
+  --paper: #1a1c18;
+  --brand: #4a7c59;
+  --brand-deep: #335840;
+  --steel: #ddd8cc;
+  --steel-soft: #7a7668;
+  --mist: #e8e5db;
+  --panel-glow: rgba(74, 124, 89, 0.14);
+  --panel-shade-from: #f4f2ea;
+  --panel-shade-to: #e8e5db;
+  --panel-glow-x: 15%;
+  --panel-shade-angle: 160deg;
+  --panel-radius: 1.4rem;
+  --panel-radius-sm: 0.95rem;
+  --panel-radius-pill: 999px;
+  --panel-gap: 0.9rem;
+  --panel-elev: 0 14px 36px rgba(26, 28, 24, 0.08);
+}
+
+[data-panel-theme="forge"] {
+  --ink: #121210;
+  --paper: #ece8e0;
+  --brand: #e08a2e;
+  --brand-deep: #a86218;
+  --steel: #2a2824;
+  --steel-soft: #6e6858;
+  --mist: #c8c0b0;
+  --panel-glow: rgba(224, 138, 46, 0.18);
+  --panel-shade-from: #121210;
+  --panel-shade-to: #1c1b18;
+  --panel-glow-x: 8%;
+  --panel-shade-angle: 140deg;
+  --panel-radius: 0.65rem;
+  --panel-radius-sm: 0.4rem;
+  --panel-radius-pill: 0.5rem;
+  --panel-gap: 0.7rem;
+  --panel-elev: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+[data-panel-theme="ribbon"] {
+  --ink: #0f1218;
+  --paper: #edf0f5;
+  --brand: #4f7cac;
+  --brand-deep: #355a80;
+  --steel: #1e2430;
+  --steel-soft: #5a6878;
+  --mist: #c0cad8;
+  --panel-glow: rgba(79, 124, 172, 0.2);
+  --panel-shade-from: #0f1218;
+  --panel-shade-to: #171b24;
+  --panel-glow-x: 50%;
+  --panel-shade-angle: 190deg;
+  --panel-radius: 1.2rem;
+  --panel-radius-sm: 0.8rem;
+  --panel-radius-pill: 999px;
+  --panel-gap: 0.8rem;
+  --panel-elev: 0 14px 34px rgba(0, 0, 0, 0.38);
+}
+
+[data-panel-theme="pulse"] {
+  --ink: #070d12;
+  --paper: #e6f4f8;
+  --brand: #2ec4e0;
+  --brand-deep: #1a8aa0;
+  --steel: #142028;
+  --steel-soft: #4a6874;
+  --mist: #a8d0dc;
+  --panel-glow: rgba(46, 196, 224, 0.2);
+  --panel-shade-from: #070d12;
+  --panel-shade-to: #0e161c;
+  --panel-glow-x: 85%;
+  --panel-shade-angle: 210deg;
+  --panel-radius: 1.45rem;
+  --panel-radius-sm: 0.95rem;
+  --panel-radius-pill: 999px;
+  --panel-gap: 0.7rem;
+  --panel-elev: 0 16px 40px rgba(0, 0, 0, 0.5);
+}
+
+[data-panel-theme="neon"] {
+  --ink: #0b0f0c;
+  --paper: #eaf4ea;
+  --brand: #7dff6b;
+  --brand-deep: #4cb83c;
+  --steel: #161c16;
+  --steel-soft: #4a5c4a;
+  --mist: #b8d4b8;
+  --panel-glow: rgba(125, 255, 107, 0.16);
+  --panel-shade-from: #0b0f0c;
+  --panel-shade-to: #121812;
+  --panel-glow-x: 5%;
+  --panel-shade-angle: 125deg;
+  --panel-radius: 1.1rem;
+  --panel-radius-sm: 0.7rem;
+  --panel-radius-pill: 0.8rem;
+  --panel-gap: 0.75rem;
+  --panel-elev: 0 12px 32px rgba(0, 0, 0, 0.42);
+}
+
+[data-panel-theme="vapor"] {
+  --ink: #e8eef8;
+  --paper: #1a2030;
+  --brand: #6b7fd7;
+  --brand-deep: #4656a8;
+  --steel: #cdd6e8;
+  --steel-soft: #6a7898;
+  --mist: #d9e2f2;
+  --panel-glow: rgba(107, 127, 215, 0.14);
+  --panel-shade-from: #e8eef8;
+  --panel-shade-to: #d9e2f2;
+  --panel-glow-x: 60%;
+  --panel-shade-angle: 170deg;
+  --panel-radius: 0.85rem;
+  --panel-radius-sm: 0.55rem;
+  --panel-radius-pill: 0.65rem;
+  --panel-gap: 0.85rem;
+  --panel-elev: 0 12px 28px rgba(26, 32, 48, 0.12);
+}
+
+/* Układ eksperymentalny — klub: pływający sidebar + studnia */
+[data-panel-layout]:not([data-panel-layout="standard"]) .klub-shell-frame {
+  gap: var(--panel-gap, 0.75rem);
+  padding: var(--panel-gap, 0.75rem);
+}
+
+[data-panel-layout]:not([data-panel-layout="standard"]) .klub-nav-desktop {
+  border-radius: var(--panel-radius, 1rem);
+  border: 1px solid color-mix(in srgb, var(--paper) 12%, transparent);
+  box-shadow: var(--panel-elev, none);
+}
+
+[data-panel-layout="studio"] .klub-nav-desktop {
+  width: 13.5rem;
+}
+
+[data-panel-layout]:not([data-panel-layout="standard"]) .klub-main-well {
+  overflow: hidden;
+  border-radius: var(--panel-radius, 1rem);
+  border: 1px solid color-mix(in srgb, var(--paper) 10%, transparent);
+  background: color-mix(in srgb, var(--ink) 72%, var(--steel));
+  box-shadow: var(--panel-elev, none);
+}
+
+[data-panel-layout]:not([data-panel-layout="standard"]) .klub-nav-link-active,
+[data-panel-layout]:not([data-panel-layout="standard"]) .klub-nav-link {
+  border-left-width: 0 !important;
+  border-radius: var(--panel-radius-sm, 0.5rem);
+}
+
+[data-panel-layout]:not([data-panel-layout="standard"]) .panel-control {
+  border-radius: var(--panel-radius-pill, 999px);
+}
+
+[data-panel-layout]:not([data-panel-layout="standard"]) .settings-surface {
+  border-radius: var(--panel-radius, 1rem);
 }
 
 @theme inline {
@@ -43,6 +455,44 @@ body {
 ::selection {
   background: color-mix(in srgb, var(--brand) 30%, transparent);
   color: var(--ink);
+}
+
+/* Scrollbar — brand / steel / mist (jasne i ciemne panele) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--brand) 72%, var(--steel))
+    color-mix(in srgb, var(--steel) 35%, transparent);
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: color-mix(in srgb, var(--steel) 28%, transparent);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--brand) 85%, var(--paper)) 0%,
+    var(--brand-deep) 100%
+  );
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--brand) 0%, var(--brand-deep) 100%);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 @keyframes rise {
@@ -84,6 +534,16 @@ body {
   }
 }
 
+@keyframes barbell-wobble {
+  0%,
+  100% {
+    transform: rotate(-1.8deg) translateY(0);
+  }
+  50% {
+    transform: rotate(2.2deg) translateY(2px);
+  }
+}
+
 .animate-rise {
   animation: rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -113,6 +573,11 @@ body {
   animation: pulse-line 3.5s ease-in-out infinite;
 }
 
+.animate-barbell-wobble {
+  transform-origin: center;
+  animation: barbell-wobble 2.8s ease-in-out infinite;
+}
+
 .texture-noise {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.45'/%3E%3C/svg%3E");
 }
@@ -128,7 +593,8 @@ body {
   .animate-rise-delay-3,
   .animate-kenburns,
   .animate-bar,
-  .animate-pulse-line {
+  .animate-pulse-line,
+  .animate-barbell-wobble {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;

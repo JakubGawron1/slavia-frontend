@@ -1,25 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { klubFetch } from "@/lib/klub-api";
+import { useAthleteStats } from "@/lib/api/generated/default/default";
+import type { AthleteStats } from "@/lib/api/generated/models";
 import {
   ATHLETE_STAT_LINKS,
   PANEL_MODULES,
 } from "@/lib/panel-nav";
 import { usePanel } from "@/components/panel/PanelProvider";
-
-type AthleteStats = {
-  results_accepted: number;
-  results_pending: number;
-  results_total: number;
-  attendance_month: number;
-  attendance_window: number;
-  plans_active: number;
-  plans_completed_exercises: number;
-  bodyweight_kg: number | null;
-  category: string | null;
-};
 
 const STAT_CARDS: {
   key: keyof typeof ATHLETE_STAT_LINKS;
@@ -50,18 +38,14 @@ const STAT_CARDS: {
 
 export default function PanelHomePage() {
   const { user } = usePanel();
-  const [stats, setStats] = useState<AthleteStats | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    void (async () => {
-      try {
-        setStats(await klubFetch<AthleteStats>("/api/athlete/stats"));
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Błąd statystyk");
-      }
-    })();
-  }, []);
+  const statsQuery = useAthleteStats();
+  const stats = (statsQuery.data?.data as AthleteStats | undefined) ?? null;
+  const error =
+    statsQuery.error instanceof Error
+      ? statsQuery.error.message
+      : statsQuery.isError
+        ? "Błąd statystyk"
+        : null;
 
   if (!user) return null;
 

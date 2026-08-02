@@ -27,6 +27,11 @@ export const KLUB_NAV: KlubNavCategory[] = [
         roles: ["trener", "admin", "superadmin"],
       },
       {
+        href: "/klub/wiadomosci",
+        label: "Skrzynka kontaktowa",
+        roles: ["trener", "admin", "superadmin"],
+      },
+      {
         href: "/klub/weryfikacja-wynikow",
         label: "Weryfikacja wyników",
         roles: ["trener", "admin", "superadmin"],
@@ -100,14 +105,18 @@ export const KLUB_NAV: KlubNavCategory[] = [
 export const PUBLIC_ROUTE_MAP = [
   { path: "/", label: "Strona główna" },
   { path: "/blog", label: "Blog / aktualności" },
+  { path: "/zawodnicy", label: "Zawodnicy" },
   { path: "/kalendarz", label: "Kalendarz" },
   { path: "/kalkulator-sinclair", label: "Kalkulator Sinclair" },
   { path: "/ogloszenia", label: "Ogłoszenia" },
+  { path: "/kontakt", label: "Kontakt" },
   { path: "/logowanie", label: "Logowanie" },
   { path: "/panel", label: "Panel zawodnika" },
   { path: "/panel/wyniki", label: "Zgłaszanie wyników" },
   { path: "/panel/obecnosc", label: "Skaner obecności" },
   { path: "/panel/plany", label: "Plany (zawodnik)" },
+  { path: "/panel/ustawienia", label: "Ustawienia (zawodnik)" },
+  { path: "/klub/ustawienia", label: "Ustawienia (klub)" },
 ] as const;
 
 export const STAFF_ROLES: Role[] = ["trener", "admin", "superadmin"];

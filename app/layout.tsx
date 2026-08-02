@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Outfit, Public_Sans } from "next/font/google";
+import { AppQueryProvider } from "@/components/AppQueryProvider";
 import "./globals.css";
 
 const display = Outfit({
@@ -30,7 +31,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pl" className={`${display.variable} ${body.variable} h-full`}>
-      <body className="flex min-h-full flex-col antialiased">{children}</body>
+      <body className="flex min-h-full flex-col antialiased">
+        <AppQueryProvider>{children}</AppQueryProvider>
+      </body>
     </html>
   );
 }

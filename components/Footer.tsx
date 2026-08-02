@@ -1,7 +1,16 @@
+"use client";
+
 import Link from "next/link";
+import { useListPublicFlags } from "@/lib/api/generated/default/default";
+import { isFlagEnabled } from "@/lib/public-flags";
 import { ClubMark } from "./ClubMark";
 
 export function Footer() {
+  const flagsQuery = useListPublicFlags({ query: { staleTime: 60_000 } });
+  const flags = flagsQuery.data?.data;
+  const blogEnabled = isFlagEnabled(flags, "public_blog");
+  const announcementsEnabled = isFlagEnabled(flags, "announcements_board");
+
   return (
     <footer className="bg-ink text-paper">
       <div className="mx-auto grid max-w-7xl gap-10 px-5 py-14 md:grid-cols-[1.3fr_1fr_1fr] md:px-8">
@@ -29,9 +38,16 @@ export function Footer() {
             Nawigacja
           </p>
           <ul className="mt-4 space-y-2 text-sm text-paper/75">
+            {blogEnabled ? (
+              <li>
+                <Link href="/blog" className="hover:text-paper">
+                  Aktualności
+                </Link>
+              </li>
+            ) : null}
             <li>
-              <Link href="/blog" className="hover:text-paper">
-                Aktualności
+              <Link href="/zawodnicy" className="hover:text-paper">
+                Zawodnicy
               </Link>
             </li>
             <li>
@@ -44,9 +60,16 @@ export function Footer() {
                 Kalkulator Sinclair
               </Link>
             </li>
+            {announcementsEnabled ? (
+              <li>
+                <Link href="/ogloszenia" className="hover:text-paper">
+                  Tablica ogłoszeń
+                </Link>
+              </li>
+            ) : null}
             <li>
-              <Link href="/ogloszenia" className="hover:text-paper">
-                Tablica ogłoszeń
+              <Link href="/kontakt" className="hover:text-paper">
+                Kontakt
               </Link>
             </li>
             <li>
@@ -65,12 +88,18 @@ export function Footer() {
             <p>ul. Konopnickiej 13</p>
             <p>41-700 Ruda Śląska</p>
           </address>
+          <p className="mt-4">
+            <Link href="/kontakt" className="text-sm text-paper/75 hover:text-paper">
+              Formularz kontaktowy →
+            </Link>
+          </p>
         </div>
       </div>
 
       <div className="border-t border-paper/10">
         <div className="mx-auto flex max-w-7xl flex-col gap-2 px-5 py-5 text-xs text-paper/45 md:flex-row md:items-center md:justify-between md:px-8">
-          <p>© 2026 CKS Slavia Ruda Śląska</p>
+          <p>CKS Slavia Ruda Śląska © 2026</p>
+          <p>Jakub Gawron © 2026 </p>
           <p>Dwubój olimpijski · Śląsk</p>
         </div>
       </div>

@@ -1,43 +1,26 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { klubFetch } from "@/lib/klub-api";
-
-type SystemLog = {
-  id: string;
-  level: "info" | "warn" | "error";
-  source: string;
-  message: string;
-  actor_id: string | null;
-  created_at: string;
-};
+import { useState } from "react";
+import { useListLogs } from "@/lib/api/generated/default/default";
+import type { SystemLog } from "@/lib/api/generated/models";
 
 export default function LogiPage() {
-  const [logs, setLogs] = useState<SystemLog[]>([]);
   const [source, setSource] = useState("");
   const [level, setLevel] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const params = new URLSearchParams({ limit: "200" });
-      if (source) params.set("source", source);
-      if (level) params.set("level", level);
-      const data = await klubFetch<SystemLog[]>(`/api/logs?${params}`);
-      setLogs(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Błąd ładowania");
-    } finally {
-      setLoading(false);
-    }
-  }, [source, level]);
+  const logsQuery = useListLogs(
+    {
+      limit: 200,
+      source: source || undefined,
+      level: level || undefined,
+    },
+    { query: { placeholderData: (prev) => prev } },
+  );
 
-  useEffect(() => {
-    void load();
-  }, [load]);
+  const logs = (logsQuery.data?.data as SystemLog[] | undefined) ?? [];
+  const loading = logsQuery.isLoading;
+  const error =
+    logsQuery.error instanceof Error ? logsQuery.error.message : null;
 
   return (
     <div className="animate-rise max-w-5xl space-y-6">
@@ -69,7 +52,7 @@ export default function LogiPage() {
         </select>
         <button
           type="button"
-          onClick={() => void load()}
+          onClick={() => void logsQuery.refetch()}
           className="border border-paper/25 px-4 py-2 font-display text-[11px] tracking-[0.12em] uppercase"
         >
           Odśwież

@@ -43,6 +43,13 @@ export const PANEL_MODULES: PanelModule[] = [
   },
 ];
 
+/** Zakładka ustawień — osobno, wypychana do prawej krawędzi nav. */
+export const PANEL_SETTINGS = {
+  href: "/panel/ustawienia",
+  label: "Ustawienia",
+  description: "Nazwa wyświetlana i hasło konta.",
+} as const;
+
 export function canAccessAthletePanel(roles: Role[]): boolean {
   return (
     roles.includes("zawodnik") ||

@@ -4,35 +4,114 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
+import {
+  getStoredToken,
+  getStoredUser,
+  hasAnyRole,
+  type AuthUser,
+} from "@/lib/auth";
+import { STAFF_ROLES } from "@/lib/klub-nav";
+import { useListPublicFlags } from "@/lib/api/generated/default/default";
+import { isFlagEnabled } from "@/lib/public-flags";
+import type { PublicFlag } from "@/lib/api/generated/models";
 import { ClubMark } from "./ClubMark";
 
-const navLinks = [
-  { href: "/blog", label: "Aktualności" },
-  { href: "/kalendarz", label: "Kalendarz" },
-  { href: "/kalkulator-sinclair", label: "Kalkulatory" },
-  { href: "/ogloszenia", label: "Ogłoszenia" },
+const NAV_LINKS = [
+  { href: "/blog", label: "Aktualności", flag: "public_blog" },
+  { href: "/zawodnicy", label: "Zawodnicy", flag: null },
+  { href: "/kalendarz", label: "Kalendarz", flag: null },
+  { href: "/kalkulator-sinclair", label: "Kalkulatory", flag: null },
+  { href: "/ogloszenia", label: "Ogłoszenia", flag: "announcements_board" },
+  { href: "/kontakt", label: "Kontakt", flag: null },
 ] as const;
+
+type NavLink = { href: string; label: string };
+
+function visibleNavLinks(flags: PublicFlag[] | undefined): NavLink[] {
+  return NAV_LINKS.filter(
+    (link) => !link.flag || isFlagEnabled(flags, link.flag),
+  );
+}
 
 const overlayPaths = new Set([
   "/",
   "/logowanie",
   "/kalkulator-sinclair",
   "/kalendarz",
+  "/zawodnicy",
+  "/kontakt",
 ]);
+
+function panelHrefFor(user: AuthUser): string {
+  return hasAnyRole(user, STAFF_ROLES) ? "/klub" : "/panel";
+}
+
+function AuthCta({
+  user,
+  pathname,
+  onNavigate,
+  className,
+}: {
+  user: AuthUser | null;
+  pathname: string;
+  onNavigate?: () => void;
+  className: string;
+}) {
+  if (user) {
+    const href = panelHrefFor(user);
+    const active = pathname === href || pathname.startsWith(`${href}/`);
+    return (
+      <Link
+        href={href}
+        aria-current={active ? "page" : undefined}
+        className={className}
+        onClick={onNavigate}
+      >
+        Panel
+      </Link>
+    );
+  }
+
+  const isLogin = pathname === "/logowanie";
+  return (
+    <Link
+      href="/logowanie"
+      aria-current={isLogin ? "page" : undefined}
+      className={className}
+      onClick={onNavigate}
+    >
+      Zaloguj się
+    </Link>
+  );
+}
 
 function HeaderChrome({
   pathname,
   open,
   onToggle,
   onClose,
+  user,
+  navLinks,
 }: {
   pathname: string;
   open: boolean;
   onToggle: () => void;
   onClose: () => void;
+  user: AuthUser | null;
+  navLinks: NavLink[];
 }) {
-  const isLogin = pathname === "/logowanie";
   const overlayHeader = overlayPaths.has(pathname);
+  const isAuthActive = user
+    ? pathname.startsWith(panelHrefFor(user))
+    : pathname === "/logowanie";
+
+  const desktopCtaClass = isAuthActive
+    ? "border border-brand bg-brand px-4 py-2 text-sm tracking-wide text-paper transition-colors"
+    : "border border-paper/35 px-4 py-2 text-sm tracking-wide text-paper transition-colors hover:border-paper hover:bg-paper/10";
+
+  const mobileCtaClass = isAuthActive
+    ? "mt-2 border border-brand bg-brand py-3 text-center text-paper"
+    : "mt-2 border border-paper/30 py-3 text-center text-paper";
 
   return (
     <header
@@ -75,17 +154,11 @@ function HeaderChrome({
               </Link>
             );
           })}
-          <Link
-            href="/logowanie"
-            aria-current={isLogin ? "page" : undefined}
-            className={
-              isLogin
-                ? "border border-brand bg-brand px-4 py-2 text-sm tracking-wide text-paper transition-colors"
-                : "border border-paper/35 px-4 py-2 text-sm tracking-wide text-paper transition-colors hover:border-paper hover:bg-paper/10"
-            }
-          >
-            Zaloguj się
-          </Link>
+          <AuthCta
+            user={user}
+            pathname={pathname}
+            className={desktopCtaClass}
+          />
         </nav>
 
         <button
@@ -143,18 +216,12 @@ function HeaderChrome({
               </Link>
             );
           })}
-          <Link
-            href="/logowanie"
-            aria-current={isLogin ? "page" : undefined}
-            className={
-              isLogin
-                ? "mt-2 border border-brand bg-brand py-3 text-center text-paper"
-                : "mt-2 border border-paper/30 py-3 text-center text-paper"
-            }
-            onClick={onClose}
-          >
-            Zaloguj się
-          </Link>
+          <AuthCta
+            user={user}
+            pathname={pathname}
+            className={mobileCtaClass}
+            onNavigate={onClose}
+          />
         </nav>
       </div>
     </header>
@@ -164,9 +231,22 @@ function HeaderChrome({
 function HeaderInner() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const flagsQuery = useListPublicFlags({ query: { staleTime: 60_000 } });
 
   useEffect(() => {
     setOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    function sync() {
+      const token = getStoredToken();
+      const stored = getStoredUser();
+      setUser(token && stored ? stored : null);
+    }
+    sync();
+    window.addEventListener("storage", sync);
+    return () => window.removeEventListener("storage", sync);
   }, [pathname]);
 
   return (
@@ -175,6 +255,8 @@ function HeaderInner() {
       open={open}
       onToggle={() => setOpen((v) => !v)}
       onClose={() => setOpen(false)}
+      user={user}
+      navLinks={visibleNavLinks(flagsQuery.data?.data)}
     />
   );
 }
@@ -186,6 +268,8 @@ function HeaderFallback() {
       open={false}
       onToggle={() => {}}
       onClose={() => {}}
+      user={null}
+      navLinks={visibleNavLinks(undefined)}
     />
   );
 }

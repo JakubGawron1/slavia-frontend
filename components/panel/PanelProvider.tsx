@@ -11,11 +11,12 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import {
-  clearSession,
+  destroySession,
   fetchMe,
   getStoredToken,
   getStoredUser,
   storeSession,
+  syncSessionCookie,
   type AuthUser,
 } from "@/lib/auth";
 import { canAccessAthletePanel } from "@/lib/panel-nav";
@@ -25,7 +26,8 @@ type PanelContextValue = {
   loading: boolean;
   error: string | null;
   logout: () => void;
-  refreshUser: () => Promise<void>;
+  /** Bez argumentu — pobiera /me. Z obiektem — odświeża lokalny stan (np. po PATCH). */
+  refreshUser: (next?: AuthUser) => Promise<void>;
 };
 
 const PanelContext = createContext<PanelContextValue | null>(null);
@@ -36,7 +38,13 @@ export function PanelProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const refreshUser = useCallback(async () => {
+  const refreshUser = useCallback(async (next?: AuthUser) => {
+    if (next) {
+      const token = getStoredToken();
+      if (token) storeSession(token, next);
+      setUser(next);
+      return;
+    }
     const token = getStoredToken();
     if (!token) {
       router.replace("/logowanie");
@@ -68,11 +76,12 @@ export function PanelProvider({ children }: { children: ReactNode }) {
           return;
         }
         storeSession(token, me);
+        void syncSessionCookie(token);
         setUser(me);
         setError(null);
       } catch (err) {
         if (cancelled) return;
-        clearSession();
+        await destroySession();
         setError(err instanceof Error ? err.message : "Sesja wygasła.");
         router.replace("/logowanie");
       } finally {
@@ -87,8 +96,10 @@ export function PanelProvider({ children }: { children: ReactNode }) {
   }, [router]);
 
   const logout = useCallback(() => {
-    clearSession();
-    router.push("/logowanie");
+    void destroySession().then(() => {
+      router.push("/logowanie");
+      router.refresh();
+    });
   }, [router]);
 
   const value = useMemo(

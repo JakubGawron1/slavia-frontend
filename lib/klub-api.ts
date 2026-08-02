@@ -12,39 +12,68 @@ async function parseError(response: Response): Promise<string> {
   return `Błąd serwera (${response.status})`;
 }
 
-export type KlubFetchOptions = {
-  method?: string;
-  body?: unknown;
-  token?: string | null;
+export type ApiMutatorOptions = {
+  url: string;
+  method: string;
+  params?: Record<string, unknown>;
+  data?: unknown;
+  headers?: Record<string, string>;
+  signal?: AbortSignal;
+  /** Gdy false — nie wymagaj Bearer (endpointy publiczne). */
+  auth?: boolean;
   viewAsUserId?: string | null;
 };
 
-export async function klubFetch<T>(
-  path: string,
-  options: KlubFetchOptions = {},
-): Promise<T> {
-  const token = options.token ?? getStoredToken();
-  if (!token) throw new Error("Brak sesji.");
+/**
+ * Mutator Orval — fetch + opcjonalny Bearer / X-View-As-User.
+ */
+export async function apiMutator<T>(options: ApiMutatorOptions): Promise<T> {
+  const {
+    url,
+    method,
+    params,
+    data,
+    headers: extraHeaders,
+    signal,
+    auth = true,
+    viewAsUserId,
+  } = options;
 
   const headers: Record<string, string> = {
     Accept: "application/json",
-    Authorization: `Bearer ${token}`,
+    ...extraHeaders,
   };
-  if (options.body !== undefined) {
+
+  if (auth) {
+    const token = getStoredToken();
+    if (!token) throw new Error("Brak sesji.");
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  if (data !== undefined) {
     headers["Content-Type"] = "application/json";
   }
-  if (options.viewAsUserId) {
-    headers["X-View-As-User"] = options.viewAsUserId;
+
+  if (viewAsUserId) {
+    headers["X-View-As-User"] = viewAsUserId;
   }
 
-  const method =
-    options.method ??
-    (options.body !== undefined ? "POST" : "GET");
+  let fullUrl = url.startsWith("http") ? url : `${getApiBaseUrl()}${url}`;
+  if (params && Object.keys(params).length > 0) {
+    const search = new URLSearchParams();
+    for (const [key, value] of Object.entries(params)) {
+      if (value === undefined || value === null) continue;
+      search.set(key, String(value));
+    }
+    const qs = search.toString();
+    if (qs) fullUrl += (fullUrl.includes("?") ? "&" : "?") + qs;
+  }
 
-  const response = await fetch(`${getApiBaseUrl()}${path}`, {
+  const response = await fetch(fullUrl, {
     method,
     headers,
-    body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
+    body: data !== undefined ? JSON.stringify(data) : undefined,
+    signal,
   });
 
   if (!response.ok) {
@@ -55,5 +84,32 @@ export async function klubFetch<T>(
     return undefined as T;
   }
 
-  return (await response.json()) as T;
+  const text = await response.text();
+  if (!text) return undefined as T;
+  return JSON.parse(text) as T;
+}
+
+/** @deprecated Używaj apiMutator / klienta Orval. */
+export type KlubFetchOptions = {
+  method?: string;
+  body?: unknown;
+  token?: string | null;
+  viewAsUserId?: string | null;
+  auth?: boolean;
+};
+
+/** @deprecated Używaj wygenerowanych funkcji Orval. */
+export async function klubFetch<T>(
+  path: string,
+  options: KlubFetchOptions = {},
+): Promise<T> {
+  return apiMutator<T>({
+    url: path,
+    method:
+      options.method ??
+      (options.body !== undefined ? "POST" : "GET"),
+    data: options.body,
+    auth: options.auth ?? true,
+    viewAsUserId: options.viewAsUserId,
+  });
 }

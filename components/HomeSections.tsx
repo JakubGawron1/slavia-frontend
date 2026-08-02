@@ -107,35 +107,54 @@ const ranking = [
   },
 ];
 
-const tools = [
+const BASE_TOOLS = [
   {
     href: "/kalkulator-sinclair",
     title: "Kalkulator Sinclair",
     text: "Przelicz dwubój na punkty Sinclair (wzór 2025–2028).",
+    flag: null,
   },
   {
     href: "/kalendarz",
     title: "Kalendarz",
     text: "Treningi, zawody i terminy klubowe w jednym miejscu.",
+    flag: null,
   },
   {
     href: "/blog",
     title: "Aktualności",
     text: "Relacje z zawodów, nowinki organizacyjne i życie sekcji.",
+    flag: "blog" as const,
   },
   {
     href: "/ogloszenia",
     title: "Tablica ogłoszeń",
     text: "Komunikaty dla zawodników, rodziców i kadry.",
+    flag: "ogloszenia" as const,
   },
   {
     href: "/logowanie",
     title: "Strefa klubowa",
     text: "Logowanie dla zawodników, trenerów i administratorów.",
+    flag: null,
   },
 ];
 
-export function HomeSections() {
+type HomeSectionsProps = {
+  blogEnabled?: boolean;
+  ogloszeniaEnabled?: boolean;
+};
+
+export function HomeSections({
+  blogEnabled = true,
+  ogloszeniaEnabled = true,
+}: HomeSectionsProps) {
+  const tools = BASE_TOOLS.filter((tool) => {
+    if (tool.flag === "blog") return blogEnabled;
+    if (tool.flag === "ogloszenia") return ogloszeniaEnabled;
+    return true;
+  });
+
   return (
     <>
       <section className="border-b border-mist bg-paper">
@@ -305,10 +324,10 @@ export function HomeSections() {
 
           <div className="mt-8">
             <Link
-              href="/kalkulator-sinclair"
+              href="/zawodnicy"
               className="inline-flex items-center gap-2 font-display text-sm tracking-[0.14em] text-ink uppercase transition-colors hover:text-brand"
             >
-              Przelicz swój wynik
+              Zobacz zawodników
               <span aria-hidden="true">→</span>
             </Link>
           </div>
@@ -409,12 +428,14 @@ export function HomeSections() {
               trochę popracować.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                href="/ogloszenia"
-                className="bg-brand px-6 py-3 font-display text-sm tracking-[0.12em] uppercase transition-colors hover:bg-brand-deep"
-              >
-                Umów pierwszy trening
-              </Link>
+              {ogloszeniaEnabled ? (
+                <Link
+                  href="/ogloszenia"
+                  className="bg-brand px-6 py-3 font-display text-sm tracking-[0.12em] uppercase transition-colors hover:bg-brand-deep"
+                >
+                  Umów pierwszy trening
+                </Link>
+              ) : null}
               <Link
                 href="/kalendarz"
                 className="border border-paper/30 px-6 py-3 font-display text-sm tracking-[0.12em] uppercase transition-colors hover:border-paper hover:bg-paper/10"

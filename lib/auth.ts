@@ -1,18 +1,9 @@
-export type Role = "zawodnik" | "trener" | "admin" | "superadmin";
+import type { LoginResponse, PublicUser, Role } from "@/lib/api/generated/models";
 
-export type AuthUser = {
-  id: string;
-  email: string;
-  display_name: string;
-  roles: Role[];
-};
+export type { LoginResponse, Role };
 
-export type LoginResponse = {
-  token: string;
-  token_type: string;
-  expires_in_hours: number;
-  user: AuthUser;
-};
+/** Zalogowany użytkownik — zgodny ze schematem `PublicUser` z backendu. */
+export type AuthUser = PublicUser;
 
 const TOKEN_KEY = "slavia_auth_token";
 const USER_KEY = "slavia_auth_user";
@@ -48,6 +39,42 @@ export function storeSession(token: string, user: AuthUser) {
 export function clearSession() {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
+}
+
+/** Ustawia localStorage + HttpOnly cookie (dla proxy). */
+export async function establishSession(
+  token: string,
+  user: AuthUser,
+  expiresInHours = 72,
+): Promise<void> {
+  storeSession(token, user);
+  await fetch("/api/auth/session", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify({ token, expires_in_hours: expiresInHours }),
+  });
+}
+
+/** Czyści localStorage + cookie sesji. */
+export async function destroySession(): Promise<void> {
+  clearSession();
+  try {
+    await fetch("/api/auth/session", { method: "DELETE" });
+  } catch {
+    /* ignore network */
+  }
+}
+
+/** Synchronizuje cookie dla już istniejącej sesji localStorage (migracja). */
+export async function syncSessionCookie(
+  token: string,
+  expiresInHours = 72,
+): Promise<void> {
+  await fetch("/api/auth/session", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify({ token, expires_in_hours: expiresInHours }),
+  });
 }
 
 export function hasRole(user: AuthUser | null, role: Role): boolean {

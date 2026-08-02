@@ -1,27 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import type {
+  AttendanceRecord,
+  AttendanceSession,
+  PublicUser,
+} from "@/lib/api/generated/models";
 import { klubFetch } from "@/lib/klub-api";
 import { QrCodeImage } from "@/components/QrCodeImage";
-
-type AttendanceSession = {
-  token: string;
-  label: string;
-  refreshed_at: string;
-};
-
-type AttendanceRecord = {
-  id: string;
-  user_id: string;
-  display_name: string;
-  checked_at: string;
-};
-
-type PublicUser = {
-  id: string;
-  display_name: string;
-  roles: string[];
-};
 
 function dayKey(iso: string) {
   return iso.slice(0, 10);

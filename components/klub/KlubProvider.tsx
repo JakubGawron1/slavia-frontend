@@ -11,12 +11,13 @@ import {
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  clearSession,
+  destroySession,
   fetchMe,
   getStoredToken,
   getStoredUser,
   hasAnyRole,
   storeSession,
+  syncSessionCookie,
   type AuthUser,
   type Role,
 } from "@/lib/auth";
@@ -51,7 +52,8 @@ type KlubContextValue = {
   mobileNavOpen: boolean;
   setMobileNavOpen: (open: boolean) => void;
   logout: () => void;
-  refreshUser: () => Promise<void>;
+  /** Bez argumentu — pobiera /me. Z obiektem — odświeża lokalny stan (np. po PATCH). */
+  refreshUser: (next?: AuthUser) => Promise<void>;
 };
 
 const KlubContext = createContext<KlubContextValue | null>(null);
@@ -100,7 +102,15 @@ export function KlubProvider({ children }: { children: ReactNode }) {
   const [viewAs, setViewAsState] = useState<ViewAsState>(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
-  const refreshUser = useCallback(async () => {
+  const refreshUser = useCallback(async (next?: AuthUser) => {
+    if (next) {
+      const token = getStoredToken();
+      if (token) storeSession(token, next);
+      setUser(next);
+      setActiveRoleState(readActiveRole(next.roles));
+      setError(null);
+      return;
+    }
     const token = getStoredToken();
     if (!token) {
       router.replace("/logowanie");
@@ -139,6 +149,7 @@ export function KlubProvider({ children }: { children: ReactNode }) {
           return;
         }
         storeSession(token, me);
+        void syncSessionCookie(token);
         setUser(me);
         setActiveRoleState(readActiveRole(me.roles));
         setCollapsed(readCollapsed());
@@ -146,7 +157,7 @@ export function KlubProvider({ children }: { children: ReactNode }) {
         setError(null);
       } catch (err) {
         if (cancelled) return;
-        clearSession();
+        await destroySession();
         setError(err instanceof Error ? err.message : "Sesja wygasła.");
         router.replace("/logowanie");
       } finally {
@@ -198,10 +209,12 @@ export function KlubProvider({ children }: { children: ReactNode }) {
   }, [setViewAs]);
 
   const logout = useCallback(() => {
-    clearSession();
-    localStorage.removeItem(ACTIVE_ROLE_KEY);
-    localStorage.removeItem(VIEW_AS_KEY);
-    router.push("/logowanie");
+    void destroySession().then(() => {
+      localStorage.removeItem(ACTIVE_ROLE_KEY);
+      localStorage.removeItem(VIEW_AS_KEY);
+      router.push("/logowanie");
+      router.refresh();
+    });
   }, [router]);
 
   const value = useMemo(

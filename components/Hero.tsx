@@ -1,7 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export function Hero() {
+type HeroProps = {
+  blogEnabled?: boolean;
+};
+
+export function Hero({ blogEnabled = true }: HeroProps) {
   return (
     <section className="relative isolate min-h-[100svh] overflow-hidden bg-ink text-paper">
       <div className="absolute inset-0 -z-10">
@@ -39,12 +43,14 @@ export function Hero() {
           >
             Kalendarz
           </Link>
-          <Link
-            href="/blog"
-            className="border border-paper/40 px-7 py-3.5 font-display text-sm tracking-[0.12em] text-paper uppercase transition-colors hover:border-paper hover:bg-paper/10"
-          >
-            Aktualności
-          </Link>
+          {blogEnabled ? (
+            <Link
+              href="/blog"
+              className="border border-paper/40 px-7 py-3.5 font-display text-sm tracking-[0.12em] text-paper uppercase transition-colors hover:border-paper hover:bg-paper/10"
+            >
+              Aktualności
+            </Link>
+          ) : null}
           <Link
             href="/logowanie"
             className="border border-paper/25 px-7 py-3.5 font-display text-sm tracking-[0.12em] text-paper/90 uppercase transition-colors hover:border-paper hover:bg-paper/10"

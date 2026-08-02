@@ -1,40 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import type {
+  PlanProgressEntry,
+  TrainingPlan,
+  TrainingPlanProgress,
+} from "@/lib/api/generated/models";
 import { klubFetch } from "@/lib/klub-api";
-
-type PlanExercise = {
-  id: string;
-  name: string;
-  sets: number | null;
-  reps: string | null;
-  load_kg: number | null;
-  notes: string | null;
-};
-
-type TrainingPlan = {
-  id: string;
-  title: string;
-  description: string | null;
-  week_label: string | null;
-  exercises: PlanExercise[];
-};
-
-type ProgressEntry = {
-  exercise_id: string;
-  completed: boolean;
-  athlete_note: string | null;
-  actual_load_kg: number | null;
-};
-
-type PlanProgress = {
-  entries: ProgressEntry[];
-};
 
 export default function AthletePlansPage() {
   const [plans, setPlans] = useState<TrainingPlan[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [progress, setProgress] = useState<Record<string, ProgressEntry>>({});
+  const [progress, setProgress] = useState<Record<string, PlanProgressEntry>>({});
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
 
@@ -57,10 +34,10 @@ export default function AthletePlansPage() {
     if (!activeId) return;
     void (async () => {
       try {
-        const p = await klubFetch<PlanProgress>(
+        const p = await klubFetch<TrainingPlanProgress>(
           `/api/plans/${activeId}/progress`,
         );
-        const map: Record<string, ProgressEntry> = {};
+        const map: Record<string, PlanProgressEntry> = {};
         for (const e of p.entries) map[e.exercise_id] = e;
         setProgress(map);
       } catch (err) {
