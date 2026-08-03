@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function KontaktPage() {
   return (
-    <section className="relative isolate min-h-[100svh] overflow-hidden bg-ink text-paper">
+    <section className="relative isolate min-h-[100svh] overflow-hidden bg-chrome text-paper">
       <div
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_25%_20%,rgba(200,16,46,0.22)_0%,transparent_48%),radial-gradient(ellipse_at_80%_75%,rgba(74,85,96,0.3)_0%,transparent_50%),linear-gradient(160deg,#0e1014_0%,#1a1f26_55%,#12151a_100%)]"
         aria-hidden="true"

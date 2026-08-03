@@ -7,6 +7,7 @@ import {
   useUpdateContactMessage,
 } from "@/lib/api/generated/contact/contact";
 import type { ContactMessage } from "@/lib/api/generated/models";
+import { useToast } from "@/components/toast/ToastProvider";
 
 function formatDate(iso: string): string {
   try {
@@ -20,6 +21,7 @@ function formatDate(iso: string): string {
 }
 
 export default function WiadomosciPage() {
+  const toast = useToast();
   const [filter, setFilter] = useState<"all" | "unread" | "read">("all");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -68,10 +70,12 @@ export default function WiadomosciPage() {
         id: message.id,
         data: { read },
       });
+      toast.success(read ? "Oznaczono jako przeczytane" : "Oznaczono jako nieprzeczytane");
     } catch (err) {
-      setActionError(
-        err instanceof Error ? err.message : "Nie udało się zaktualizować.",
-      );
+      const msg =
+        err instanceof Error ? err.message : "Nie udało się zaktualizować.";
+      setActionError(msg);
+      toast.error("Skrzynka", msg);
     }
   }
 
@@ -94,11 +98,13 @@ export default function WiadomosciPage() {
     setActionError(null);
     try {
       await deleteMutation.mutateAsync({ id: message.id });
+      toast.success("Usunięto wiadomość", message.subject);
       setSelectedId((current) => (current === message.id ? null : current));
     } catch (err) {
-      setActionError(
-        err instanceof Error ? err.message : "Nie udało się usunąć wiadomości.",
-      );
+      const msg =
+        err instanceof Error ? err.message : "Nie udało się usunąć wiadomości.";
+      setActionError(msg);
+      toast.error("Skrzynka", msg);
     }
   }
 

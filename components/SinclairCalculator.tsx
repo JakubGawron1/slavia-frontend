@@ -17,6 +17,7 @@ function parsePositive(raw: string): number {
   return Number.isFinite(value) && value > 0 ? value : Number.NaN;
 }
 
+/** Kalkulator Sinclair — UI paneli (zawodnik / klub). */
 export function SinclairCalculator() {
   const sexId = useId();
   const bwId = useId();
@@ -37,20 +38,23 @@ export function SinclairCalculator() {
   const hasTotal = Number.isFinite(tot);
   const ready = hasBodyweight && hasTotal;
 
+  const field =
+    "panel-control w-full border border-paper/20 bg-chrome/40 px-4 py-3 pr-14 text-sm text-paper outline-none transition-colors placeholder:text-paper/35 focus:border-brand";
+  const label =
+    "font-display text-[10px] tracking-[0.14em] text-paper/45 uppercase";
+
   return (
-    <div className="grid gap-8 lg:grid-cols-2 lg:gap-0">
-      <div className="border border-mist bg-paper p-6 md:p-8">
-        <p className="font-display text-xs tracking-[0.2em] text-brand uppercase">
+    <div className="grid gap-6 lg:grid-cols-2 lg:gap-0 lg:border lg:border-paper/10">
+      <div className="border border-paper/10 bg-chrome/30 p-5 md:p-6 lg:border-0 lg:border-r lg:border-paper/10">
+        <p className="font-display text-xs tracking-[0.16em] text-brand uppercase">
           Dane
         </p>
-        <h2 className="mt-2 font-display text-2xl tracking-wide text-ink uppercase md:text-3xl">
+        <h2 className="mt-2 font-display text-xl tracking-wide text-paper uppercase md:text-2xl">
           Wprowadź wynik
         </h2>
 
-        <fieldset className="mt-8">
-          <legend className="font-display text-xs tracking-[0.16em] text-steel-soft uppercase">
-            Płeć
-          </legend>
+        <fieldset className="mt-6">
+          <legend className={label}>Płeć</legend>
           <div
             className="mt-3 grid grid-cols-2 gap-2"
             role="radiogroup"
@@ -73,10 +77,10 @@ export function SinclairCalculator() {
                   role="radio"
                   aria-checked={active}
                   onClick={() => setSex(option.value)}
-                  className={`border px-4 py-3 font-display text-sm tracking-[0.1em] uppercase transition-colors ${
+                  className={`panel-control border px-4 py-3 font-display text-xs tracking-[0.1em] uppercase transition-colors ${
                     active
-                      ? "border-brand bg-brand text-paper"
-                      : "border-mist bg-background text-steel hover:border-steel-soft"
+                      ? "border-brand bg-brand/20 text-paper"
+                      : "border-paper/20 bg-chrome/40 text-paper/70 hover:border-paper/40"
                   }`}
                 >
                   {option.label}
@@ -86,11 +90,8 @@ export function SinclairCalculator() {
           </div>
         </fieldset>
 
-        <div className="mt-6">
-          <label
-            htmlFor={bwId}
-            className="font-display text-xs tracking-[0.16em] text-steel-soft uppercase"
-          >
+        <div className="mt-5">
+          <label htmlFor={bwId} className={label}>
             Masa ciała z ważenia
           </label>
           <div className="relative mt-2">
@@ -100,22 +101,19 @@ export function SinclairCalculator() {
               value={bodyweight}
               onChange={(e) => setBodyweight(e.target.value)}
               placeholder="np. 81.4"
-              className="w-full border border-mist bg-background px-4 py-3.5 pr-14 text-ink outline-none transition-[border-color] placeholder:text-steel-soft/50 focus:border-brand"
+              className={field}
             />
-            <span className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-sm text-steel-soft">
+            <span className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-sm text-paper/40">
               kg
             </span>
           </div>
-          <p className="mt-2 text-sm text-steel-soft">
+          <p className="mt-2 text-xs text-paper/45">
             Rzeczywista masa ciała z zawodów
           </p>
         </div>
 
-        <div className="mt-6">
-          <label
-            htmlFor={totalId}
-            className="font-display text-xs tracking-[0.16em] text-steel-soft uppercase"
-          >
+        <div className="mt-5">
+          <label htmlFor={totalId} className={label}>
             Dwubój (total)
           </label>
           <div className="relative mt-2">
@@ -125,85 +123,82 @@ export function SinclairCalculator() {
               value={total}
               onChange={(e) => setTotal(e.target.value)}
               placeholder="np. 265"
-              className="w-full border border-mist bg-background px-4 py-3.5 pr-14 text-ink outline-none transition-[border-color] placeholder:text-steel-soft/50 focus:border-brand"
+              className={field}
             />
-            <span className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-sm text-steel-soft">
+            <span className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-sm text-paper/40">
               kg
             </span>
           </div>
-          <p className="mt-2 text-sm text-steel-soft">
+          <p className="mt-2 text-xs text-paper/45">
             Suma najlepszego rwania i podrzutu
           </p>
         </div>
 
-        <p className="mt-8 border-t border-mist pt-5 font-mono text-xs leading-relaxed text-steel-soft">
-          Stałe {sex === "male" ? "mężczyźni" : "kobiety"}: A ={" "}
-          {constants.A}, b = {constants.b} kg
+        <p className="mt-6 border-t border-paper/10 pt-4 font-mono text-[11px] leading-relaxed text-paper/40">
+          Stałe {sex === "male" ? "mężczyźni" : "kobiety"}: A = {constants.A}, b
+          = {constants.b} kg
         </p>
       </div>
 
-      <div className="border border-mist border-t-0 bg-ink text-paper lg:border-t lg:border-l-0">
-        <div className="p-6 md:p-8">
-          <p className="font-display text-xs tracking-[0.2em] text-brand uppercase">
-            Wynik
-          </p>
-          <h2 className="mt-2 font-display text-2xl tracking-wide uppercase md:text-3xl">
-            Punkty Sinclair
-          </h2>
+      <div className="border border-paper/10 bg-chrome/50 p-5 md:p-6 lg:border-0">
+        <p className="font-display text-xs tracking-[0.16em] text-brand uppercase">
+          Wynik
+        </p>
+        <h2 className="mt-2 font-display text-xl tracking-wide text-paper uppercase md:text-2xl">
+          Punkty Sinclair
+        </h2>
 
-          <dl className="mt-10 space-y-8">
-            <div>
-              <dt className="font-display text-xs tracking-[0.16em] text-paper/55 uppercase">
-                Współczynnik Sinclair
-              </dt>
-              <dd
-                className={`mt-2 font-display text-4xl tracking-tight md:text-5xl ${
-                  hasBodyweight ? "text-paper" : "text-paper/30"
-                }`}
-                aria-live="polite"
-              >
-                {hasBodyweight ? formatCoefficient(coefficient) : "—"}
-              </dd>
-            </div>
-
-            <div className="border-t border-paper/15 pt-8">
-              <dt className="font-display text-xs tracking-[0.16em] text-paper/55 uppercase">
-                Total Sinclair
-              </dt>
-              <dd
-                className={`mt-2 font-display text-5xl tracking-tight text-brand md:text-6xl ${
-                  ready ? "" : "opacity-40"
-                }`}
-                aria-live="polite"
-              >
-                {ready ? formatPoints(points) : "—"}
-                <span className="ml-2 text-lg tracking-[0.12em] text-paper/50 uppercase">
-                  pkt
-                </span>
-              </dd>
-            </div>
-          </dl>
-
-          <div className="mt-10 space-y-3 border-t border-paper/15 pt-6 text-sm leading-relaxed text-paper/65">
-            {hasBodyweight && bw >= constants.b ? (
-              <p>
-                Masa ciała ≥ b ({constants.b} kg) — współczynnik wynosi{" "}
-                <strong className="font-medium text-paper">1</strong>, bez
-                podwyższenia wyniku względem rzeczywistego totalu.
-              </p>
-            ) : (
-              <p>
-                Dla mas niższych niż b stosuje się wzór:{" "}
-                <span className="font-mono text-paper/80">
-                  10^(A × log₁₀(x/b)²)
-                </span>
-              </p>
-            )}
-            <p>
-              Total Sinclair = dwubój × współczynnik. Wynik przelicza się na
-              żywo — bez przycisku.
-            </p>
+        <dl className="mt-8 space-y-6">
+          <div>
+            <dt className="font-display text-[10px] tracking-[0.14em] text-paper/45 uppercase">
+              Współczynnik Sinclair
+            </dt>
+            <dd
+              className={`mt-2 font-display text-3xl tracking-tight md:text-4xl ${
+                hasBodyweight ? "text-paper" : "text-paper/25"
+              }`}
+              aria-live="polite"
+            >
+              {hasBodyweight ? formatCoefficient(coefficient) : "—"}
+            </dd>
           </div>
+
+          <div className="border-t border-paper/10 pt-6">
+            <dt className="font-display text-[10px] tracking-[0.14em] text-paper/45 uppercase">
+              Total Sinclair
+            </dt>
+            <dd
+              className={`mt-2 font-display text-4xl tracking-tight text-brand md:text-5xl ${
+                ready ? "" : "opacity-40"
+              }`}
+              aria-live="polite"
+            >
+              {ready ? formatPoints(points) : "—"}
+              <span className="ml-2 text-sm tracking-[0.12em] text-paper/45 uppercase">
+                pkt
+              </span>
+            </dd>
+          </div>
+        </dl>
+
+        <div className="mt-8 space-y-2 border-t border-paper/10 pt-5 text-xs leading-relaxed text-paper/50">
+          {hasBodyweight && bw >= constants.b ? (
+            <p>
+              Masa ciała ≥ b ({constants.b} kg) — współczynnik wynosi 1.
+            </p>
+          ) : (
+            <p>
+              Dla mas niższych niż b:{" "}
+              <span className="font-mono text-paper/65">
+                10^(A × log₁₀(x/b)²)
+              </span>
+            </p>
+          )}
+          <p>Total Sinclair = dwubój × współczynnik. Przelicza się na żywo.</p>
+          <p>
+            Okres 2025–2028 (jak PodnoszenieCiężarów.pl): mężczyźni b = 201 kg,
+            kobiety b = 164 kg.
+          </p>
         </div>
       </div>
     </div>

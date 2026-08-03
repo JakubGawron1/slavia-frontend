@@ -6,6 +6,7 @@ import type {
   ResultStatus,
 } from "@/lib/api/generated/models";
 import { klubFetch } from "@/lib/klub-api";
+import { useToast } from "@/components/toast/ToastProvider";
 
 const STATUS: Record<ResultStatus, string> = {
   pending: "Oczekuje",
@@ -15,6 +16,7 @@ const STATUS: Record<ResultStatus, string> = {
 };
 
 export default function WynikiPage() {
+  const toast = useToast();
   const [results, setResults] = useState<CompetitionResult[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [kind, setKind] = useState<"competition" | "training">("competition");
@@ -61,9 +63,12 @@ export default function WynikiPage() {
       setBodyweight("");
       setVenue("");
       setCategory("");
+      toast.success("Wysłano wynik do weryfikacji", eventName);
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Nie udało się wysłać");
+      const msg = err instanceof Error ? err.message : "Nie udało się wysłać";
+      setError(msg);
+      toast.error("Wysyłanie wyniku", msg);
     }
   }
 
@@ -114,7 +119,7 @@ export default function WynikiPage() {
           </button>
         </div>
         <input
-          className="border border-paper/20 bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand sm:col-span-2"
+          className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand sm:col-span-2"
           placeholder={
             kind === "competition" ? "Nazwa zawodów" : "Nazwa / opis treningu"
           }
@@ -123,7 +128,7 @@ export default function WynikiPage() {
           required
         />
         <input
-          className="border border-paper/20 bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand"
+          className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
           placeholder="Rwanie (kg)"
           type="number"
           step="0.5"
@@ -131,7 +136,7 @@ export default function WynikiPage() {
           onChange={(e) => setSnatch(e.target.value)}
         />
         <input
-          className="border border-paper/20 bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand"
+          className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
           placeholder="Podrzut (kg)"
           type="number"
           step="0.5"
@@ -141,7 +146,7 @@ export default function WynikiPage() {
         {kind === "competition" ? (
           <>
             <input
-              className="border border-paper/20 bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand"
+              className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
               placeholder="Masa ciała na zawodach (kg)"
               type="number"
               step="0.1"
@@ -149,13 +154,13 @@ export default function WynikiPage() {
               onChange={(e) => setBodyweight(e.target.value)}
             />
             <input
-              className="border border-paper/20 bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand"
+              className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
               placeholder="Kategoria wagowa"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
             />
             <input
-              className="border border-paper/20 bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand sm:col-span-2"
+              className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand sm:col-span-2"
               placeholder="Miejsce zawodów"
               value={venue}
               onChange={(e) => setVenue(e.target.value)}

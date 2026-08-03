@@ -1,16 +1,20 @@
 {
   "name": "slavia-frontend",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "gen:api": "orval --config orval.config.ts"
+    "gen:api": "orval --config orval.config.ts",
+    "sync:version": "node ../scripts/sync-version.mjs",
+    "sync:changelog": "node ../scripts/sync-changelog.mjs"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.101.4",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "html5-qrcode": "^2.3.8",
     "next": "16.2.12",
     "qrcode": "^1.5.4",

@@ -7,8 +7,10 @@ import type {
   TrainingPlanProgress,
 } from "@/lib/api/generated/models";
 import { klubFetch } from "@/lib/klub-api";
+import { useToast } from "@/components/toast/ToastProvider";
 
 export default function AthletePlansPage() {
+  const toast = useToast();
   const [plans, setPlans] = useState<TrainingPlan[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [progress, setProgress] = useState<Record<string, PlanProgressEntry>>({});
@@ -105,8 +107,11 @@ export default function AthletePlansPage() {
         body: { entries: Object.values(progress) },
       });
       setSaved(true);
+      toast.success("Zapisano postęp treningu");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Zapis nieudany");
+      const msg = err instanceof Error ? err.message : "Zapis nieudany";
+      setError(msg);
+      toast.error("Postęp planu", msg);
     }
   }
 
@@ -185,7 +190,7 @@ export default function AthletePlansPage() {
                   </label>
                   <div className="mt-3 grid gap-2 sm:grid-cols-2">
                     <input
-                      className="border border-paper/20 bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand"
+                      className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
                       placeholder="Faktyczne obciążenie (kg)"
                       type="number"
                       step="0.5"
@@ -193,7 +198,7 @@ export default function AthletePlansPage() {
                       onChange={(e) => setLoad(ex.id, e.target.value)}
                     />
                     <input
-                      className="border border-paper/20 bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand"
+                      className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
                       placeholder="Notatka"
                       value={entry?.athlete_note ?? ""}
                       onChange={(e) => setNote(ex.id, e.target.value)}

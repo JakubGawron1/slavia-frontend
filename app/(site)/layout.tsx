@@ -1,5 +1,6 @@
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { SiteThemeProvider } from "@/components/SiteThemeProvider";
 
 export default function SiteLayout({
   children,
@@ -7,10 +8,12 @@ export default function SiteLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="flex min-h-full flex-1 flex-col">
-      <Header />
-      <main className="flex-1">{children}</main>
-      <Footer />
-    </div>
+    <SiteThemeProvider>
+      <div className="flex min-h-full flex-1 flex-col">
+        <Header />
+        <main className="flex flex-1 flex-col">{children}</main>
+        <Footer />
+      </div>
+    </SiteThemeProvider>
   );
 }

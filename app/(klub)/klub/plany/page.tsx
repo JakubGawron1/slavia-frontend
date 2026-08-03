@@ -7,6 +7,7 @@ import type {
   TrainingPlan,
 } from "@/lib/api/generated/models";
 import { klubFetch } from "@/lib/klub-api";
+import { useToast } from "@/components/toast/ToastProvider";
 
 function emptyEx(): PlanExercise {
   return {
@@ -20,6 +21,7 @@ function emptyEx(): PlanExercise {
 }
 
 export default function StaffPlansPage() {
+  const toast = useToast();
   const [plans, setPlans] = useState<TrainingPlan[]>([]);
   const [users, setUsers] = useState<PublicUser[]>([]);
   const [editing, setEditing] = useState<TrainingPlan | null>(null);
@@ -70,13 +72,17 @@ export default function StaffPlansPage() {
       };
       if (editing.id) {
         await klubFetch(`/api/plans/${editing.id}`, { method: "PATCH", body });
+        toast.success("Zapisano plan", editing.title);
       } else {
         await klubFetch("/api/plans", { method: "POST", body });
+        toast.success("Dodano plan", editing.title);
       }
       setEditing(null);
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Zapis nieudany");
+      const msg = err instanceof Error ? err.message : "Zapis nieudany";
+      setError(msg);
+      toast.error("Plan treningowy", msg);
     }
   }
 
@@ -84,9 +90,12 @@ export default function StaffPlansPage() {
     if (!confirm("Usunąć plan?")) return;
     try {
       await klubFetch(`/api/plans/${id}`, { method: "DELETE" });
+      toast.success("Usunięto plan");
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Usuwanie nieudane");
+      const msg = err instanceof Error ? err.message : "Usuwanie nieudane";
+      setError(msg);
+      toast.error("Usuwanie planu", msg);
     }
   }
 
@@ -136,14 +145,14 @@ export default function StaffPlansPage() {
           className="space-y-4 border border-paper/10 bg-paper/[0.03] p-4"
         >
           <input
-            className="w-full border border-paper/20 bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand"
+            className="w-full border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
             placeholder="Tytuł"
             value={editing.title}
             onChange={(e) => setEditing({ ...editing, title: e.target.value })}
             required
           />
           <input
-            className="w-full border border-paper/20 bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand"
+            className="w-full border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
             placeholder="Etykieta tygodnia (opcjonalnie)"
             value={editing.week_label ?? ""}
             onChange={(e) =>
@@ -151,7 +160,7 @@ export default function StaffPlansPage() {
             }
           />
           <textarea
-            className="w-full border border-paper/20 bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand"
+            className="w-full border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
             placeholder="Opis"
             rows={2}
             value={editing.description ?? ""}
@@ -190,7 +199,7 @@ export default function StaffPlansPage() {
             {editing.exercises.map((ex, i) => (
               <div key={ex.id} className="grid gap-2 border border-paper/10 p-3 sm:grid-cols-4">
                 <input
-                  className="border border-paper/20 bg-ink/40 px-2 py-1.5 text-sm sm:col-span-2"
+                  className="border border-paper/20 bg-chrome/40 px-2 py-1.5 text-sm sm:col-span-2"
                   placeholder="Nazwa"
                   value={ex.name}
                   onChange={(e) => {
@@ -201,7 +210,7 @@ export default function StaffPlansPage() {
                   required
                 />
                 <input
-                  className="border border-paper/20 bg-ink/40 px-2 py-1.5 text-sm"
+                  className="border border-paper/20 bg-chrome/40 px-2 py-1.5 text-sm"
                   placeholder="Serie"
                   type="number"
                   value={ex.sets ?? ""}
@@ -215,7 +224,7 @@ export default function StaffPlansPage() {
                   }}
                 />
                 <input
-                  className="border border-paper/20 bg-ink/40 px-2 py-1.5 text-sm"
+                  className="border border-paper/20 bg-chrome/40 px-2 py-1.5 text-sm"
                   placeholder="Powtórzenia"
                   value={ex.reps ?? ""}
                   onChange={(e) => {
@@ -225,7 +234,7 @@ export default function StaffPlansPage() {
                   }}
                 />
                 <input
-                  className="border border-paper/20 bg-ink/40 px-2 py-1.5 text-sm"
+                  className="border border-paper/20 bg-chrome/40 px-2 py-1.5 text-sm"
                   placeholder="Kg"
                   type="number"
                   step="0.5"

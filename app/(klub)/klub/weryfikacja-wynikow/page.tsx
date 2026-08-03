@@ -8,6 +8,7 @@ import type {
 } from "@/lib/api/generated/models";
 import { klubFetch } from "@/lib/klub-api";
 import { useKlub } from "@/components/klub/KlubProvider";
+import { useToast } from "@/components/toast/ToastProvider";
 
 const STATUS_LABEL: Record<ResultStatus, string> = {
   pending: "Oczekuje",
@@ -17,9 +18,10 @@ const STATUS_LABEL: Record<ResultStatus, string> = {
 };
 
 const inputClass =
-  "border border-paper/20 bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand";
+  "border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand";
 
 export default function WeryfikacjaPage() {
+  const toast = useToast();
   const { viewAs } = useKlub();
   const [results, setResults] = useState<CompetitionResult[]>([]);
   const [profiles, setProfiles] = useState<AthleteProfile[]>([]);
@@ -80,9 +82,19 @@ export default function WeryfikacjaPage() {
           reviewer_note: notes[id] || null,
         },
       });
+      toast.success(
+        status === "accepted"
+          ? "Zaakceptowano wynik"
+          : status === "rejected"
+            ? "Odrzucono wynik"
+            : "Zaktualizowano wynik",
+        STATUS_LABEL[status],
+      );
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Błąd weryfikacji");
+      const msg = err instanceof Error ? err.message : "Błąd weryfikacji";
+      setError(msg);
+      toast.error("Weryfikacja", msg);
     }
   }
 
@@ -91,6 +103,7 @@ export default function WeryfikacjaPage() {
     setError(null);
     if (!selectedProfile) {
       setError("Wybierz profil zawodnika.");
+      toast.error("Wynik", "Wybierz profil zawodnika.");
       return;
     }
     setSaving(true);
@@ -113,6 +126,7 @@ export default function WeryfikacjaPage() {
           auto_accept: true,
         },
       });
+      toast.success("Dodano wynik", selectedProfile.display_name);
       setProfileId("");
       setEventName("");
       setSnatch("");
@@ -122,7 +136,10 @@ export default function WeryfikacjaPage() {
       setVenue("");
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Nie udało się dodać wyniku");
+      const msg =
+        err instanceof Error ? err.message : "Nie udało się dodać wyniku";
+      setError(msg);
+      toast.error("Dodawanie wyniku", msg);
     } finally {
       setSaving(false);
     }
@@ -271,7 +288,7 @@ export default function WeryfikacjaPage() {
 
               <div className="mt-4 space-y-3">
                 <textarea
-                  className="w-full border border-paper/20 bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand"
+                  className="w-full border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
                   rows={2}
                   placeholder="Notatka dla zawodnika (opcjonalnie)"
                   value={notes[r.id] ?? ""}

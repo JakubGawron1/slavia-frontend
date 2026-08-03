@@ -59,7 +59,7 @@ export function ErrorScene({
     Boolean(technical?.message?.trim()) || Boolean(technical?.digest?.trim());
 
   return (
-    <div className="relative isolate flex min-h-[100svh] flex-1 flex-col overflow-hidden bg-ink text-paper">
+    <div className="relative isolate flex min-h-[100svh] flex-1 flex-col overflow-hidden bg-chrome text-paper">
       <div
         className="pointer-events-none absolute inset-0 -z-10"
         aria-hidden="true"

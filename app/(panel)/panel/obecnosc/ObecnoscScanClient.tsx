@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Html5Qrcode } from "html5-qrcode";
 import type { AttendanceRecord } from "@/lib/api/generated/models";
 import { klubFetch } from "@/lib/klub-api";
+import { useToast } from "@/components/toast/ToastProvider";
 
 function extractToken(raw: string): string {
   try {
@@ -18,6 +19,7 @@ function extractToken(raw: string): string {
 
 export default function ObecnoscScanClient() {
   const search = useSearchParams();
+  const toast = useToast();
   const scannerRegionId = useId().replace(/:/g, "");
   const [token, setToken] = useState("");
   const [message, setMessage] = useState<string | null>(null);
@@ -57,9 +59,18 @@ export default function ObecnoscScanClient() {
         body: { token: token.trim() },
       });
       setMessage("Obecność zapisana.");
+      toast.success("Obecność zapisana");
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Check-in nieudany");
+      const msg = err instanceof Error ? err.message : "Check-in nieudany";
+      // Komunikat „brak treningu” — bez wzmianki o powiadomieniu kadry
+      if (msg.toLowerCase().includes("nie ma treningu")) {
+        setMessage(msg);
+        toast.info("Brak treningu", msg);
+      } else {
+        setError(msg);
+        toast.error("Check-in nieudany", msg);
+      }
     }
   }
 
@@ -116,7 +127,7 @@ export default function ObecnoscScanClient() {
           Obecność
         </h1>
         <p className="mt-2 text-sm text-paper/55">
-          Zeskanuj kod QR u trenera albo wklej token sesji.
+          Zeskanuj stały kod QR u trenera albo wklej token sesji.
         </p>
       </div>
 
@@ -133,7 +144,7 @@ export default function ObecnoscScanClient() {
 
       <form onSubmit={checkIn} className="space-y-3 border border-paper/10 p-4">
         <input
-          className="w-full border border-paper/20 bg-ink/40 px-3 py-2 font-mono text-sm outline-none focus:border-brand"
+          className="w-full border border-paper/20 bg-chrome/40 px-3 py-2 font-mono text-sm outline-none focus:border-brand"
           placeholder="Token z QR"
           value={token}
           onChange={(e) => setToken(e.target.value)}

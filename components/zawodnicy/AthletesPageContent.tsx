@@ -19,7 +19,7 @@ export function AthletesPageContent({ profiles, results }: Props) {
 
   return (
     <>
-      <section className="border-b border-mist bg-paper py-14 md:py-20">
+      <section className="border-b border-mist bg-surface py-14 md:py-20">
         <div className="mx-auto max-w-7xl px-5 md:px-8">
           <p className="font-display text-sm tracking-[0.22em] text-brand uppercase">
             Ranking

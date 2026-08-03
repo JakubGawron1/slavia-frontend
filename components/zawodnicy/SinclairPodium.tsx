@@ -44,7 +44,7 @@ function Photo({
           className="h-full w-full object-cover"
         />
       ) : (
-        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-steel/15 to-ink/5">
+        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-steel/15 to-chrome/5">
           <span className="font-display text-xl tracking-wide text-steel/45 uppercase sm:text-2xl">
             {initials || "?"}
           </span>

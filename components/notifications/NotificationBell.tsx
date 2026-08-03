@@ -12,6 +12,7 @@ import {
 } from "@/lib/api/generated/notifications/notifications";
 import type { Notification } from "@/lib/api/generated/models";
 import { useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/components/toast/ToastProvider";
 
 function BellIcon({ className }: { className?: string }) {
   return (
@@ -57,6 +58,7 @@ type NotificationBellProps = {
 };
 
 export function NotificationBell({ variant = "default" }: NotificationBellProps) {
+  const toast = useToast();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
@@ -124,8 +126,12 @@ export function NotificationBell({ variant = "default" }: NotificationBellProps)
     try {
       await markAllMutation.mutateAsync();
       await invalidate();
-    } catch {
-      /* ignore */
+      toast.success("Oznaczono wszystkie jako przeczytane");
+    } catch (err) {
+      toast.error(
+        "Powiadomienia",
+        err instanceof Error ? err.message : "Nie udało się oznaczyć",
+      );
     }
   }
 
@@ -165,7 +171,7 @@ export function NotificationBell({ variant = "default" }: NotificationBellProps)
         <div
           role="dialog"
           aria-label="Skrzynka powiadomień"
-          className="absolute top-full right-0 z-50 mt-2 flex w-[min(100vw-2rem,22rem)] flex-col border border-paper/15 bg-ink shadow-[0_16px_48px_rgba(0,0,0,0.45)]"
+          className="absolute top-full right-0 z-50 mt-2 flex w-[min(100vw-2rem,22rem)] flex-col border border-paper/15 bg-chrome shadow-[0_16px_48px_rgba(0,0,0,0.45)]"
         >
           <div className="flex items-center justify-between gap-2 border-b border-paper/10 px-3 py-2.5">
             <p className="font-display text-[11px] tracking-[0.14em] text-paper uppercase">

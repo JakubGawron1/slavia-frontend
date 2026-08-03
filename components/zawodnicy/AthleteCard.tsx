@@ -22,7 +22,7 @@ function Avatar({ name, photoUrl }: { name: string; photoUrl?: string | null }) 
         // eslint-disable-next-line @next/next/no-img-element
         <img src={url} alt={name} className="h-full w-full object-cover" />
       ) : (
-        <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-ink/5 via-steel/10 to-brand/10">
+        <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-chrome/5 via-steel/10 to-brand/10">
           <span className="font-display text-4xl tracking-wide text-steel/40 uppercase">
             {initials || "?"}
           </span>
@@ -32,7 +32,7 @@ function Avatar({ name, photoUrl }: { name: string; photoUrl?: string | null }) 
         </div>
       )}
       <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-ink/35 to-transparent"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-chrome/35 to-transparent"
         aria-hidden
       />
     </div>
@@ -46,7 +46,7 @@ export function AthleteCard({ athlete }: Props) {
     "Zawodnik CKS Slavia — dwubój olimpijski.";
 
   return (
-    <article className="group flex flex-col border border-mist bg-paper transition-[border-color,box-shadow] duration-300 hover:border-brand/40 hover:shadow-[0_16px_48px_rgba(14,16,20,0.06)]">
+    <article className="group flex flex-col border border-mist bg-surface transition-[border-color,box-shadow] duration-300 hover:border-brand/40 hover:shadow-[0_16px_48px_rgba(14,16,20,0.06)]">
       <Avatar name={profile.display_name} photoUrl={profile.photo_url} />
 
       <div className="flex flex-1 flex-col px-5 pt-5 pb-5">

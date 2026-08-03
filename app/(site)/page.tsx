@@ -17,13 +17,15 @@ export default async function Home() {
   const flags = await fetchPublicFlags();
   const blogEnabled = isFlagEnabled(flags, "public_blog");
   const ogloszeniaEnabled = isFlagEnabled(flags, "announcements_board");
+  const calendarEnabled = isFlagEnabled(flags, "public_calendar");
 
   return (
     <>
-      <Hero blogEnabled={blogEnabled} />
+      <Hero blogEnabled={blogEnabled} calendarEnabled={calendarEnabled} />
       <HomeSections
         blogEnabled={blogEnabled}
         ogloszeniaEnabled={ogloszeniaEnabled}
+        calendarEnabled={calendarEnabled}
       />
     </>
   );

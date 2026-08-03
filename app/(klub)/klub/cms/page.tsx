@@ -7,6 +7,7 @@ import type {
   CmsStatus,
 } from "@/lib/api/generated/models";
 import { klubFetch } from "@/lib/klub-api";
+import { useToast } from "@/components/toast/ToastProvider";
 
 function newBlock(type = "paragraph"): CmsBlock {
   return {
@@ -17,6 +18,7 @@ function newBlock(type = "paragraph"): CmsBlock {
 }
 
 export default function CmsAdminPage() {
+  const toast = useToast();
   const [pages, setPages] = useState<CmsPage[]>([]);
   const [editing, setEditing] = useState<CmsPage | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -65,13 +67,17 @@ export default function CmsAdminPage() {
           method: "PATCH",
           body,
         });
+        toast.success("Zapisano stronę", editing.title);
       } else {
         await klubFetch("/api/cms/pages", { method: "POST", body });
+        toast.success("Dodano stronę", editing.title);
       }
       setEditing(null);
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Zapis nieudany");
+      const msg = err instanceof Error ? err.message : "Zapis nieudany";
+      setError(msg);
+      toast.error("CMS", msg);
     }
   }
 
@@ -79,9 +85,12 @@ export default function CmsAdminPage() {
     if (!confirm("Usunąć stronę CMS?")) return;
     try {
       await klubFetch(`/api/cms/pages/${id}`, { method: "DELETE" });
+      toast.success("Usunięto stronę");
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Usuwanie nieudane");
+      const msg = err instanceof Error ? err.message : "Usuwanie nieudane";
+      setError(msg);
+      toast.error("CMS", msg);
     }
   }
 
@@ -121,7 +130,7 @@ export default function CmsAdminPage() {
         >
           <div className="grid gap-3 sm:grid-cols-2">
             <input
-              className="border border-paper/20 bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand"
+              className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
               placeholder="Tytuł"
               value={editing.title}
               onChange={(e) =>
@@ -130,7 +139,7 @@ export default function CmsAdminPage() {
               required
             />
             <input
-              className="border border-paper/20 bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand"
+              className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
               placeholder="slug (np. o-klubie)"
               value={editing.slug}
               onChange={(e) =>
@@ -139,7 +148,7 @@ export default function CmsAdminPage() {
               required
             />
             <select
-              className="border border-paper/20 bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand"
+              className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
               value={editing.status}
               onChange={(e) =>
                 setEditing({
@@ -160,11 +169,11 @@ export default function CmsAdminPage() {
             {editing.blocks.map((block, index) => (
               <div
                 key={block.id}
-                className="border border-paper/10 bg-ink/30 p-3"
+                className="border border-paper/10 bg-chrome/30 p-3"
               >
                 <div className="mb-2 flex flex-wrap gap-2">
                   <select
-                    className="border border-paper/20 bg-ink/40 px-2 py-1 text-xs"
+                    className="border border-paper/20 bg-chrome/40 px-2 py-1 text-xs"
                     value={block.type}
                     onChange={(e) => {
                       const blocks = [...editing.blocks];
@@ -189,7 +198,7 @@ export default function CmsAdminPage() {
                   </button>
                 </div>
                 <textarea
-                  className="w-full border border-paper/20 bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand"
+                  className="w-full border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
                   rows={block.type === "paragraph" || block.type === "html" ? 4 : 2}
                   value={block.content}
                   onChange={(e) => {
@@ -240,7 +249,7 @@ export default function CmsAdminPage() {
               <p className="font-display text-[11px] tracking-[0.14em] text-paper/45 uppercase">
                 Podgląd
               </p>
-              <div className="mt-3 space-y-3 bg-paper px-5 py-6 text-ink">
+              <div className="mt-3 space-y-3 bg-surface px-5 py-6 text-ink">
                 {editing.blocks.map((b) => {
                   if (b.type === "heading") {
                     return (

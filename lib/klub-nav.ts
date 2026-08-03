@@ -7,6 +7,10 @@ export type KlubNavItem = {
   roles: Role[];
   /** Wymaga prawdziwej roli superadmin (nawet przy podglądzie roli). */
   requireSuperadmin?: boolean;
+  /** Ukryj w widoku superadmin (np. user-friendly changelog — SA ma DevTools). */
+  hideForSuperadminView?: boolean;
+  /** Opcjonalna flaga publiczna — pozycja znika, gdy flaga jest wyłączona. */
+  flag?: string;
 };
 
 export type KlubNavCategory = {
@@ -52,6 +56,17 @@ export const KLUB_NAV: KlubNavCategory[] = [
         label: "Plany treningowe",
         roles: ["trener", "superadmin"],
       },
+      {
+        href: "/klub/kalendarz",
+        label: "Kalendarz zawodów",
+        roles: ["trener", "admin", "superadmin"],
+        flag: "club_calendar",
+      },
+      {
+        href: "/klub/kalkulator-sinclair",
+        label: "Kalkulator Sinclair",
+        roles: ["trener", "admin", "superadmin"],
+      },
     ],
   },
   {
@@ -69,6 +84,12 @@ export const KLUB_NAV: KlubNavCategory[] = [
     id: "system",
     label: "System",
     items: [
+      {
+        href: "/klub/co-nowego",
+        label: "Co nowego",
+        roles: ["trener", "admin"],
+        hideForSuperadminView: true,
+      },
       {
         href: "/klub/logi",
         label: "Logi systemowe",
@@ -107,7 +128,6 @@ export const PUBLIC_ROUTE_MAP = [
   { path: "/blog", label: "Blog / aktualności" },
   { path: "/zawodnicy", label: "Zawodnicy" },
   { path: "/kalendarz", label: "Kalendarz" },
-  { path: "/kalkulator-sinclair", label: "Kalkulator Sinclair" },
   { path: "/ogloszenia", label: "Ogłoszenia" },
   { path: "/kontakt", label: "Kontakt" },
   { path: "/logowanie", label: "Logowanie" },
@@ -115,7 +135,13 @@ export const PUBLIC_ROUTE_MAP = [
   { path: "/panel/wyniki", label: "Zgłaszanie wyników" },
   { path: "/panel/obecnosc", label: "Skaner obecności" },
   { path: "/panel/plany", label: "Plany (zawodnik)" },
+  { path: "/panel/kalendarz", label: "Kalendarz (zawodnik)" },
+  { path: "/panel/kalkulator-sinclair", label: "Kalkulator Sinclair (zawodnik)" },
+  { path: "/panel/co-nowego", label: "Co nowego (zawodnik)" },
   { path: "/panel/ustawienia", label: "Ustawienia (zawodnik)" },
+  { path: "/klub/kalkulator-sinclair", label: "Kalkulator Sinclair (klub)" },
+  { path: "/klub/kalendarz", label: "Kalendarz zawodów (klub)" },
+  { path: "/klub/co-nowego", label: "Co nowego (klub)" },
   { path: "/klub/ustawienia", label: "Ustawienia (klub)" },
 ] as const;
 
@@ -153,6 +179,8 @@ export function filterNavForRole(
     items: category.items.filter((item) => {
       if (item.requireSuperadmin && !isRealSuperadmin) return false;
       if (item.requireSuperadmin && activeRole !== "superadmin") return false;
+      // User-friendly changelog — tylko konta bez superadmin (SA ma DevTools).
+      if (item.hideForSuperadminView && isRealSuperadmin) return false;
       if (isRealSuperadmin && activeRole === "superadmin") return true;
       return item.roles.includes(activeRole);
     }),
@@ -169,6 +197,10 @@ export function canAccessPath(
   const item = KLUB_NAV.flatMap((c) => c.items).find((i) => i.href === href);
   if (!item) return realRoles.some((r) => STAFF_ROLES.includes(r));
   if (item.requireSuperadmin) return realRoles.includes("superadmin");
+  if (item.hideForSuperadminView) {
+    if (realRoles.includes("superadmin")) return false;
+    return item.roles.some((r) => realRoles.includes(r));
+  }
   if (realRoles.includes("superadmin")) return true;
   return item.roles.some((r) => realRoles.includes(r));
 }

@@ -18,6 +18,8 @@ import {
 } from "@/lib/panel-themes";
 import { isFlagEnabled } from "@/lib/public-flags";
 import { PhotoUploadField } from "@/components/settings/PhotoUploadField";
+import { CookieConsentSettings } from "@/components/settings/CookieConsentSettings";
+import { useToast } from "@/components/toast/ToastProvider";
 
 type ThemeOption = (typeof PANEL_THEMES)[number];
 
@@ -56,7 +58,7 @@ function ThemeGrid({
             className={`settings-surface group text-left transition-colors disabled:cursor-wait disabled:opacity-60 ${
               selected
                 ? "border border-brand bg-brand/10"
-                : "border border-paper/15 bg-ink/20 hover:border-paper/35"
+                : "border border-paper/15 bg-chrome/20 hover:border-paper/35"
             }`}
           >
             <div
@@ -92,6 +94,7 @@ function ThemeGrid({
 }
 
 export function AccountSettingsForm({ user, onUpdated }: Props) {
+  const toast = useToast();
   const flagsQuery = useListPublicFlags({ query: { staleTime: 60_000 } });
   const allowExperimental = isFlagEnabled(
     flagsQuery.data?.data ?? [],
@@ -124,6 +127,7 @@ export function AccountSettingsForm({ user, onUpdated }: Props) {
     if (token) storeSession(token, updated);
     await onUpdated(updated);
     setOk(message);
+    toast.success(message);
   }
 
   async function saveProfile(e: React.FormEvent) {
@@ -139,7 +143,9 @@ export function AccountSettingsForm({ user, onUpdated }: Props) {
       });
       await applyUserUpdate(result.data as AuthUser, "Zapisano profil konta.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Nie udało się zapisać.");
+      const msg = err instanceof Error ? err.message : "Nie udało się zapisać.";
+      setError(msg);
+      toast.error("Profil konta", msg);
     }
   }
 
@@ -163,7 +169,10 @@ export function AccountSettingsForm({ user, onUpdated }: Props) {
       );
     } catch (err) {
       setUiTheme(resolvePanelTheme(user.ui_theme, { allowExperimental }));
-      setError(err instanceof Error ? err.message : "Nie udało się zapisać motywu.");
+      const msg =
+        err instanceof Error ? err.message : "Nie udało się zapisać motywu.";
+      setError(msg);
+      toast.error("Motyw", msg);
     }
   }
 
@@ -173,10 +182,12 @@ export function AccountSettingsForm({ user, onUpdated }: Props) {
     setOk(null);
     if (newPassword.length < 6) {
       setError("Nowe hasło musi mieć co najmniej 6 znaków.");
+      toast.error("Hasło", "Nowe hasło musi mieć co najmniej 6 znaków.");
       return;
     }
     if (newPassword !== confirmPassword) {
       setError("Nowe hasła nie są zgodne.");
+      toast.error("Hasło", "Nowe hasła nie są zgodne.");
       return;
     }
     try {
@@ -191,7 +202,10 @@ export function AccountSettingsForm({ user, onUpdated }: Props) {
       setNewPassword("");
       setConfirmPassword("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Nie udało się zmienić hasła.");
+      const msg =
+        err instanceof Error ? err.message : "Nie udało się zmienić hasła.";
+      setError(msg);
+      toast.error("Hasło", msg);
     }
   }
 
@@ -200,10 +214,10 @@ export function AccountSettingsForm({ user, onUpdated }: Props) {
     (photoUrl.trim() || "") !== (user.photo_url ?? "");
 
   const field =
-    "panel-control w-full border border-paper/20 bg-ink/40 px-3 py-2 text-sm text-paper outline-none transition-colors focus:border-brand";
+    "panel-control w-full border border-paper/20 bg-chrome/40 px-3 py-2 text-sm text-paper outline-none transition-colors focus:border-brand";
   const label =
     "mb-1.5 block font-display text-[10px] tracking-[0.14em] text-paper/45 uppercase";
-  const surface = "settings-surface border border-paper/10 bg-ink/30 p-5 md:p-6";
+  const surface = "settings-surface border border-paper/10 bg-chrome/30 p-5 md:p-6";
 
   return (
     <div className="space-y-6">
@@ -371,6 +385,8 @@ export function AccountSettingsForm({ user, onUpdated }: Props) {
               />
             </section>
           ) : null}
+
+          <CookieConsentSettings className={surface} />
         </div>
       </div>
     </div>

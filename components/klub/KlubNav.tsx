@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useListPublicFlags } from "@/lib/api/generated/default/default";
 import { filterNavForRole, ROLE_LABELS } from "@/lib/klub-nav";
+import { isFlagEnabled } from "@/lib/public-flags";
 import { useKlub } from "./KlubProvider";
 import { RoleSwitcher } from "./RoleSwitcher";
 
@@ -27,9 +29,18 @@ function GearIcon({ className }: { className?: string }) {
 function NavBody({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   const { user, activeRole, collapsedCategories, toggleCategory } = useKlub();
+  const flagsQuery = useListPublicFlags({ query: { staleTime: 60_000 } });
+  const flags = flagsQuery.data?.data;
   if (!user) return null;
 
-  const categories = filterNavForRole(activeRole, user.roles);
+  const categories = filterNavForRole(activeRole, user.roles)
+    .map((category) => ({
+      ...category,
+      items: category.items.filter(
+        (item) => !item.flag || isFlagEnabled(flags, item.flag),
+      ),
+    }))
+    .filter((category) => category.items.length > 0);
   const settingsActive =
     pathname === "/klub/ustawienia" ||
     pathname.startsWith("/klub/ustawienia/");
@@ -136,7 +147,7 @@ export function KlubNav() {
 
   return (
     <>
-      <aside className="klub-nav-desktop hidden h-full min-h-0 w-64 shrink-0 overflow-hidden border-r border-paper/10 bg-ink/80 lg:block">
+      <aside className="klub-nav-desktop hidden h-full min-h-0 w-64 shrink-0 overflow-hidden border-r border-paper/10 bg-chrome/80 lg:block">
         <NavBody />
       </aside>
 
@@ -144,11 +155,11 @@ export function KlubNav() {
         <div className="fixed inset-0 z-50 lg:hidden">
           <button
             type="button"
-            className="absolute inset-0 bg-ink/70"
+            className="absolute inset-0 bg-chrome/70"
             aria-label="Zamknij menu"
             onClick={() => setMobileNavOpen(false)}
           />
-          <aside className="relative h-full min-h-0 w-[min(100%,18rem)] overflow-hidden border-r border-paper/10 bg-ink shadow-2xl">
+          <aside className="relative h-full min-h-0 w-[min(100%,18rem)] overflow-hidden border-r border-paper/10 bg-chrome shadow-2xl">
             <NavBody onNavigate={() => setMobileNavOpen(false)} />
           </aside>
         </div>

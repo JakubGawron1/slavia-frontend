@@ -6,11 +6,13 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
 import { useRouter } from "next/navigation";
 import {
+  clearSession,
   destroySession,
   fetchMe,
   getStoredToken,
@@ -37,6 +39,7 @@ export function PanelProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const cookieSyncedFor = useRef<string | null>(null);
 
   const refreshUser = useCallback(async (next?: AuthUser) => {
     if (next) {
@@ -61,6 +64,13 @@ export function PanelProvider({ children }: { children: ReactNode }) {
     async function load() {
       const token = getStoredToken();
       if (!token) {
+        clearSession();
+        try {
+          await destroySession();
+        } catch {
+          /* ignore */
+        }
+        if (!cancelled) setLoading(false);
         router.replace("/logowanie");
         return;
       }
@@ -72,16 +82,21 @@ export function PanelProvider({ children }: { children: ReactNode }) {
         const me = await fetchMe(token);
         if (cancelled) return;
         if (!canAccessAthletePanel(me.roles)) {
+          if (!cancelled) setLoading(false);
           router.replace("/logowanie");
           return;
         }
         storeSession(token, me);
-        void syncSessionCookie(token);
         setUser(me);
         setError(null);
       } catch (err) {
         if (cancelled) return;
-        await destroySession();
+        clearSession();
+        try {
+          await destroySession();
+        } catch {
+          /* ignore */
+        }
         setError(err instanceof Error ? err.message : "Sesja wygasła.");
         router.replace("/logowanie");
       } finally {
@@ -94,6 +109,16 @@ export function PanelProvider({ children }: { children: ReactNode }) {
       cancelled = true;
     };
   }, [router]);
+
+  useEffect(() => {
+    if (!user || loading) return;
+    const token = getStoredToken();
+    if (!token || cookieSyncedFor.current === token) return;
+    cookieSyncedFor.current = token;
+    void syncSessionCookie(token).catch(() => {
+      cookieSyncedFor.current = null;
+    });
+  }, [user, loading]);
 
   const logout = useCallback(() => {
     void destroySession().then(() => {

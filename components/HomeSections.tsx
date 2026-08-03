@@ -109,16 +109,10 @@ const ranking = [
 
 const BASE_TOOLS = [
   {
-    href: "/kalkulator-sinclair",
-    title: "Kalkulator Sinclair",
-    text: "Przelicz dwubój na punkty Sinclair (wzór 2025–2028).",
-    flag: null,
-  },
-  {
     href: "/kalendarz",
     title: "Kalendarz",
     text: "Treningi, zawody i terminy klubowe w jednym miejscu.",
-    flag: null,
+    flag: "calendar" as const,
   },
   {
     href: "/blog",
@@ -135,7 +129,7 @@ const BASE_TOOLS = [
   {
     href: "/logowanie",
     title: "Strefa klubowa",
-    text: "Logowanie dla zawodników, trenerów i administratorów.",
+    text: "Logowanie dla zawodników, trenerów i administratorów — m.in. kalkulator Sinclair.",
     flag: null,
   },
 ];
@@ -143,21 +137,24 @@ const BASE_TOOLS = [
 type HomeSectionsProps = {
   blogEnabled?: boolean;
   ogloszeniaEnabled?: boolean;
+  calendarEnabled?: boolean;
 };
 
 export function HomeSections({
   blogEnabled = true,
   ogloszeniaEnabled = true,
+  calendarEnabled = true,
 }: HomeSectionsProps) {
   const tools = BASE_TOOLS.filter((tool) => {
     if (tool.flag === "blog") return blogEnabled;
     if (tool.flag === "ogloszenia") return ogloszeniaEnabled;
+    if (tool.flag === "calendar") return calendarEnabled;
     return true;
   });
 
   return (
     <>
-      <section className="border-b border-mist bg-paper">
+      <section className="border-b border-mist bg-surface">
         <div className="mx-auto grid max-w-7xl grid-cols-2 lg:grid-cols-4">
           {stats.map((stat) => (
             <div
@@ -205,7 +202,7 @@ export function HomeSections({
         </div>
       </section>
 
-      <section className="bg-ink py-16 text-paper md:py-24">
+      <section className="bg-chrome py-16 text-paper md:py-24">
         <div className="mx-auto max-w-7xl px-5 md:px-8">
           <p className="font-display text-sm tracking-[0.22em] text-brand uppercase">
             O nas
@@ -237,7 +234,7 @@ export function HomeSections({
         </div>
       </section>
 
-      <section className="bg-paper py-16 md:py-24">
+      <section className="bg-surface py-16 md:py-24">
         <div className="mx-auto max-w-7xl px-5 md:px-8">
           <p className="font-display text-sm tracking-[0.22em] text-brand uppercase">
             Co Cię czeka na sali
@@ -334,7 +331,7 @@ export function HomeSections({
         </div>
       </section>
 
-      <section className="bg-steel py-16 text-paper md:py-24">
+      <section className="bg-steel-panel py-16 text-paper md:py-24">
         <div className="mx-auto max-w-7xl px-5 md:px-8">
           <p className="font-display text-sm tracking-[0.22em] text-brand uppercase">
             Narzędzia
@@ -343,8 +340,8 @@ export function HomeSections({
             Wszystko w jednym miejscu
           </h2>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-paper/70 md:text-lg">
-            Ranking Sinclair, kalkulatory, blog i kalendarz — trenuj mądrzej i
-            bądź na bieżąco z życiem klubu.
+            Ranking Sinclair, blog i kalendarz — trenuj mądrzej i bądź na
+            bieżąco z życiem klubu.
           </p>
 
           <div className="mt-12 grid gap-px bg-paper/10 sm:grid-cols-2 lg:grid-cols-3">
@@ -352,7 +349,7 @@ export function HomeSections({
               <Link
                 key={tool.href}
                 href={tool.href}
-                className="group bg-steel px-5 py-8 transition-colors hover:bg-ink md:px-6"
+                className="group bg-steel-panel px-5 py-8 transition-colors hover:bg-chrome md:px-6"
               >
                 <h3 className="font-display text-xl tracking-wide uppercase transition-colors group-hover:text-brand">
                   {tool.title}
@@ -369,7 +366,7 @@ export function HomeSections({
         </div>
       </section>
 
-      <section className="bg-paper py-16 md:py-24">
+      <section className="bg-surface py-16 md:py-24">
         <div className="mx-auto grid max-w-7xl gap-12 px-5 md:grid-cols-2 md:gap-16 md:px-8">
           <div>
             <p className="font-display text-sm tracking-[0.22em] text-brand uppercase">
@@ -418,7 +415,7 @@ export function HomeSections({
             </div>
           </div>
 
-          <div className="flex flex-col justify-end bg-ink px-6 py-10 text-paper md:px-8 md:py-12">
+          <div className="flex flex-col justify-end bg-chrome px-6 py-10 text-paper md:px-8 md:py-12">
             <p className="font-display text-sm tracking-[0.2em] text-brand uppercase">
               Sprawdź, jak smakuje sztanga
             </p>
@@ -436,12 +433,14 @@ export function HomeSections({
                   Umów pierwszy trening
                 </Link>
               ) : null}
-              <Link
-                href="/kalendarz"
-                className="border border-paper/30 px-6 py-3 font-display text-sm tracking-[0.12em] uppercase transition-colors hover:border-paper hover:bg-paper/10"
-              >
-                Zobacz kalendarz
-              </Link>
+              {calendarEnabled ? (
+                <Link
+                  href="/kalendarz"
+                  className="border border-paper/30 px-6 py-3 font-display text-sm tracking-[0.12em] uppercase transition-colors hover:border-paper hover:bg-paper/10"
+                >
+                  Zobacz kalendarz
+                </Link>
+              ) : null}
             </div>
           </div>
         </div>

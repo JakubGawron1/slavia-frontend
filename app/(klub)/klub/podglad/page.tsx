@@ -6,8 +6,10 @@ import { klubFetch } from "@/lib/klub-api";
 import { ROLE_LABELS } from "@/lib/klub-nav";
 import type { Role } from "@/lib/auth";
 import { useKlub } from "@/components/klub/KlubProvider";
+import { useToast } from "@/components/toast/ToastProvider";
 
 export default function PodgladPage() {
+  const toast = useToast();
   const { viewAs, setViewAs, clearViewAs, setActiveRole } = useKlub();
   const [users, setUsers] = useState<PublicUser[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -45,14 +47,19 @@ export default function PodgladPage() {
         target.roles.find((r) => r !== "superadmin") ??
         target.roles[0];
       if (pick) setActiveRole(pick);
+      toast.success("Włączono podgląd", target.display_name);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Nie udało się wejść w podgląd");
+      const msg =
+        err instanceof Error ? err.message : "Nie udało się wejść w podgląd";
+      setError(msg);
+      toast.error("Podgląd", msg);
     }
   }
 
   async function stopPreview() {
     try {
       await klubFetch("/api/admin/preview/stop", { method: "POST", body: {} });
+      toast.info("Zakończono podgląd");
     } catch {
       /* ignore */
     }

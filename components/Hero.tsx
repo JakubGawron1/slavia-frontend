@@ -3,11 +3,15 @@ import Link from "next/link";
 
 type HeroProps = {
   blogEnabled?: boolean;
+  calendarEnabled?: boolean;
 };
 
-export function Hero({ blogEnabled = true }: HeroProps) {
+export function Hero({
+  blogEnabled = true,
+  calendarEnabled = true,
+}: HeroProps) {
   return (
-    <section className="relative isolate min-h-[100svh] overflow-hidden bg-ink text-paper">
+    <section className="relative isolate min-h-[100svh] overflow-hidden bg-chrome text-paper">
       <div className="absolute inset-0 -z-10">
         <Image
           src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=2400&q=80"
@@ -17,8 +21,8 @@ export function Hero({ blogEnabled = true }: HeroProps) {
           sizes="100vw"
           className="animate-kenburns object-cover object-[center_28%]"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-ink via-ink/80 to-ink/40" />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink via-transparent to-ink/50" />
+        <div className="absolute inset-0 bg-gradient-to-r from-chrome via-chrome/80 to-chrome/40" />
+        <div className="absolute inset-0 bg-gradient-to-t from-chrome via-transparent to-chrome/50" />
         <div className="texture-noise absolute inset-0 opacity-[0.12] mix-blend-overlay" />
       </div>
 
@@ -37,12 +41,14 @@ export function Hero({ blogEnabled = true }: HeroProps) {
           ogólnopolskich.
         </p>
         <div className="animate-rise-delay-3 mt-10 flex flex-wrap gap-3 md:gap-4">
-          <Link
-            href="/kalendarz"
-            className="bg-brand px-7 py-3.5 font-display text-sm tracking-[0.12em] text-paper uppercase transition-colors hover:bg-brand-deep"
-          >
-            Kalendarz
-          </Link>
+          {calendarEnabled ? (
+            <Link
+              href="/kalendarz"
+              className="bg-brand px-7 py-3.5 font-display text-sm tracking-[0.12em] text-paper uppercase transition-colors hover:bg-brand-deep"
+            >
+              Kalendarz
+            </Link>
+          ) : null}
           {blogEnabled ? (
             <Link
               href="/blog"

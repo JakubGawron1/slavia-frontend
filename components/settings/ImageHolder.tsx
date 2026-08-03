@@ -16,7 +16,7 @@ export function ImageHolder({
 
   return (
     <div
-      className={`relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-paper/10 via-ink/40 to-brand/15 ${rounded} ${className}`}
+      className={`relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-paper/10 via-chrome/40 to-brand/15 ${rounded} ${className}`}
       aria-hidden={label ? undefined : true}
       role={label ? "img" : undefined}
       aria-label={label ? `Brak zdjęcia — ${label}` : undefined}

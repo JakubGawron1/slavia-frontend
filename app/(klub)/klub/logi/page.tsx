@@ -31,17 +31,20 @@ export default function LogiPage() {
         <h1 className="mt-2 font-display text-3xl font-semibold uppercase">
           Logi systemowe
         </h1>
+        <p className="mt-2 text-sm text-paper/50">
+          Przechowywane przez 7 dni.
+        </p>
       </div>
 
       <div className="flex flex-wrap gap-3">
         <input
-          className="border border-paper/20 bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand"
+          className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
           placeholder="Źródło (users, cms…)"
           value={source}
           onChange={(e) => setSource(e.target.value)}
         />
         <select
-          className="border border-paper/20 bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand"
+          className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
           value={level}
           onChange={(e) => setLevel(e.target.value)}
         >

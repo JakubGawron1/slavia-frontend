@@ -24,9 +24,9 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(login);
   }
 
-  if (pathname === "/logowanie" && hasSession) {
-    return NextResponse.redirect(new URL("/klub", request.url));
-  }
+  // Nie przekierowuj /logowanie → /klub|/panel tylko dlatego, że cookie istnieje.
+  // Stale cookie + next=/klub powodowało pętlę z „Ładowanie panelu…”.
+  // Po udanym loginie klient sam robi push na właściwy panel.
 
   return NextResponse.next();
 }

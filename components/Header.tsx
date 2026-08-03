@@ -15,12 +15,12 @@ import { useListPublicFlags } from "@/lib/api/generated/default/default";
 import { isFlagEnabled } from "@/lib/public-flags";
 import type { PublicFlag } from "@/lib/api/generated/models";
 import { ClubMark } from "./ClubMark";
+import { SiteThemeToggle } from "./SiteThemeToggle";
 
 const NAV_LINKS = [
   { href: "/blog", label: "Aktualności", flag: "public_blog" },
   { href: "/zawodnicy", label: "Zawodnicy", flag: null },
-  { href: "/kalendarz", label: "Kalendarz", flag: null },
-  { href: "/kalkulator-sinclair", label: "Kalkulatory", flag: null },
+  { href: "/kalendarz", label: "Kalendarz", flag: "public_calendar" },
   { href: "/ogloszenia", label: "Ogłoszenia", flag: "announcements_board" },
   { href: "/kontakt", label: "Kontakt", flag: null },
 ] as const;
@@ -36,7 +36,6 @@ function visibleNavLinks(flags: PublicFlag[] | undefined): NavLink[] {
 const overlayPaths = new Set([
   "/",
   "/logowanie",
-  "/kalkulator-sinclair",
   "/kalendarz",
   "/zawodnicy",
   "/kontakt",
@@ -118,7 +117,7 @@ function HeaderChrome({
       className={
         overlayHeader
           ? "absolute inset-x-0 top-0 z-50"
-          : "sticky top-0 z-50 border-b border-paper/10 bg-ink/95 backdrop-blur-md"
+          : "sticky top-0 z-50 border-b border-paper/10 bg-chrome/95 backdrop-blur-md"
       }
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 md:px-8">
@@ -159,16 +158,19 @@ function HeaderChrome({
             pathname={pathname}
             className={desktopCtaClass}
           />
+          <SiteThemeToggle />
         </nav>
 
-        <button
-          type="button"
-          className="relative flex h-11 w-11 items-center justify-center text-paper lg:hidden"
-          aria-expanded={open}
-          aria-controls="mobile-nav"
-          aria-label={open ? "Zamknij menu" : "Otwórz menu"}
-          onClick={onToggle}
-        >
+        <div className="flex items-center gap-2 lg:hidden">
+          <SiteThemeToggle />
+          <button
+            type="button"
+            className="relative flex h-11 w-11 items-center justify-center text-paper"
+            aria-expanded={open}
+            aria-controls="mobile-nav"
+            aria-label={open ? "Zamknij menu" : "Otwórz menu"}
+            onClick={onToggle}
+          >
           <span className="sr-only">Menu</span>
           <span
             className={`absolute h-0.5 w-6 bg-current transition-transform duration-300 ${
@@ -185,12 +187,13 @@ function HeaderChrome({
               open ? "translate-y-0 -rotate-45" : "translate-y-2"
             }`}
           />
-        </button>
+          </button>
+        </div>
       </div>
 
       <div
         id="mobile-nav"
-        className={`border-t border-paper/10 bg-ink/95 backdrop-blur-md lg:hidden ${
+        className={`border-t border-paper/10 bg-chrome/95 backdrop-blur-md lg:hidden ${
           open ? "block" : "hidden"
         }`}
       >

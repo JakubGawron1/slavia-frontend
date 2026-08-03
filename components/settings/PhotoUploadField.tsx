@@ -3,6 +3,7 @@
 import { useId, useRef, useState } from "react";
 import { deleteImageFile, uploadImageFile } from "@/lib/upload-image";
 import { ImageHolder } from "@/components/settings/ImageHolder";
+import { useToast } from "@/components/toast/ToastProvider";
 
 type Props = {
   value: string;
@@ -24,6 +25,7 @@ export function PhotoUploadField({
   inputClassName,
   className,
 }: Props) {
+  const toast = useToast();
   const inputId = useId();
   const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
@@ -36,8 +38,12 @@ export function PhotoUploadField({
     try {
       const url = await uploadImageFile(file);
       onChange(url);
+      toast.success("Wgrano zdjęcie");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Nie udało się wgrać zdjęcia.");
+      const msg =
+        err instanceof Error ? err.message : "Nie udało się wgrać zdjęcia.";
+      setError(msg);
+      toast.error("Zdjęcie", msg);
     } finally {
       setBusy(false);
       if (fileRef.current) fileRef.current.value = "";
@@ -54,9 +60,11 @@ export function PhotoUploadField({
     try {
       await deleteImageFile(value);
       onChange("");
+      toast.success("Usunięto zdjęcie");
     } catch (err) {
       // Lokalnie i tak czyścimy — remote delete jest best-effort.
       onChange("");
+      toast.info("Usunięto zdjęcie lokalnie");
       console.warn("delete image remote failed", err);
     } finally {
       setBusy(false);
@@ -65,12 +73,12 @@ export function PhotoUploadField({
 
   const field =
     inputClassName ??
-    "w-full border border-paper/20 bg-ink/40 px-3 py-2 text-sm text-paper outline-none transition-colors focus:border-brand";
+    "w-full border border-paper/20 bg-chrome/40 px-3 py-2 text-sm text-paper outline-none transition-colors focus:border-brand";
 
   return (
     <div className={className}>
       <div className="flex flex-wrap items-start gap-4">
-        <div className="relative h-20 w-20 shrink-0 overflow-hidden border border-paper/20 bg-ink/50">
+        <div className="relative h-20 w-20 shrink-0 overflow-hidden border border-paper/20 bg-chrome/50">
           {value.trim() ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img

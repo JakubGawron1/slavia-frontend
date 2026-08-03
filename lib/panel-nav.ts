@@ -5,6 +5,8 @@ export type PanelModule = {
   label: string;
   description: string;
   statKey?: keyof AthleteStatsLinks;
+  /** Opcjonalna flaga publiczna — moduł znika, gdy flaga jest wyłączona. */
+  flag?: string;
 };
 
 /** Klucze statystyk → docelowe ścieżki (klikalne kafelki). */
@@ -40,6 +42,22 @@ export const PANEL_MODULES: PanelModule[] = [
     label: "Plany treningowe",
     description: "Podgląd planów i oznaczanie wykonanych ćwiczeń.",
     statKey: "plans_active",
+  },
+  {
+    href: "/panel/kalendarz",
+    label: "Kalendarz",
+    description: "Treningi, zawody, skład i rezygnacje.",
+    flag: "athlete_calendar",
+  },
+  {
+    href: "/panel/kalkulator-sinclair",
+    label: "Kalkulator Sinclair",
+    description: "Przelicz dwubój na punkty Sinclair (wzór 2025–2028).",
+  },
+  {
+    href: "/panel/co-nowego",
+    label: "Co nowego",
+    description: "Nowości w panelu — krótko i zrozumiale.",
   },
 ];
 

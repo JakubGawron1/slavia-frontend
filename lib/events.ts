@@ -1,15 +1,90 @@
+/** Typy kalendarza — spójne z backendem CalendarEvent / DTO. */
+
 export type EventType = "zawody" | "trening" | "zebranie" | "inne";
+
+export type EventStatus = "scheduled" | "cancelled";
+
+export type WithdrawalStatus = "pending" | "accepted" | "rejected";
 
 export type ClubEvent = {
   id: string;
   title: string;
   type: EventType;
-  /** ISO date YYYY-MM-DD */
+  /** ISO date YYYY-MM-DD — początek */
   date: string;
-  /** optional HH:mm */
+  /** ISO date YYYY-MM-DD — koniec (włącznie); brak = jednodniowe */
+  end_date?: string;
   time?: string;
   location?: string;
   description?: string;
+  status?: EventStatus;
+  cancellation_note?: string;
+  /** Własny status obecności (kalendarz zawodnika, treningi) */
+  attendance_status?: "present" | "absent" | "withdrawn";
+  /** Frekwencja (kalendarz kadry, treningi) */
+  attendance_counts?: { present: number; expected: number };
+};
+
+export type CalendarEventFull = {
+  id: string;
+  title: string;
+  event_type: string;
+  date: string;
+  end_date?: string | null;
+  time?: string | null;
+  location?: string | null;
+  description?: string | null;
+  status: string;
+  cancellation_note?: string | null;
+  club_assigned: boolean;
+  source: string;
+  locked: boolean;
+  all_athletes: boolean;
+  assigned_athlete_ids: string[];
+  withdrawals: Array<{
+    athlete_id: string;
+    user_id?: string | null;
+    reason: string;
+    at: string;
+    status: WithdrawalStatus;
+  }>;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type AssignedAthleteBrief = {
+  id: string;
+  display_name: string;
+};
+
+export type AthleteCalendarEvent = {
+  id: string;
+  title: string;
+  event_type: string;
+  date: string;
+  end_date?: string | null;
+  time?: string | null;
+  location?: string | null;
+  description?: string | null;
+  status: string;
+  cancellation_note?: string | null;
+  club_assigned: boolean;
+  all_athletes: boolean;
+  assigned_athletes: AssignedAthleteBrief[];
+  i_am_assigned: boolean;
+  roster_announced: boolean;
+  my_withdrawal_status?: string | null;
+  attendance_status?: string | null;
+};
+
+export type TrainingScheduleDefaults = {
+  weekdays: number[];
+  time: string;
+  end_time: string;
+  location: string;
+  title: string;
+  attendance_buffer_minutes: number;
 };
 
 export const EVENT_TYPE_LABELS: Record<EventType, string> = {
@@ -19,98 +94,51 @@ export const EVENT_TYPE_LABELS: Record<EventType, string> = {
   inne: "Inne",
 };
 
-/**
- * Mock na czas developmentu.
- * Po podłączeniu API Rust zastąp implementację getEvents() fetchiem.
- */
-const MOCK_EVENTS: ClubEvent[] = [
-  {
-    id: "1",
-    title: "Trening klubowy",
-    type: "trening",
-    date: "2026-08-03",
-    time: "15:00",
-    location: "ul. Konopnickiej 13, Ruda Śląska",
-    description: "Regularny trening dwuboju — rwanie i podrzut.",
-  },
-  {
-    id: "2",
-    title: "Trening klubowy",
-    type: "trening",
-    date: "2026-08-05",
-    time: "15:00",
-    location: "ul. Konopnickiej 13, Ruda Śląska",
-  },
-  {
-    id: "3",
-    title: "Trening klubowy",
-    type: "trening",
-    date: "2026-08-07",
-    time: "15:00",
-    location: "ul. Konopnickiej 13, Ruda Śląska",
-  },
-  {
-    id: "4",
-    title: "Kontrola masy ciała",
-    type: "inne",
-    date: "2026-08-12",
-    time: "17:00",
-    location: "Sala klubowa",
-    description: "Ważenie przed startami — obowiązkowe dla zgłoszonych zawodników.",
-  },
-  {
-    id: "5",
-    title: "Puchar Śląska — młodzież",
-    type: "zawody",
-    date: "2026-08-22",
-    time: "09:00",
-    location: "Piekary Śląskie",
-    description: "Starty kategorii młodzieżowych. Zbiórka przy klubie o 7:00.",
-  },
-  {
-    id: "6",
-    title: "Zebranie zarządu",
-    type: "zebranie",
-    date: "2026-08-26",
-    time: "18:30",
-    location: "ul. Konopnickiej 13",
-  },
-  {
-    id: "7",
-    title: "Mistrzostwa Śląska U23",
-    type: "zawody",
-    date: "2026-09-12",
-    time: "10:00",
-    location: "Katowice",
-    description: "Dwudniowe zawody — szczegóły w ogłoszeniach.",
-  },
-  {
-    id: "8",
-    title: "Mistrzostwa Śląska U23 — dzień 2",
-    type: "zawody",
-    date: "2026-09-13",
-    time: "10:00",
-    location: "Katowice",
-  },
-  {
-    id: "9",
-    title: "Trening otwarty dla rodziców",
-    type: "trening",
-    date: "2026-09-19",
-    time: "16:00",
-    location: "ul. Konopnickiej 13",
-    description: "Pokaz techniki i rozmowa o planie sezonu.",
-  },
-];
-
 export type EventsQuery = {
   from?: string;
   to?: string;
 };
 
+function mapPublicType(t: string): EventType {
+  if (t === "zawody" || t === "trening" || t === "zebranie" || t === "inne") {
+    return t;
+  }
+  return "inne";
+}
+
+export function publicApiToClubEvent(raw: {
+  id: string;
+  title: string;
+  event_type: string;
+  date: string;
+  end_date?: string | null;
+  time?: string | null;
+  location?: string | null;
+  description?: string | null;
+  status?: string;
+  cancellation_note?: string | null;
+}): ClubEvent {
+  const end = raw.end_date?.trim();
+  return {
+    id: raw.id,
+    title: raw.title,
+    type: mapPublicType(raw.event_type),
+    date: raw.date,
+    end_date: end && end.length === 10 && end !== raw.date ? end : undefined,
+    time: raw.time ?? undefined,
+    location: raw.location ?? undefined,
+    description: raw.description ?? undefined,
+    status: (raw.status as EventStatus) || "scheduled",
+    cancellation_note: raw.cancellation_note ?? undefined,
+  };
+}
+
+export function fullToClubEvent(e: CalendarEventFull): ClubEvent {
+  return publicApiToClubEvent(e);
+}
+
 /**
- * Źródło wydarzeń kalendarza.
- * Próbuje backend Rust (`/api/events`); przy braku endpointu wraca do mocków.
+ * Źródło wydarzeń kalendarza publicznego.
  */
 export async function getEvents(query: EventsQuery = {}): Promise<ClubEvent[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
@@ -121,23 +149,37 @@ export async function getEvents(query: EventsQuery = {}): Promise<ClubEvent[]> {
       if (query.from) params.set("from", query.from);
       if (query.to) params.set("to", query.to);
       const qs = params.toString();
-      const url = `${baseUrl}/api/events${qs ? `?${qs}` : ""}`;
+      const url = `${baseUrl}/api/public/events${qs ? `?${qs}` : ""}`;
 
       const response = await fetch(url, {
         next: { revalidate: 60, tags: ["events"] },
       });
 
       if (response.ok) {
-        return (await response.json()) as ClubEvent[];
+        const data = (await response.json()) as Array<{
+          id: string;
+          title: string;
+          event_type: string;
+          date: string;
+          end_date?: string | null;
+          time?: string | null;
+          location?: string | null;
+          description?: string | null;
+          status?: string;
+          cancellation_note?: string | null;
+        }>;
+        return data
+          .map(publicApiToClubEvent)
+          .sort(
+            (a, b) =>
+              a.date.localeCompare(b.date) ||
+              (a.time ?? "").localeCompare(b.time ?? ""),
+          );
       }
     } catch {
-      // Backend niedostępny lub brak /api/events — mock poniżej
+      // Backend niedostępny
     }
   }
 
-  return MOCK_EVENTS.filter((event) => {
-    if (query.from && event.date < query.from) return false;
-    if (query.to && event.date > query.to) return false;
-    return true;
-  }).sort((a, b) => a.date.localeCompare(b.date) || (a.time ?? "").localeCompare(b.time ?? ""));
+  return [];
 }

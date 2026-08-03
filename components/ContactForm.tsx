@@ -2,6 +2,7 @@
 
 import { FormEvent, useId, useState } from "react";
 import { useSubmitContact } from "@/lib/api/generated/contact/contact";
+import { useToast } from "@/components/toast/ToastProvider";
 
 type FormState = "idle" | "submitting" | "success" | "error";
 
@@ -15,12 +16,13 @@ const PHONE_CODES = [
 ] as const;
 
 const fieldClass =
-  "mt-1.5 w-full border border-paper/20 bg-ink/40 px-3.5 py-2.5 text-sm text-paper outline-none transition-[border-color,background-color] placeholder:text-paper/35 focus:border-brand focus:bg-ink/60 disabled:opacity-60";
+  "mt-1.5 w-full border border-paper/20 bg-chrome/40 px-3.5 py-2.5 text-sm text-paper outline-none transition-[border-color,background-color] placeholder:text-paper/35 focus:border-brand focus:bg-chrome/60 disabled:opacity-60";
 
 const labelClass =
   "font-display text-[0.65rem] tracking-[0.16em] text-paper/65 uppercase";
 
 export function ContactForm() {
+  const toast = useToast();
   const nameId = useId();
   const emailId = useId();
   const phoneId = useId();
@@ -54,26 +56,31 @@ export function ContactForm() {
     if (trimmedName.length < 2) {
       setState("error");
       setError("Podaj imię i nazwisko.");
+      toast.error("Formularz", "Podaj imię i nazwisko.");
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
       setState("error");
       setError("Podaj poprawny adres e-mail.");
+      toast.error("Formularz", "Podaj poprawny adres e-mail.");
       return;
     }
     if (digits.length < 6) {
       setState("error");
       setError("Podaj poprawny numer telefonu.");
+      toast.error("Formularz", "Podaj poprawny numer telefonu.");
       return;
     }
     if (!trimmedSubject) {
       setState("error");
       setError("Podaj tytuł wiadomości.");
+      toast.error("Formularz", "Podaj tytuł wiadomości.");
       return;
     }
     if (!trimmedBody) {
       setState("error");
       setError("Podaj treść wiadomości.");
+      toast.error("Formularz", "Podaj treść wiadomości.");
       return;
     }
 
@@ -96,13 +103,15 @@ export function ContactForm() {
       setSubject("");
       setBody("");
       setState("success");
+      toast.success("Wysłano wiadomość", "Odpowiemy tak szybko, jak to możliwe.");
     } catch (err) {
       setState("error");
-      setError(
+      const msg =
         err instanceof Error
           ? err.message
-          : "Nie udało się wysłać wiadomości. Spróbuj ponownie.",
-      );
+          : "Nie udało się wysłać wiadomości. Spróbuj ponownie.";
+      setError(msg);
+      toast.error("Wysyłanie", msg);
     }
   }
 
@@ -162,7 +171,7 @@ export function ContactForm() {
               value={phoneCode}
               onChange={(e) => setPhoneCode(e.target.value)}
               disabled={state === "submitting"}
-              className="h-[2.625rem] shrink-0 border border-paper/20 bg-ink/40 px-2.5 text-sm text-paper outline-none focus:border-brand disabled:opacity-60"
+              className="h-[2.625rem] shrink-0 border border-paper/20 bg-chrome/40 px-2.5 text-sm text-paper outline-none focus:border-brand disabled:opacity-60"
             >
               {PHONE_CODES.map((item) => (
                 <option key={item.code} value={item.code}>
@@ -179,7 +188,7 @@ export function ContactForm() {
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               disabled={state === "submitting"}
-              className="h-[2.625rem] w-full border border-paper/20 bg-ink/40 px-3.5 text-sm text-paper outline-none transition-[border-color,background-color] placeholder:text-paper/35 focus:border-brand focus:bg-ink/60 disabled:opacity-60"
+              className="h-[2.625rem] w-full border border-paper/20 bg-chrome/40 px-3.5 text-sm text-paper outline-none transition-[border-color,background-color] placeholder:text-paper/35 focus:border-brand focus:bg-chrome/60 disabled:opacity-60"
               placeholder="500 123 456"
             />
           </div>

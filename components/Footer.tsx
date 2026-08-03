@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useListPublicFlags } from "@/lib/api/generated/default/default";
+import { openCookieSettings } from "@/lib/cookie-consent";
 import { isFlagEnabled } from "@/lib/public-flags";
+import { SLAVIA_VERSION } from "@/lib/version";
 import { ClubMark } from "./ClubMark";
 
 export function Footer() {
@@ -10,9 +12,10 @@ export function Footer() {
   const flags = flagsQuery.data?.data;
   const blogEnabled = isFlagEnabled(flags, "public_blog");
   const announcementsEnabled = isFlagEnabled(flags, "announcements_board");
+  const calendarEnabled = isFlagEnabled(flags, "public_calendar");
 
   return (
-    <footer className="bg-ink text-paper">
+    <footer className="bg-chrome text-paper">
       <div className="mx-auto grid max-w-7xl gap-10 px-5 py-14 md:grid-cols-[1.3fr_1fr_1fr] md:px-8">
         <div>
           <div className="flex items-center gap-3">
@@ -50,16 +53,13 @@ export function Footer() {
                 Zawodnicy
               </Link>
             </li>
-            <li>
-              <Link href="/kalendarz" className="hover:text-paper">
-                Kalendarz
-              </Link>
-            </li>
-            <li>
-              <Link href="/kalkulator-sinclair" className="hover:text-paper">
-                Kalkulator Sinclair
-              </Link>
-            </li>
+            {calendarEnabled ? (
+              <li>
+                <Link href="/kalendarz" className="hover:text-paper">
+                  Kalendarz
+                </Link>
+              </li>
+            ) : null}
             {announcementsEnabled ? (
               <li>
                 <Link href="/ogloszenia" className="hover:text-paper">
@@ -97,10 +97,30 @@ export function Footer() {
       </div>
 
       <div className="border-t border-paper/10">
-        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-5 py-5 text-xs text-paper/45 md:flex-row md:items-center md:justify-between md:px-8">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-5 text-xs text-paper/45 md:flex-row md:items-center md:justify-between md:gap-4 md:px-8">
           <p>CKS Slavia Ruda Śląska © 2026</p>
-          <p>Jakub Gawron © 2026 </p>
-          <p>Dwubój olimpijski · Śląsk</p>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <Link
+              href="/polityka-prywatnosci"
+              className="hover:text-paper"
+            >
+              Polityka prywatności
+            </Link>
+            <button
+              type="button"
+              onClick={() => openCookieSettings()}
+              className="hover:text-paper"
+            >
+              Ustawienia cookies
+            </button>
+            <span
+              className="font-mono text-paper/35"
+              title="Wersja platformy (Slavia.toml)"
+            >
+              v{SLAVIA_VERSION}
+            </span>
+          </div>
+          <p>Jakub Gawron © 2026</p>
         </div>
       </div>
     </footer>

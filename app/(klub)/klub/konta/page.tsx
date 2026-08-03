@@ -8,6 +8,7 @@ import type { Role } from "@/lib/auth";
 import { useKlub } from "@/components/klub/KlubProvider";
 import { PhotoUploadField } from "@/components/settings/PhotoUploadField";
 import { ImageHolder } from "@/components/settings/ImageHolder";
+import { useToast } from "@/components/toast/ToastProvider";
 
 const ALL_ROLES: Role[] = ["zawodnik", "trener", "admin", "superadmin"];
 
@@ -15,7 +16,7 @@ type AccountLinkMode = "existing" | "new" | "none";
 type ProfileSex = "" | "male" | "female";
 
 const inputClass =
-  "border border-paper/20 bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand";
+  "border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand";
 const formClass =
   "grid gap-3 border border-paper/10 bg-paper/[0.03] p-4 sm:grid-cols-2";
 
@@ -36,6 +37,7 @@ function emptyProfileForm() {
 }
 
 export default function KontaPage() {
+  const toast = useToast();
   const { user, activeRole, viewAs } = useKlub();
   const showUsersSection =
     activeRole === "admin" || activeRole === "superadmin";
@@ -175,9 +177,12 @@ export default function KontaPage() {
       setNewName("");
       setNewPhotoUrl("");
       setNewRoles(["zawodnik"]);
+      toast.success("Utworzono konto", newName || newEmail);
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Nie udało się utworzyć");
+      const msg = err instanceof Error ? err.message : "Nie udało się utworzyć";
+      setError(msg);
+      toast.error("Tworzenie konta", msg);
     }
   }
 
@@ -199,10 +204,13 @@ export default function KontaPage() {
         method: "PATCH",
         body,
       });
+      toast.success("Zapisano konto", editName.trim() || editEmail.trim());
       cancelEditUser();
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Błąd zapisu konta");
+      const msg = err instanceof Error ? err.message : "Błąd zapisu konta";
+      setError(msg);
+      toast.error("Zapis konta", msg);
     }
   }
 
@@ -212,9 +220,15 @@ export default function KontaPage() {
         method: "PATCH",
         body: { is_active: !u.is_active },
       });
+      toast.success(
+        u.is_active ? "Zablokowano konto" : "Odblokowano konto",
+        u.display_name,
+      );
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Błąd banowania");
+      const msg = err instanceof Error ? err.message : "Błąd banowania";
+      setError(msg);
+      toast.error("Status konta", msg);
     }
   }
 
@@ -222,10 +236,13 @@ export default function KontaPage() {
     if (!confirm("Na pewno usunąć konto?")) return;
     try {
       await klubFetch(`/api/users/${id}`, { method: "DELETE" });
+      toast.success("Usunięto konto");
       if (editingUserId === id) cancelEditUser();
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Błąd usuwania");
+      const msg = err instanceof Error ? err.message : "Błąd usuwania";
+      setError(msg);
+      toast.error("Usuwanie konta", msg);
     }
   }
 
@@ -239,12 +256,14 @@ export default function KontaPage() {
       if (mode === "existing") {
         if (!profileForm.userId) {
           setError("Wybierz konto zawodnika z listy.");
+          toast.error("Profil", "Wybierz konto zawodnika z listy.");
           return;
         }
         userId = profileForm.userId;
       } else if (mode === "new") {
         if (!profileForm.accountEmail.trim() || !profileForm.accountPassword) {
           setError("Podaj e-mail i hasło dla nowego konta.");
+          toast.error("Profil", "Podaj e-mail i hasło dla nowego konta.");
           return;
         }
         const created = await klubFetch<PublicUser>("/api/users", {
@@ -276,17 +295,21 @@ export default function KontaPage() {
           method: "PATCH",
           body,
         });
+        toast.success("Zapisano profil", profileForm.name);
       } else {
         await klubFetch("/api/profiles", {
           method: "POST",
           body,
         });
+        toast.success("Dodano profil", profileForm.name);
       }
 
       resetProfileForm();
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Błąd profilu");
+      const msg = err instanceof Error ? err.message : "Błąd profilu";
+      setError(msg);
+      toast.error("Profil", msg);
     }
   }
 
@@ -294,10 +317,13 @@ export default function KontaPage() {
     if (!confirm("Usunąć profil zawodnika?")) return;
     try {
       await klubFetch(`/api/profiles/${id}`, { method: "DELETE" });
+      toast.success("Usunięto profil");
       if (editingProfileId === id) resetProfileForm();
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Błąd usuwania profilu");
+      const msg = err instanceof Error ? err.message : "Błąd usuwania profilu";
+      setError(msg);
+      toast.error("Usuwanie profilu", msg);
     }
   }
 

@@ -36,7 +36,7 @@ export default async function ZawodnicyPage() {
 
   return (
     <section className="relative isolate bg-background pb-0">
-      <div className="relative overflow-hidden bg-ink text-paper">
+      <div className="relative overflow-hidden bg-chrome text-paper">
         <div
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_70%_25%,rgba(200,16,46,0.2)_0%,transparent_48%),linear-gradient(160deg,#0e1014_0%,#1a1f26_100%)]"
           aria-hidden="true"

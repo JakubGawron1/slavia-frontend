@@ -9,6 +9,7 @@ import {
   resolvePanelTheme,
 } from "@/lib/panel-themes";
 import { isFlagEnabled } from "@/lib/public-flags";
+import { LoadingScene } from "@/components/loading/LoadingScene";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useKlub } from "./KlubProvider";
 import { KlubNav } from "./KlubNav";
@@ -35,15 +36,16 @@ export function KlubShell({ children }: { children: ReactNode }) {
 
   if (loading && !user) {
     return (
-      <div className="flex min-h-[100svh] items-center justify-center bg-ink text-paper/60">
-        Ładowanie panelu…
-      </div>
+      <LoadingScene
+        label="Panel klubowy"
+        hint="Sprawdzamy sesję i przygotowujemy pomost…"
+      />
     );
   }
 
   if (!user) {
     return (
-      <div className="flex min-h-[100svh] items-center justify-center bg-ink text-paper/60">
+      <div className="flex min-h-[100svh] items-center justify-center bg-chrome text-paper/60">
         {error ?? "Brak sesji."}
       </div>
     );
@@ -53,7 +55,7 @@ export function KlubShell({ children }: { children: ReactNode }) {
     <div
       data-panel-theme={theme}
       data-panel-layout={layout}
-      className="relative isolate flex h-[100svh] overflow-hidden bg-ink text-paper"
+      className="relative isolate flex h-[100svh] overflow-hidden bg-chrome text-paper"
     >
       <div className="panel-atmosphere pointer-events-none absolute inset-0" aria-hidden="true" />
 

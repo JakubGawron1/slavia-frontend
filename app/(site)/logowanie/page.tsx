@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
   return (
-    <section className="relative isolate min-h-[100svh] overflow-hidden bg-ink text-paper">
+    <section className="relative isolate min-h-[100svh] overflow-hidden bg-chrome text-paper">
       <div
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_15%_20%,rgba(200,16,46,0.22)_0%,transparent_45%),radial-gradient(ellipse_at_85%_80%,rgba(74,85,96,0.35)_0%,transparent_50%),linear-gradient(160deg,#0e1014_0%,#1a1f26_55%,#12151a_100%)]"
         aria-hidden="true"

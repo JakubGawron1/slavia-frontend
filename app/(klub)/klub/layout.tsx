@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { KlubProvider } from "@/components/klub/KlubProvider";
 import { KlubShell } from "@/components/klub/KlubShell";
+import { KlubWhatsNewHost } from "@/components/changelog/KlubWhatsNewHost";
 
 export const metadata: Metadata = {
   title: "Panel klubowy",
@@ -15,6 +16,7 @@ export default function KlubLayout({
   return (
     <KlubProvider>
       <KlubShell>{children}</KlubShell>
+      <KlubWhatsNewHost />
     </KlubProvider>
   );
 }

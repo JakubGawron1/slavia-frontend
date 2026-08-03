@@ -13,7 +13,9 @@ import {
   type AuthUser,
   type Role,
 } from "@/lib/auth";
+import { useListPublicFlags } from "@/lib/api/generated/default/default";
 import { ROLE_LABELS, STAFF_ROLES } from "@/lib/klub-nav";
+import { isFlagEnabled, PUBLIC_CALENDAR_FLAG } from "@/lib/public-flags";
 
 export function PanelClient() {
   const router = useRouter();
@@ -80,6 +82,11 @@ export function PanelClient() {
   }
 
   const isStaff = hasAnyRole(user, STAFF_ROLES);
+  const flagsQuery = useListPublicFlags({ query: { staleTime: 60_000 } });
+  const calendarEnabled = isFlagEnabled(
+    flagsQuery.data?.data,
+    PUBLIC_CALENDAR_FLAG,
+  );
 
   return (
     <div className="w-full max-w-2xl">
@@ -124,12 +131,14 @@ export function PanelClient() {
             Panel zawodnika
           </Link>
         ) : null}
-        <Link
-          href="/kalendarz"
-          className="border border-paper/30 px-6 py-3 font-display text-sm tracking-[0.12em] uppercase transition-colors hover:border-paper hover:bg-paper/10"
-        >
-          Kalendarz
-        </Link>
+        {calendarEnabled ? (
+          <Link
+            href="/kalendarz"
+            className="border border-paper/30 px-6 py-3 font-display text-sm tracking-[0.12em] uppercase transition-colors hover:border-paper hover:bg-paper/10"
+          >
+            Kalendarz
+          </Link>
+        ) : null}
         <button
           type="button"
           onClick={logout}

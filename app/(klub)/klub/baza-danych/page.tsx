@@ -2,8 +2,10 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { klubFetch } from "@/lib/klub-api";
+import { useToast } from "@/components/toast/ToastProvider";
 
 export default function BazaDanychPage() {
+  const toast = useToast();
   const [tables, setTables] = useState<string[]>([]);
   const [table, setTable] = useState<string>("");
   const [rows, setRows] = useState<Record<string, unknown>[]>([]);
@@ -57,10 +59,13 @@ export default function BazaDanychPage() {
         body: { row },
       });
       setMessage("Zapisano wiersz.");
+      toast.success("Zapisano wiersz", table);
       setEditJson("");
       await loadRows(table);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Zapis nieudany");
+      const msg = err instanceof Error ? err.message : "Zapis nieudany";
+      setError(msg);
+      toast.error("Baza danych", msg);
     }
   }
 
@@ -68,9 +73,12 @@ export default function BazaDanychPage() {
     if (!confirm(`Usunąć rekord ${id}?`)) return;
     try {
       await klubFetch(`/api/admin/db/${table}/${id}`, { method: "DELETE" });
+      toast.success("Usunięto rekord", id);
       await loadRows(table);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Usuwanie nieudane");
+      const msg = err instanceof Error ? err.message : "Usuwanie nieudane";
+      setError(msg);
+      toast.error("Baza danych", msg);
     }
   }
 
@@ -180,7 +188,7 @@ export default function BazaDanychPage() {
           Upsert wiersza (JSON)
         </p>
         <textarea
-          className="h-48 w-full border border-paper/20 bg-ink/40 p-3 font-mono text-xs outline-none focus:border-brand"
+          className="h-48 w-full border border-paper/20 bg-chrome/40 p-3 font-mono text-xs outline-none focus:border-brand"
           value={editJson}
           onChange={(e) => setEditJson(e.target.value)}
           placeholder='{"id":"…", ...}'

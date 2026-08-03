@@ -101,7 +101,7 @@ export function LoginForm() {
             disabled={state === "submitting"}
             aria-invalid={Boolean(error)}
             aria-describedby={error ? errorId : undefined}
-            className="mt-2 w-full border border-paper/20 bg-ink/40 px-4 py-3.5 text-paper outline-none transition-[border-color,background-color] placeholder:text-paper/35 focus:border-brand focus:bg-ink/60 disabled:opacity-60"
+            className="mt-2 w-full border border-paper/20 bg-chrome/40 px-4 py-3.5 text-paper outline-none transition-[border-color,background-color] placeholder:text-paper/35 focus:border-brand focus:bg-chrome/60 disabled:opacity-60"
             placeholder="superadmin@cks-slavia.local"
           />
         </div>
@@ -132,7 +132,7 @@ export function LoginForm() {
             disabled={state === "submitting"}
             aria-invalid={Boolean(error)}
             aria-describedby={error ? errorId : undefined}
-            className="mt-2 w-full border border-paper/20 bg-ink/40 px-4 py-3.5 text-paper outline-none transition-[border-color,background-color] placeholder:text-paper/35 focus:border-brand focus:bg-ink/60 disabled:opacity-60"
+            className="mt-2 w-full border border-paper/20 bg-chrome/40 px-4 py-3.5 text-paper outline-none transition-[border-color,background-color] placeholder:text-paper/35 focus:border-brand focus:bg-chrome/60 disabled:opacity-60"
             placeholder="••••••••"
           />
         </div>

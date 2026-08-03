@@ -13,6 +13,7 @@ import {
   type PanelThemeId,
 } from "@/lib/panel-themes";
 import { isFlagEnabled } from "@/lib/public-flags";
+import { LoadingScene } from "@/components/loading/LoadingScene";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { STAFF_ROLES } from "@/lib/klub-nav";
 import { usePanel } from "./PanelProvider";
@@ -26,23 +27,38 @@ function useResolvedPanelTheme(raw?: string | null): PanelThemeId {
   return resolvePanelTheme(raw, { allowExperimental });
 }
 
+function useVisiblePanelModules() {
+  const flagsQuery = useListPublicFlags({ query: { staleTime: 60_000 } });
+  const flags = flagsQuery.data?.data;
+  return PANEL_MODULES.filter(
+    (mod) => !mod.flag || isFlagEnabled(flags, mod.flag),
+  );
+}
+
 export function PanelShell({ children }: { children: ReactNode }) {
   const { user, loading, error, logout } = usePanel();
   const pathname = usePathname();
   const theme = useResolvedPanelTheme(user?.ui_theme);
   const layout = getPanelTheme(theme).layout;
+  const wideContent = pathname.startsWith("/panel/kalendarz");
+  const contentMax = wideContent ? "max-w-[96rem]" : "max-w-6xl";
+  const isSuperadmin = Boolean(user?.roles.includes("superadmin"));
+  const modules = useVisiblePanelModules().filter(
+    (mod) => !(isSuperadmin && mod.href === "/panel/co-nowego"),
+  );
 
   if (loading && !user) {
     return (
-      <div className="flex min-h-[100svh] items-center justify-center bg-ink text-paper/60">
-        Ładowanie panelu…
-      </div>
+      <LoadingScene
+        label="Panel zawodnika"
+        hint="Sprawdzamy sesję i przygotowujemy pomost…"
+      />
     );
   }
 
   if (!user) {
     return (
-      <div className="flex min-h-[100svh] items-center justify-center bg-ink text-paper/60">
+      <div className="flex min-h-[100svh] items-center justify-center bg-chrome text-paper/60">
         {error ?? "Brak sesji."}
       </div>
     );
@@ -79,7 +95,7 @@ export function PanelShell({ children }: { children: ReactNode }) {
 
   const navItems = [
     { href: "/panel", label: "Pulpit", exact: true },
-    ...PANEL_MODULES.map((mod) => ({
+    ...modules.map((mod) => ({
       href: mod.href,
       label: mod.label,
       exact: false,
@@ -101,10 +117,10 @@ export function PanelShell({ children }: { children: ReactNode }) {
       <div
         data-panel-theme={theme}
         data-panel-layout={layout}
-        className="relative isolate flex min-h-[100svh] bg-ink text-paper"
+        className="relative isolate flex min-h-[100svh] bg-chrome text-paper"
       >
         <div className="panel-atmosphere pointer-events-none absolute inset-0" aria-hidden="true" />
-        <aside className="relative z-10 flex w-[4.75rem] shrink-0 flex-col border-r border-paper/10 bg-ink/70 py-4 md:w-52 md:px-3">
+        <aside className="relative z-10 flex w-[4.75rem] shrink-0 flex-col border-r border-paper/10 bg-chrome/70 py-4 md:w-52 md:px-3">
           <Link
             href="/panel"
             className="px-2 font-display text-[10px] tracking-[0.18em] text-brand uppercase md:px-3 md:text-sm md:tracking-[0.2em]"
@@ -145,7 +161,7 @@ export function PanelShell({ children }: { children: ReactNode }) {
             </p>
           </header>
           <main className="flex-1 p-4 md:p-6 lg:p-8">
-            <div className="settings-surface mx-auto max-w-6xl rounded-[var(--panel-radius)] border border-paper/10 bg-ink/40 p-4 shadow-[var(--panel-elev)] md:p-6">
+            <div className={`settings-surface mx-auto ${contentMax} rounded-[var(--panel-radius)] border border-paper/10 bg-chrome/40 p-4 shadow-[var(--panel-elev)] md:p-6`}>
               {children}
             </div>
           </main>
@@ -159,11 +175,11 @@ export function PanelShell({ children }: { children: ReactNode }) {
       <div
         data-panel-theme={theme}
         data-panel-layout={layout}
-        className="relative isolate flex min-h-[100svh] flex-col bg-ink text-paper"
+        className="relative isolate flex min-h-[100svh] flex-col bg-chrome text-paper"
       >
         <div className="panel-atmosphere pointer-events-none absolute inset-0" aria-hidden="true" />
-        <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 pb-28 pt-5 md:px-6">
-          <header className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--panel-radius)] border border-paper/10 bg-ink/55 px-4 py-3 shadow-[var(--panel-elev)]">
+        <div className={`relative z-10 mx-auto flex w-full ${contentMax} flex-1 flex-col px-4 pb-28 pt-5 md:px-6`}>
+          <header className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--panel-radius)] border border-paper/10 bg-chrome/55 px-4 py-3 shadow-[var(--panel-elev)]">
             <div>
               <Link
                 href="/panel"
@@ -175,7 +191,7 @@ export function PanelShell({ children }: { children: ReactNode }) {
             </div>
             {actions()}
           </header>
-          <div className="mt-4 flex-1 rounded-[var(--panel-radius)] border border-paper/10 bg-ink/45 p-4 shadow-[var(--panel-elev)] md:p-6">
+          <div className="mt-4 flex-1 rounded-[var(--panel-radius)] border border-paper/10 bg-chrome/45 p-4 shadow-[var(--panel-elev)] md:p-6">
             {children}
           </div>
         </div>
@@ -183,7 +199,7 @@ export function PanelShell({ children }: { children: ReactNode }) {
           className="fixed inset-x-0 bottom-0 z-20 px-3 pb-3 pt-2"
           aria-label="Moduły zawodnika"
         >
-          <div className="mx-auto flex max-w-6xl gap-1 overflow-x-auto rounded-[var(--panel-radius)] border border-paper/15 bg-ink/90 p-1.5 shadow-[var(--panel-elev)] backdrop-blur-md">
+          <div className="mx-auto flex max-w-6xl gap-1 overflow-x-auto rounded-[var(--panel-radius)] border border-paper/15 bg-chrome/90 p-1.5 shadow-[var(--panel-elev)] backdrop-blur-md">
             {navItems.map((item) => {
               const active = isActive(item.href, item.exact);
               return (
@@ -211,11 +227,11 @@ export function PanelShell({ children }: { children: ReactNode }) {
       <div
         data-panel-theme={theme}
         data-panel-layout={layout}
-        className="relative isolate min-h-[100svh] bg-ink text-paper"
+        className="relative isolate min-h-[100svh] bg-chrome text-paper"
       >
         <div className="panel-atmosphere pointer-events-none absolute inset-0" aria-hidden="true" />
-        <div className="relative z-10 mx-auto max-w-6xl p-3 md:p-5">
-          <div className="rounded-[var(--panel-radius)] border-2 border-paper/20 bg-ink/60 p-3 shadow-[var(--panel-elev)] md:p-5">
+        <div className={`relative z-10 mx-auto ${contentMax} p-3 md:p-5`}>
+          <div className="rounded-[var(--panel-radius)] border-2 border-paper/20 bg-chrome/60 p-3 shadow-[var(--panel-elev)] md:p-5">
             <header className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-brand/40 pb-4">
               <div>
                 <Link
@@ -246,7 +262,7 @@ export function PanelShell({ children }: { children: ReactNode }) {
                 );
               })}
             </nav>
-            <div className="mt-5 rounded-[var(--panel-radius-sm)] border border-paper/10 bg-ink/40 p-4 md:p-5">
+            <div className="mt-5 rounded-[var(--panel-radius-sm)] border border-paper/10 bg-chrome/40 p-4 md:p-5">
               {children}
             </div>
           </div>
@@ -260,7 +276,7 @@ export function PanelShell({ children }: { children: ReactNode }) {
       <div
         data-panel-theme={theme}
         data-panel-layout={layout}
-        className="relative isolate min-h-[100svh] bg-ink text-paper"
+        className="relative isolate min-h-[100svh] bg-chrome text-paper"
       >
         <div className="panel-atmosphere pointer-events-none absolute inset-0" aria-hidden="true" />
         <div className="relative z-10">
@@ -281,7 +297,7 @@ export function PanelShell({ children }: { children: ReactNode }) {
             </div>
           </div>
           <nav
-            className="border-b border-paper/10 bg-ink/80 px-4 py-3 md:px-6"
+            className="border-b border-paper/10 bg-chrome/80 px-4 py-3 md:px-6"
             aria-label="Moduły zawodnika"
           >
             <div className="mx-auto flex max-w-6xl gap-2 overflow-x-auto">
@@ -293,7 +309,7 @@ export function PanelShell({ children }: { children: ReactNode }) {
                     href={item.href}
                     className={
                       active
-                        ? "shrink-0 rounded-[var(--panel-radius-pill)] bg-paper px-4 py-2 font-display text-[11px] tracking-[0.1em] text-ink uppercase"
+                        ? "shrink-0 rounded-[var(--panel-radius-pill)] bg-surface px-4 py-2 font-display text-[11px] tracking-[0.1em] text-ink uppercase"
                         : "shrink-0 rounded-[var(--panel-radius-pill)] bg-paper/10 px-4 py-2 font-display text-[11px] tracking-[0.1em] text-paper/60 uppercase transition-colors hover:bg-paper/15 hover:text-paper"
                     }
                   >
@@ -303,7 +319,7 @@ export function PanelShell({ children }: { children: ReactNode }) {
               })}
             </div>
           </nav>
-          <div className="mx-auto max-w-6xl px-4 py-6 md:px-6 md:py-8">{children}</div>
+          <div className={`mx-auto ${contentMax} px-4 py-6 md:px-6 md:py-8`}>{children}</div>
         </div>
       </div>
     );
@@ -323,21 +339,21 @@ export function PanelShell({ children }: { children: ReactNode }) {
     <div
       data-panel-theme={theme}
       data-panel-layout={layout}
-      className="relative isolate min-h-[100svh] bg-ink text-paper"
+      className="relative isolate min-h-[100svh] bg-chrome text-paper"
     >
       <div className="panel-atmosphere pointer-events-none absolute inset-0" aria-hidden="true" />
 
       <div
-        className={
-          capsule
-            ? "relative mx-auto max-w-6xl px-3 py-4 md:px-5 md:py-6"
-            : "relative mx-auto max-w-6xl px-4 py-6 md:px-6 md:py-8"
-        }
+          className={
+            capsule
+              ? `relative mx-auto ${contentMax} px-3 py-4 md:px-5 md:py-6`
+              : `relative mx-auto ${contentMax} px-4 py-6 md:px-6 md:py-8`
+          }
       >
         <div
           className={
             capsule
-              ? "rounded-[var(--panel-radius)] border border-paper/12 bg-ink/50 p-4 shadow-[var(--panel-elev)] md:p-6"
+              ? "rounded-[var(--panel-radius)] border border-paper/12 bg-chrome/50 p-4 shadow-[var(--panel-elev)] md:p-6"
               : undefined
           }
         >
@@ -363,7 +379,7 @@ export function PanelShell({ children }: { children: ReactNode }) {
           <nav
             className={
               capsule
-                ? "mt-2 flex items-center gap-1 overflow-x-auto rounded-[var(--panel-radius-pill)] border border-paper/10 bg-ink/35 p-1"
+                ? "mt-2 flex items-center gap-1 overflow-x-auto rounded-[var(--panel-radius-pill)] border border-paper/10 bg-chrome/35 p-1"
                 : "mt-4 flex items-end gap-1 overflow-x-auto border-b border-paper/10 pb-px"
             }
             aria-label="Moduły zawodnika"

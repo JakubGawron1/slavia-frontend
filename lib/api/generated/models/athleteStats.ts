@@ -11,6 +11,21 @@ export interface AthleteStats {
   attendance_month: number;
   /** @minimum 0 */
   attendance_window: number;
+  /**
+   * Najlepszy zaakceptowany podrzut (kg)
+   * @nullable
+   */
+  best_clean_jerk_kg?: number | null;
+  /**
+   * Najlepsze zaakceptowane rwanie (kg)
+   * @nullable
+   */
+  best_snatch_kg?: number | null;
+  /**
+   * Najlepszy zaakceptowany dwubój (kg)
+   * @nullable
+   */
+  best_total_kg?: number | null;
   /** @nullable */
   bodyweight_kg?: number | null;
   /** @nullable */
@@ -25,4 +40,9 @@ export interface AthleteStats {
   results_pending: number;
   /** @minimum 0 */
   results_total: number;
+  /**
+   * Liczba zaakceptowanych startów (wyniki z zawodów)
+   * @minimum 0
+   */
+  starts_count: number;
 }

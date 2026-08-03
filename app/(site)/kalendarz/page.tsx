@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { ClubCalendar } from "@/components/ClubCalendar";
+import { listPublicFlags } from "@/lib/api/generated/default/default";
 import { toDateKey } from "@/lib/calendar";
 import { getEvents } from "@/lib/events";
+import { isFlagEnabled, PUBLIC_CALENDAR_FLAG } from "@/lib/public-flags";
 
 export const metadata: Metadata = {
   title: "Kalendarz",
@@ -10,6 +13,18 @@ export const metadata: Metadata = {
 };
 
 export default async function CalendarPage() {
+  let flagEnabled = true;
+  try {
+    const result = await listPublicFlags();
+    flagEnabled = isFlagEnabled(result.data, PUBLIC_CALENDAR_FLAG);
+  } catch {
+    flagEnabled = true;
+  }
+
+  if (!flagEnabled) {
+    notFound();
+  }
+
   const todayKey = toDateKey(new Date());
   const events = await getEvents();
 
@@ -25,7 +40,7 @@ export default async function CalendarPage() {
           aria-hidden="true"
         />
 
-        <div className="relative mx-auto max-w-[90rem] px-4 pt-24 pb-8 sm:px-6 md:pt-28 md:pb-10 lg:px-8">
+        <div className="relative mx-auto max-w-[110rem] px-4 pt-24 pb-8 sm:px-6 md:pt-28 md:pb-10 lg:px-8">
           <p className="animate-rise font-display text-sm tracking-[0.28em] text-brand uppercase">
             Terminarz
           </p>
@@ -42,12 +57,8 @@ export default async function CalendarPage() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-[90rem] px-4 pt-5 pb-2 sm:px-6 lg:px-8 lg:pt-6">
+      <div className="mx-auto max-w-[110rem] px-4 pt-5 pb-2 sm:px-6 lg:px-8 lg:pt-6">
         <ClubCalendar initialEvents={events} todayKey={todayKey} />
-        <p className="mt-4 text-xs text-steel-soft">
-          Dane przykładowe — po podłączeniu backendu:{" "}
-          <code className="text-ink">NEXT_PUBLIC_API_URL/api/events</code>
-        </p>
       </div>
     </section>
   );

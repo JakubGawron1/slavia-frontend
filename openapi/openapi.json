@@ -2878,7 +2878,8 @@
           "attendance_month",
           "attendance_window",
           "plans_active",
-          "plans_completed_exercises"
+          "plans_completed_exercises",
+          "starts_count"
         ],
         "properties": {
           "attendance_month": {
@@ -2888,6 +2889,30 @@
           "attendance_window": {
             "type": "integer",
             "minimum": 0
+          },
+          "best_clean_jerk_kg": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "description": "Najlepszy zaakceptowany podrzut (kg)"
+          },
+          "best_snatch_kg": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "description": "Najlepsze zaakceptowane rwanie (kg)"
+          },
+          "best_total_kg": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "description": "Najlepszy zaakceptowany dwubój (kg)"
           },
           "bodyweight_kg": {
             "type": [
@@ -2921,6 +2946,11 @@
           "results_total": {
             "type": "integer",
             "minimum": 0
+          },
+          "starts_count": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Liczba zaakceptowanych startów (wyniki z zawodów)"
           }
         }
       },

@@ -6,11 +6,13 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
+  clearSession,
   destroySession,
   fetchMe,
   getStoredToken,
@@ -101,6 +103,7 @@ export function KlubProvider({ children }: { children: ReactNode }) {
   );
   const [viewAs, setViewAsState] = useState<ViewAsState>(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const cookieSyncedFor = useRef<string | null>(null);
 
   const refreshUser = useCallback(async (next?: AuthUser) => {
     if (next) {
@@ -129,6 +132,14 @@ export function KlubProvider({ children }: { children: ReactNode }) {
     async function load() {
       const token = getStoredToken();
       if (!token) {
+        // Cookie bez localStorage → proxy wpuszcza na /klub, a UI wisi na „Ładowanie…”
+        clearSession();
+        try {
+          await destroySession();
+        } catch {
+          /* ignore */
+        }
+        if (!cancelled) setLoading(false);
         router.replace("/logowanie");
         return;
       }
@@ -145,11 +156,11 @@ export function KlubProvider({ children }: { children: ReactNode }) {
         const me = await fetchMe(token);
         if (cancelled) return;
         if (!hasAnyRole(me, STAFF_ROLES)) {
+          if (!cancelled) setLoading(false);
           router.replace("/panel");
           return;
         }
         storeSession(token, me);
-        void syncSessionCookie(token);
         setUser(me);
         setActiveRoleState(readActiveRole(me.roles));
         setCollapsed(readCollapsed());
@@ -157,7 +168,13 @@ export function KlubProvider({ children }: { children: ReactNode }) {
         setError(null);
       } catch (err) {
         if (cancelled) return;
-        await destroySession();
+        // Najpierw lokalnie, potem cookie — żeby proxy nie odbijało /logowanie → /klub
+        clearSession();
+        try {
+          await destroySession();
+        } catch {
+          /* ignore */
+        }
         setError(err instanceof Error ? err.message : "Sesja wygasła.");
         router.replace("/logowanie");
       } finally {
@@ -173,10 +190,23 @@ export function KlubProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!user || loading) return;
+    // Unikaj pętli replace → RSC refetch na samym /klub
+    if (pathname === "/klub" || pathname === "/klub/") return;
     if (!canAccessPath(pathname, user.roles)) {
       router.replace("/klub");
     }
   }, [user, loading, pathname, router]);
+
+  // syncSessionCookie tylko raz na token — ponowne Set-Cookie potrafi wywołać RSC refresh
+  useEffect(() => {
+    if (!user || loading) return;
+    const token = getStoredToken();
+    if (!token || cookieSyncedFor.current === token) return;
+    cookieSyncedFor.current = token;
+    void syncSessionCookie(token).catch(() => {
+      cookieSyncedFor.current = null;
+    });
+  }, [user, loading]);
 
   useEffect(() => {
     setMobileNavOpen(false);
