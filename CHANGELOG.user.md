@@ -11,6 +11,13 @@ Format:
 - zdanie zrozumiałe dla zwykłego użytkownika
 ```
 
+## [1.0.0.1+1] - 2026-08-03
+
+### Zawody przez kilka dni
+
+- Przy dodawaniu lub edycji zawodów możesz podać datę zakończenia — zawody wielodniowe widać w kalendarzu jako jeden ciągły termin.
+- Domyślnie koniec to ten sam dzień co start (jak dotychczas przy jednodniowych).
+
 ## [1.0.0] - 2026-08-03
 
 ### Łatwiej śledzić obecność na treningach

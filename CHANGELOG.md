@@ -12,6 +12,14 @@ Format sekcji:
 
 Opcjonalnie po dacie: `!breaking` (breaking API).
 
+## [1.0.0.1+1] - 2026-08-03
+
+### Zawody wielodniowe w kalendarzu
+
+- Formularz tworzenia/edycji zawodów: pole **Data zakończenia** (domyślnie = dzień rozpoczęcia).
+- Siatka kalendarza: pasek wydarzenia przez wiele dni (`end_date`).
+- Odwołanie / usuwanie / przywracanie przez modale UI (bez `alert` / `confirm` / `prompt`).
+
 ## [1.0.0] - 2026-08-03
 
 ### DevTools: Changelog + wersja platformy

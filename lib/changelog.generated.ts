@@ -3,6 +3,17 @@ import type { ChangelogEntry } from "@/lib/changelog";
 
 export const GENERATED_CHANGELOG: ChangelogEntry[] = [
   {
+    "version": "1.0.0.1+1",
+    "date": "2026-08-03",
+    "category": "backend",
+    "title": "`end_date` dla zawodów",
+    "notes": [
+      "`CalendarEvent.end_date` (włącznie); brak / równy `date` = jednodniowe.",
+      "Walidacja w create/update: treningi bez zakresu; zawody z opcjonalnym zakresem.",
+      "Publiczne / zawodnik DTO zwracają `end_date` gdy zakres > 1 dzień."
+    ]
+  },
+  {
     "version": "1.0.0",
     "date": "2026-08-03",
     "category": "frontend",
@@ -12,6 +23,15 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
       "Wersja platformy z `Slavia.toml` (`lib/version.ts`) widoczna w stopce strony publicznej.",
       "Skrypt `scripts/sync-version.mjs` synchronizuje version w package.json / Cargo.toml / pubspec.yaml.",
       "Wpisy changelogu pochodzą z `CHANGELOG.md` każdego projektu (`sync-changelog`)."
+    ]
+  },
+  {
+    "version": "1.0.0.1+1",
+    "date": "2026-08-03",
+    "category": "mobile",
+    "title": "Sync wersji poprawki",
+    "notes": [
+      "`Slavia.toml` dopuszcza `X.Y.Z.W+build`; mobile dostaje kompatybilne `semver3+build` (np. `1.0.1+1`)."
     ]
   },
   {
@@ -31,6 +51,17 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
     "notes": [
       "`info.version` w OpenAPI synchronizowane z `Slavia.toml` (`sync-version`).",
       "Brak breaking API w tej wersji — klienci (web/mobile) dzielą ten sam numer."
+    ]
+  },
+  {
+    "version": "1.0.0.1+1",
+    "date": "2026-08-03",
+    "category": "frontend",
+    "title": "Zawody wielodniowe w kalendarzu",
+    "notes": [
+      "Formularz tworzenia/edycji zawodów: pole **Data zakończenia** (domyślnie = dzień rozpoczęcia).",
+      "Siatka kalendarza: pasek wydarzenia przez wiele dni (`end_date`).",
+      "Odwołanie / usuwanie / przywracanie przez modale UI (bez `alert` / `confirm` / `prompt`)."
     ]
   },
   {
