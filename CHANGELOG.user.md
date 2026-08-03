@@ -18,6 +18,10 @@ Format:
 - Przy dodawaniu lub edycji zawodów możesz podać datę zakończenia — zawody wielodniowe widać w kalendarzu jako jeden ciągły termin.
 - Domyślnie koniec to ten sam dzień co start (jak dotychczas przy jednodniowych).
 
+### Szybszy kalendarz zawodnika
+
+- Treningi i zawody w panelu zawodnika ładują się wyraźnie szybciej i znów są widoczne na siatce.
+
 ## [1.0.0] - 2026-08-03
 
 ### Łatwiej śledzić obecność na treningach

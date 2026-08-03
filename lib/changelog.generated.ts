@@ -28,6 +28,28 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
   {
     "version": "1.0.0.1+1",
     "date": "2026-08-03",
+    "category": "frontend",
+    "title": "Fix: kalendarz zawodnika",
+    "notes": [
+      "`GET /api/events/mine` nie robi już N× odczytów DB na każde wydarzenie (profile + attendance raz).",
+      "Reconcile auto-nieobecności ograniczone do ostatnich 21 dni i zbatchowane.",
+      "Zakres dat w żądaniu FE + wskaźnik ładowania."
+    ]
+  },
+  {
+    "version": "1.0.0.1+1",
+    "date": "2026-08-03",
+    "category": "backend",
+    "title": "Fix: wydajność `/api/events/mine`",
+    "notes": [
+      "Jednorazowe `list_profiles` + `list_attendance` przy budowie widoku zawodnika (wcześniej per event).",
+      "`reconcile_past_training_attendance_since_days` — batch + limit dni (mine: 21, attendance: 62).",
+      "Widoczność: `club_assigned` **lub** `all_athletes` **lub** skład; treningi bez rozdmuchanej listy `assigned_athletes`."
+    ]
+  },
+  {
+    "version": "1.0.0.1+1",
+    "date": "2026-08-03",
     "category": "mobile",
     "title": "Sync wersji poprawki",
     "notes": [

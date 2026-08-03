@@ -20,6 +20,12 @@ Opcjonalnie po dacie: `!breaking` (breaking API).
 - Siatka kalendarza: pasek wydarzenia przez wiele dni (`end_date`).
 - Odwołanie / usuwanie / przywracanie przez modale UI (bez `alert` / `confirm` / `prompt`).
 
+### Fix: kalendarz zawodnika
+
+- `GET /api/events/mine` nie robi już N× odczytów DB na każde wydarzenie (profile + attendance raz).
+- Reconcile auto-nieobecności ograniczone do ostatnich 21 dni i zbatchowane.
+- Zakres dat w żądaniu FE + wskaźnik ładowania.
+
 ## [1.0.0] - 2026-08-03
 
 ### DevTools: Changelog + wersja platformy

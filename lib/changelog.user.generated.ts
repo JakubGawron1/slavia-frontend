@@ -31,6 +31,14 @@ export const GENERATED_USER_CHANGELOG: UserChangelogEntry[] = [
   {
     "version": "1.0.0.1+1",
     "date": "2026-08-03",
+    "title": "Szybszy kalendarz zawodnika",
+    "notes": [
+      "Treningi i zawody w panelu zawodnika ładują się wyraźnie szybciej i znów są widoczne na siatce."
+    ]
+  },
+  {
+    "version": "1.0.0.1+1",
+    "date": "2026-08-03",
     "title": "Zawody przez kilka dni",
     "notes": [
       "Przy dodawaniu lub edycji zawodów możesz podać datę zakończenia — zawody wielodniowe widać w kalendarzu jako jeden ciągły termin.",

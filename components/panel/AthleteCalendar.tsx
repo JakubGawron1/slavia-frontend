@@ -16,10 +16,18 @@ import {
 } from "@/lib/events";
 import { klubFetch } from "@/lib/klub-api";
 
+function eventsRangeAroundToday(): { from: string; to: string } {
+  const today = new Date();
+  const fromDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+  const toDate = new Date(today.getFullYear(), today.getMonth() + 4, 0);
+  return { from: toDateKey(fromDate), to: toDateKey(toDate) };
+}
+
 export function AthleteCalendar() {
   const toast = useToast();
   const todayKey = toDateKey(new Date());
   const [events, setEvents] = useState<AthleteCalendarEvent[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [mineOnly, setMineOnly] = useState(false);
   const [hideCancelled, setHideCancelled] = useState(false);
@@ -28,15 +36,20 @@ export function AthleteCalendar() {
 
   const load = useCallback(async () => {
     setError(null);
+    setLoading(true);
     try {
-      const data = await klubFetch<AthleteCalendarEvent[]>("/api/events/mine", {
-        auth: true,
-      });
-      setEvents(data);
+      const { from, to } = eventsRangeAroundToday();
+      const data = await klubFetch<AthleteCalendarEvent[]>(
+        `/api/events/mine?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`,
+        { auth: true },
+      );
+      setEvents(Array.isArray(data) ? data : []);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Błąd kalendarza";
       setError(msg);
       toast.error("Nie udało się załadować", msg);
+    } finally {
+      setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -141,32 +154,36 @@ export function AthleteCalendar() {
         </p>
       ) : null}
 
+      {loading && events.length === 0 ? (
+        <p className="text-sm text-paper/50">Ładowanie wydarzeń…</p>
+      ) : null}
+
       <div className="flex w-full min-w-0 min-h-[min(48rem,calc(100svh-10.5rem))] flex-col rounded border border-paper/10">
         <div className="min-h-0 flex-1">
-        <CalendarMonthGrid
-          events={clubEvents}
-          todayKey={todayKey}
-          filterTypes={["zawody", "trening"]}
-          hideCancelled={hideCancelled}
-          onHideCancelledChange={setHideCancelled}
-          onSelectEvent={onSelect}
-          size="medium"
-          layout="wide"
-          tone="panel"
-          extraFilters={
-            <button
-              type="button"
-              onClick={() => setMineOnly((v) => !v)}
-              className={`px-3 py-2 font-display text-xs tracking-[0.1em] uppercase ${
-                mineOnly
-                  ? "bg-brand text-paper"
-                  : "border border-paper/20 text-paper/60 hover:border-paper/40"
-              }`}
-            >
-              Moje starty
-            </button>
-          }
-        />
+          <CalendarMonthGrid
+            events={clubEvents}
+            todayKey={todayKey}
+            filterTypes={["zawody", "trening"]}
+            hideCancelled={hideCancelled}
+            onHideCancelledChange={setHideCancelled}
+            onSelectEvent={onSelect}
+            size="medium"
+            layout="wide"
+            tone="panel"
+            extraFilters={
+              <button
+                type="button"
+                onClick={() => setMineOnly((v) => !v)}
+                className={`px-3 py-2 font-display text-xs tracking-[0.1em] uppercase ${
+                  mineOnly
+                    ? "bg-brand text-paper"
+                    : "border border-paper/20 text-paper/60 hover:border-paper/40"
+                }`}
+              >
+                Moje starty
+              </button>
+            }
+          />
         </div>
       </div>
 
