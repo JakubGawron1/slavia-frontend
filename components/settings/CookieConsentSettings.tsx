@@ -38,7 +38,14 @@ function statusLabel(consent: CookieConsentPreferences | null): string {
  * Zarządzanie zgodą RODO / cookies w ustawieniach panelu.
  * Wycofanie opcjonalnych zgód = tylko niezbędne (analityka wyłączona).
  */
-export function CookieConsentSettings({ className }: { className?: string }) {
+export function CookieConsentSettings({
+  className,
+  hideHeading = false,
+}: {
+  className?: string;
+  /** Gdy true — bez własnego h2 (np. wewnątrz SettingsCategory). */
+  hideHeading?: boolean;
+}) {
   const toast = useToast();
   const functionalId = useId();
   const analyticsId = useId();
@@ -102,10 +109,12 @@ export function CookieConsentSettings({ className }: { className?: string }) {
 
   return (
     <section className={className}>
-      <h2 className="font-display text-sm tracking-[0.16em] text-paper/70 uppercase">
-        Prywatność i cookies
-      </h2>
-      <p className="mt-2 text-sm text-paper/55">
+      {hideHeading ? null : (
+        <h2 className="font-display text-sm tracking-[0.16em] text-paper/70 uppercase">
+          Prywatność i cookies
+        </h2>
+      )}
+      <p className={hideHeading ? "text-sm text-paper/55" : "mt-2 text-sm text-paper/55"}>
         Zarządzaj zgodami RODO. Analityka i preferencje opcjonalne możesz
         wycofać w każdej chwili. Szczegóły w{" "}
         <Link

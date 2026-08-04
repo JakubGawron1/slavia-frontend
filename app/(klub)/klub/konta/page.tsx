@@ -9,16 +9,18 @@ import { useKlub } from "@/components/klub/KlubProvider";
 import { PhotoUploadField } from "@/components/settings/PhotoUploadField";
 import { ImageHolder } from "@/components/settings/ImageHolder";
 import { useToast } from "@/components/toast/ToastProvider";
+import { Modal } from "@/components/ui/Modal";
 
 const ALL_ROLES: Role[] = ["zawodnik", "trener", "admin", "superadmin"];
 
 type AccountLinkMode = "existing" | "new" | "none";
 type ProfileSex = "" | "male" | "female";
+type UserModalMode = "closed" | "create" | "edit";
+type ProfileModalMode = "closed" | "create" | "edit";
 
 const inputClass =
   "border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand";
-const formClass =
-  "grid gap-3 border border-paper/10 bg-paper/[0.03] p-4 sm:grid-cols-2";
+const formGridClass = "grid gap-3 sm:grid-cols-2";
 
 function emptyProfileForm() {
   return {
@@ -36,6 +38,16 @@ function emptyProfileForm() {
   };
 }
 
+function emptyUserCreateForm() {
+  return {
+    email: "",
+    password: "",
+    name: "",
+    photoUrl: "",
+    roles: ["zawodnik"] as Role[],
+  };
+}
+
 export default function KontaPage() {
   const toast = useToast();
   const { user, activeRole, viewAs } = useKlub();
@@ -48,12 +60,8 @@ export default function KontaPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const [newEmail, setNewEmail] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [newName, setNewName] = useState("");
-  const [newPhotoUrl, setNewPhotoUrl] = useState("");
-  const [newRoles, setNewRoles] = useState<Role[]>(["zawodnik"]);
-
+  const [userModal, setUserModal] = useState<UserModalMode>("closed");
+  const [createUserForm, setCreateUserForm] = useState(emptyUserCreateForm);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editEmail, setEditEmail] = useState("");
@@ -61,6 +69,7 @@ export default function KontaPage() {
   const [editPhotoUrl, setEditPhotoUrl] = useState("");
   const [editRoles, setEditRoles] = useState<Role[]>([]);
 
+  const [profileModal, setProfileModal] = useState<ProfileModalMode>("closed");
   const [editingProfileId, setEditingProfileId] = useState<string | null>(null);
   const [profileForm, setProfileForm] = useState(emptyProfileForm);
 
@@ -114,23 +123,10 @@ export default function KontaPage() {
     setProfileForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  function resetProfileForm() {
-    setEditingProfileId(null);
-    setProfileForm(emptyProfileForm());
-  }
-
-  function startEditUser(u: PublicUser) {
-    setError(null);
-    setEditingUserId(u.id);
-    setEditName(u.display_name);
-    setEditEmail(u.email);
-    setEditPassword("");
-    setEditPhotoUrl(u.photo_url ?? "");
-    setEditRoles([...u.roles]);
-  }
-
-  function cancelEditUser() {
+  function closeUserModal() {
+    setUserModal("closed");
     setEditingUserId(null);
+    setCreateUserForm(emptyUserCreateForm());
     setEditName("");
     setEditEmail("");
     setEditPassword("");
@@ -138,7 +134,37 @@ export default function KontaPage() {
     setEditRoles([]);
   }
 
-  function startEditProfile(p: AthleteProfile) {
+  function closeProfileModal() {
+    setProfileModal("closed");
+    setEditingProfileId(null);
+    setProfileForm(emptyProfileForm());
+  }
+
+  function openCreateUser() {
+    setError(null);
+    setCreateUserForm(emptyUserCreateForm());
+    setUserModal("create");
+  }
+
+  function openEditUser(u: PublicUser) {
+    setError(null);
+    setEditingUserId(u.id);
+    setEditName(u.display_name);
+    setEditEmail(u.email);
+    setEditPassword("");
+    setEditPhotoUrl(u.photo_url ?? "");
+    setEditRoles([...u.roles]);
+    setUserModal("edit");
+  }
+
+  function openCreateProfile() {
+    setError(null);
+    setEditingProfileId(null);
+    setProfileForm(emptyProfileForm());
+    setProfileModal("create");
+  }
+
+  function openEditProfile(p: AthleteProfile) {
     setError(null);
     setEditingProfileId(p.id);
     const linked =
@@ -156,6 +182,7 @@ export default function KontaPage() {
       photoUrl: p.photo_url ?? "",
       notes: p.notes ?? "",
     });
+    setProfileModal("edit");
   }
 
   async function createUser(e: FormEvent) {
@@ -165,19 +192,18 @@ export default function KontaPage() {
       await klubFetch("/api/users", {
         method: "POST",
         body: {
-          email: newEmail,
-          password: newPassword,
-          display_name: newName,
-          roles: newRoles,
-          photo_url: newPhotoUrl.trim() || null,
+          email: createUserForm.email,
+          password: createUserForm.password,
+          display_name: createUserForm.name,
+          roles: createUserForm.roles,
+          photo_url: createUserForm.photoUrl.trim() || null,
         },
       });
-      setNewEmail("");
-      setNewPassword("");
-      setNewName("");
-      setNewPhotoUrl("");
-      setNewRoles(["zawodnik"]);
-      toast.success("Utworzono konto", newName || newEmail);
+      toast.success(
+        "Utworzono konto",
+        createUserForm.name || createUserForm.email,
+      );
+      closeUserModal();
       await load();
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Nie udało się utworzyć";
@@ -205,7 +231,7 @@ export default function KontaPage() {
         body,
       });
       toast.success("Zapisano konto", editName.trim() || editEmail.trim());
-      cancelEditUser();
+      closeUserModal();
       await load();
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Błąd zapisu konta";
@@ -237,7 +263,7 @@ export default function KontaPage() {
     try {
       await klubFetch(`/api/users/${id}`, { method: "DELETE" });
       toast.success("Usunięto konto");
-      if (editingUserId === id) cancelEditUser();
+      if (editingUserId === id) closeUserModal();
       await load();
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Błąd usuwania";
@@ -304,7 +330,7 @@ export default function KontaPage() {
         toast.success("Dodano profil", profileForm.name);
       }
 
-      resetProfileForm();
+      closeProfileModal();
       await load();
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Błąd profilu";
@@ -318,7 +344,7 @@ export default function KontaPage() {
     try {
       await klubFetch(`/api/profiles/${id}`, { method: "DELETE" });
       toast.success("Usunięto profil");
-      if (editingProfileId === id) resetProfileForm();
+      if (editingProfileId === id) closeProfileModal();
       await load();
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Błąd usuwania profilu";
@@ -327,13 +353,16 @@ export default function KontaPage() {
     }
   }
 
-  function toggleRole(role: Role, target: "new" | "edit") {
-    if (target === "new") {
-      setNewRoles((prev) =>
-        prev.includes(role) ? prev.filter((r) => r !== role) : [...prev, role],
-      );
-      return;
-    }
+  function toggleCreateRole(role: Role) {
+    setCreateUserForm((prev) => ({
+      ...prev,
+      roles: prev.roles.includes(role)
+        ? prev.roles.filter((r) => r !== role)
+        : [...prev.roles, role],
+    }));
+  }
+
+  function toggleEditRole(role: Role) {
     setEditRoles((prev) =>
       prev.includes(role) ? prev.filter((r) => r !== role) : [...prev, role],
     );
@@ -346,19 +375,14 @@ export default function KontaPage() {
     return userId;
   }
 
-  const roleCheckboxes = (selected: Role[], target: "new" | "edit") =>
-    ALL_ROLES.filter(
-      (r) => r !== "superadmin" || user?.roles.includes("superadmin"),
-    ).map((role) => (
-      <label key={role} className="flex items-center gap-1.5 text-xs">
-        <input
-          type="checkbox"
-          checked={selected.includes(role)}
-          onChange={() => toggleRole(role, target)}
-        />
-        {ROLE_LABELS[role]}
-      </label>
-    ));
+  const roleOptions = ALL_ROLES.filter(
+    (r) => r !== "superadmin" || user?.roles.includes("superadmin"),
+  );
+
+  const sectionHeader =
+    "flex flex-wrap items-end justify-between gap-3";
+  const addButtonClass =
+    "border border-brand/50 bg-brand/15 px-3 py-2 font-display text-[11px] tracking-[0.12em] text-paper uppercase transition-colors hover:border-brand hover:bg-brand/25";
 
   return (
     <div className="animate-rise max-w-5xl space-y-10">
@@ -376,7 +400,7 @@ export default function KontaPage() {
         </p>
       </div>
 
-      {error ? (
+      {error && userModal === "closed" && profileModal === "closed" ? (
         <p
           className="border-l-2 border-brand bg-brand/10 px-4 py-3 text-sm"
           role="alert"
@@ -389,9 +413,20 @@ export default function KontaPage() {
 
       {showUsersSection ? (
         <section className="space-y-4">
-          <h2 className="font-display text-sm tracking-[0.14em] uppercase">
-            Konta
-          </h2>
+          <div className={sectionHeader}>
+            <h2 className="font-display text-sm tracking-[0.14em] uppercase">
+              Konta
+            </h2>
+            {canManageUsers ? (
+              <button
+                type="button"
+                className={addButtonClass}
+                onClick={openCreateUser}
+              >
+                Dodaj konto
+              </button>
+            ) : null}
+          </div>
           <div className="overflow-x-auto border border-paper/10">
             <table className="w-full min-w-[40rem] text-left text-sm">
               <thead className="bg-paper/5 font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
@@ -439,7 +474,7 @@ export default function KontaPage() {
                         <button
                           type="button"
                           className="text-xs text-paper/70 underline-offset-2 hover:underline"
-                          onClick={() => startEditUser(u)}
+                          onClick={() => openEditUser(u)}
                         >
                           Edytuj
                         </button>
@@ -461,121 +496,32 @@ export default function KontaPage() {
                     </td>
                   </tr>
                 ))}
+                {users.length === 0 && !loading ? (
+                  <tr>
+                    <td colSpan={6} className="px-3 py-4 text-paper/45">
+                      Brak kont.
+                    </td>
+                  </tr>
+                ) : null}
               </tbody>
             </table>
           </div>
-
-          {editingUserId ? (
-            <form onSubmit={(e) => void saveUser(e)} className={formClass}>
-              <h3 className="font-display text-xs tracking-[0.14em] text-paper/50 uppercase sm:col-span-2">
-                Edycja konta
-              </h3>
-              <input
-                className={inputClass}
-                placeholder="Nazwa"
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-                required
-              />
-              <input
-                className={inputClass}
-                placeholder="E-mail"
-                type="email"
-                value={editEmail}
-                onChange={(e) => setEditEmail(e.target.value)}
-                required
-              />
-              <input
-                className={`${inputClass} sm:col-span-2`}
-                placeholder="Nowe hasło (opcjonalnie)"
-                type="password"
-                value={editPassword}
-                onChange={(e) => setEditPassword(e.target.value)}
-                minLength={6}
-              />
-              <PhotoUploadField
-                className="sm:col-span-2"
-                value={editPhotoUrl}
-                onChange={setEditPhotoUrl}
-                label="Zdjęcie konta"
-                hint="Dla zawodnika synchronizowane z profilem publicznym."
-                inputClassName={inputClass}
-              />
-              <div className="flex flex-wrap gap-2 self-center sm:col-span-2">
-                {roleCheckboxes(editRoles, "edit")}
-              </div>
-              <div className="flex flex-wrap gap-2 sm:col-span-2">
-                <button
-                  type="submit"
-                  className="bg-brand px-4 py-2 font-display text-xs tracking-[0.12em] uppercase"
-                >
-                  Zapisz konto
-                </button>
-                <button
-                  type="button"
-                  className="border border-paper/20 px-4 py-2 font-display text-xs tracking-[0.12em] uppercase text-paper/70"
-                  onClick={cancelEditUser}
-                >
-                  Anuluj
-                </button>
-              </div>
-            </form>
-          ) : null}
-
-          {canManageUsers && !editingUserId ? (
-            <form onSubmit={createUser} className={formClass}>
-              <h3 className="font-display text-xs tracking-[0.14em] text-paper/50 uppercase sm:col-span-2">
-                Nowe konto
-              </h3>
-              <input
-                className={inputClass}
-                placeholder="Nazwa"
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                required
-              />
-              <input
-                className={inputClass}
-                placeholder="E-mail"
-                type="email"
-                value={newEmail}
-                onChange={(e) => setNewEmail(e.target.value)}
-                required
-              />
-              <input
-                className={inputClass}
-                placeholder="Hasło"
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                required
-              />
-              <PhotoUploadField
-                className="sm:col-span-2"
-                value={newPhotoUrl}
-                onChange={setNewPhotoUrl}
-                label="Zdjęcie konta"
-                hint="Opcjonalnie — możesz też dodać później."
-                inputClassName={inputClass}
-              />
-              <div className="flex flex-wrap gap-2 self-center sm:col-span-2">
-                {roleCheckboxes(newRoles, "new")}
-              </div>
-              <button
-                type="submit"
-                className="bg-brand px-4 py-2 font-display text-xs tracking-[0.12em] uppercase sm:col-span-2 sm:justify-self-start"
-              >
-                Dodaj konto
-              </button>
-            </form>
-          ) : null}
         </section>
       ) : null}
 
       <section className="space-y-4">
-        <h2 className="font-display text-sm tracking-[0.14em] uppercase">
-          Profile zawodników
-        </h2>
+        <div className={sectionHeader}>
+          <h2 className="font-display text-sm tracking-[0.14em] uppercase">
+            Profile zawodników
+          </h2>
+          <button
+            type="button"
+            className={addButtonClass}
+            onClick={openCreateProfile}
+          >
+            Dodaj profil
+          </button>
+        </div>
         <div className="overflow-x-auto border border-paper/10">
           <table className="w-full min-w-[36rem] text-left text-sm">
             <thead className="bg-paper/5 font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
@@ -610,7 +556,7 @@ export default function KontaPage() {
                       <button
                         type="button"
                         className="text-xs text-paper/70 underline-offset-2 hover:underline"
-                        onClick={() => startEditProfile(p)}
+                        onClick={() => openEditProfile(p)}
                       >
                         Edytuj
                       </button>
@@ -635,14 +581,181 @@ export default function KontaPage() {
             </tbody>
           </table>
         </div>
+      </section>
 
+      <Modal
+        open={userModal === "create"}
+        title="Nowe konto"
+        onClose={closeUserModal}
+        wide
+      >
+        {error ? (
+          <p className="mb-4 border-l-2 border-brand bg-brand/10 px-3 py-2 text-sm" role="alert">
+            {error}
+          </p>
+        ) : null}
+        <form onSubmit={(e) => void createUser(e)} className={formGridClass}>
+          <input
+            className={inputClass}
+            placeholder="Nazwa"
+            value={createUserForm.name}
+            onChange={(e) =>
+              setCreateUserForm((prev) => ({ ...prev, name: e.target.value }))
+            }
+            required
+          />
+          <input
+            className={inputClass}
+            placeholder="E-mail"
+            type="email"
+            value={createUserForm.email}
+            onChange={(e) =>
+              setCreateUserForm((prev) => ({ ...prev, email: e.target.value }))
+            }
+            required
+          />
+          <input
+            className={`${inputClass} sm:col-span-2`}
+            placeholder="Hasło"
+            type="password"
+            value={createUserForm.password}
+            onChange={(e) =>
+              setCreateUserForm((prev) => ({
+                ...prev,
+                password: e.target.value,
+              }))
+            }
+            required
+            minLength={6}
+          />
+          <PhotoUploadField
+            className="sm:col-span-2"
+            value={createUserForm.photoUrl}
+            onChange={(url) =>
+              setCreateUserForm((prev) => ({ ...prev, photoUrl: url }))
+            }
+            label="Zdjęcie konta"
+            hint="Opcjonalnie — możesz też dodać później."
+            inputClassName={inputClass}
+          />
+          <div className="flex flex-wrap gap-2 self-center sm:col-span-2">
+            {roleOptions.map((role) => (
+              <label key={role} className="flex items-center gap-1.5 text-xs">
+                <input
+                  type="checkbox"
+                  checked={createUserForm.roles.includes(role)}
+                  onChange={() => toggleCreateRole(role)}
+                />
+                {ROLE_LABELS[role]}
+              </label>
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-2 sm:col-span-2">
+            <button
+              type="submit"
+              className="bg-brand px-4 py-2 font-display text-xs tracking-[0.12em] uppercase"
+            >
+              Dodaj konto
+            </button>
+            <button
+              type="button"
+              className="border border-paper/20 px-4 py-2 font-display text-xs tracking-[0.12em] uppercase text-paper/70"
+              onClick={closeUserModal}
+            >
+              Anuluj
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal
+        open={userModal === "edit"}
+        title="Edycja konta"
+        onClose={closeUserModal}
+        wide
+      >
+        {error ? (
+          <p className="mb-4 border-l-2 border-brand bg-brand/10 px-3 py-2 text-sm" role="alert">
+            {error}
+          </p>
+        ) : null}
+        <form onSubmit={(e) => void saveUser(e)} className={formGridClass}>
+          <input
+            className={inputClass}
+            placeholder="Nazwa"
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+            required
+          />
+          <input
+            className={inputClass}
+            placeholder="E-mail"
+            type="email"
+            value={editEmail}
+            onChange={(e) => setEditEmail(e.target.value)}
+            required
+          />
+          <input
+            className={`${inputClass} sm:col-span-2`}
+            placeholder="Nowe hasło (opcjonalnie)"
+            type="password"
+            value={editPassword}
+            onChange={(e) => setEditPassword(e.target.value)}
+            minLength={6}
+          />
+          <PhotoUploadField
+            className="sm:col-span-2"
+            value={editPhotoUrl}
+            onChange={setEditPhotoUrl}
+            label="Zdjęcie konta"
+            hint="Dla zawodnika synchronizowane z profilem publicznym."
+            inputClassName={inputClass}
+          />
+          <div className="flex flex-wrap gap-2 self-center sm:col-span-2">
+            {roleOptions.map((role) => (
+              <label key={role} className="flex items-center gap-1.5 text-xs">
+                <input
+                  type="checkbox"
+                  checked={editRoles.includes(role)}
+                  onChange={() => toggleEditRole(role)}
+                />
+                {ROLE_LABELS[role]}
+              </label>
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-2 sm:col-span-2">
+            <button
+              type="submit"
+              className="bg-brand px-4 py-2 font-display text-xs tracking-[0.12em] uppercase"
+            >
+              Zapisz konto
+            </button>
+            <button
+              type="button"
+              className="border border-paper/20 px-4 py-2 font-display text-xs tracking-[0.12em] uppercase text-paper/70"
+              onClick={closeUserModal}
+            >
+              Anuluj
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal
+        open={profileModal !== "closed"}
+        title={profileModal === "edit" ? "Edycja profilu" : "Nowy profil zawodnika"}
+        onClose={closeProfileModal}
+        wide
+      >
+        {error ? (
+          <p className="mb-4 border-l-2 border-brand bg-brand/10 px-3 py-2 text-sm" role="alert">
+            {error}
+          </p>
+        ) : null}
         <form
           onSubmit={(e) => void submitProfile(e)}
-          className={formClass}
+          className={formGridClass}
         >
-          <h3 className="font-display text-xs tracking-[0.14em] text-paper/50 uppercase sm:col-span-2">
-            {editingProfileId ? "Edycja profilu" : "Nowy profil zawodnika"}
-          </h3>
           <input
             className={`${inputClass} sm:col-span-2`}
             placeholder="Imię i nazwisko"
@@ -670,7 +783,7 @@ export default function KontaPage() {
               }}
             >
               <option value="existing">Połącz z istniejącym kontem</option>
-              {!editingProfileId ? (
+              {profileModal === "create" ? (
                 <option value="new">Utwórz nowe konto zawodnika</option>
               ) : null}
               <option value="none">Bez konta</option>
@@ -715,7 +828,7 @@ export default function KontaPage() {
             </label>
           ) : null}
 
-          {profileForm.accountMode === "new" && !editingProfileId ? (
+          {profileForm.accountMode === "new" && profileModal === "create" ? (
             <>
               <input
                 className={inputClass}
@@ -803,20 +916,18 @@ export default function KontaPage() {
               type="submit"
               className="bg-brand px-4 py-2 font-display text-xs tracking-[0.12em] uppercase"
             >
-              {editingProfileId ? "Zapisz profil" : "Dodaj profil"}
+              {profileModal === "edit" ? "Zapisz profil" : "Dodaj profil"}
             </button>
-            {editingProfileId ? (
-              <button
-                type="button"
-                className="border border-paper/20 px-4 py-2 font-display text-xs tracking-[0.12em] uppercase text-paper/70"
-                onClick={resetProfileForm}
-              >
-                Anuluj
-              </button>
-            ) : null}
+            <button
+              type="button"
+              className="border border-paper/20 px-4 py-2 font-display text-xs tracking-[0.12em] uppercase text-paper/70"
+              onClick={closeProfileModal}
+            >
+              Anuluj
+            </button>
           </div>
         </form>
-      </section>
+      </Modal>
     </div>
   );
 }

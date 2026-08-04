@@ -11,6 +11,36 @@ Format:
 - zdanie zrozumiałe dla zwykłego użytkownika
 ```
 
+## [1.0.0.2+11] - 2026-08-04
+
+### Kalendarz czytelniejszy
+
+- Na paskach wydarzeń w siatce miesiąca widać tylko tytuł — bez godziny (godzina jest w szczegółach dnia).
+
+## [1.0.0.2+10] - 2026-08-04
+
+### Nawigacja wstecz w aplikacji zawodnika
+
+- Możesz wrócić wstecz przyciskiem w pasku, gestem/przyciskiem systemowym albo przyciskiem Back na myszy (Windows).
+
+## [1.0.0.2+8] - 2026-08-04
+
+### Konta i profile
+
+- W panelu klubu dodawanie i edycja kont oraz profili zawodników odbywa się w oknach dialogowych — lista pozostaje czytelna.
+
+## [1.0.0.2+7] - 2026-08-04
+
+### Ustawienia konta
+
+- Ustawienia są podzielone na kategorie (profil, e-mail, hasło, powiadomienia, wygląd, prywatność) — możesz je zwijać i rozwijać.
+
+## [1.0.0.2+6] - 2026-08-04
+
+### Powiadomienia
+
+- W dzwonku możesz usunąć pojedyncze powiadomienie (ikona × przy wpisie).
+
 ## [1.0.0.2+5] - 2026-08-04
 
 ### E-mail i powiadomienia

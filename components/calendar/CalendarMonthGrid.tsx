@@ -444,9 +444,7 @@ export function CalendarMonthGrid({
                             ) : null}
                             <span className="min-w-0 flex-1 truncate">
                               {span.continuesLeft ? "… " : ""}
-                              {showTitle
-                                ? `${event.time && !isMultiDay(event) && !event.attendance_counts ? `${event.time} · ` : ""}${event.title}`
-                                : ""}
+                              {showTitle ? event.title : ""}
                               {span.continuesRight ? " …" : ""}
                             </span>
                             <EventAttendanceCountsChip event={event} />

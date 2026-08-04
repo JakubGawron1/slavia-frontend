@@ -20,6 +20,7 @@ import {
 import { isFlagEnabled } from "@/lib/public-flags";
 import { PhotoUploadField } from "@/components/settings/PhotoUploadField";
 import { CookieConsentSettings } from "@/components/settings/CookieConsentSettings";
+import { SettingsCategory } from "@/components/settings/SettingsCategory";
 import { useToast } from "@/components/toast/ToastProvider";
 import type { NotificationPrefs } from "@/lib/api/generated/models";
 
@@ -92,6 +93,42 @@ function ThemeGrid({
         );
       })}
     </div>
+  );
+}
+
+function PrefToggle({
+  id,
+  checked,
+  title,
+  description,
+  onChange,
+  disabled,
+}: {
+  id: string;
+  checked: boolean;
+  title: string;
+  description: string;
+  onChange: (v: boolean) => void;
+  disabled?: boolean;
+}) {
+  return (
+    <label
+      htmlFor={id}
+      className="flex cursor-pointer items-start justify-between gap-4 border border-paper/10 bg-chrome/20 px-3 py-3"
+    >
+      <span>
+        <span className="block text-sm text-paper">{title}</span>
+        <span className="mt-0.5 block text-xs text-paper/50">{description}</span>
+      </span>
+      <input
+        id={id}
+        type="checkbox"
+        className="mt-1 h-4 w-4 accent-brand"
+        checked={checked}
+        disabled={disabled}
+        onChange={(e) => onChange(e.target.checked)}
+      />
+    </label>
   );
 }
 
@@ -303,44 +340,11 @@ export function AccountSettingsForm({ user, onUpdated }: Props) {
     "panel-control w-full border border-paper/20 bg-chrome/40 px-3 py-2 text-sm text-paper outline-none transition-colors focus:border-brand";
   const label =
     "mb-1.5 block font-display text-[10px] tracking-[0.14em] text-paper/45 uppercase";
-  const surface = "settings-surface border border-paper/10 bg-chrome/30 p-5 md:p-6";
-
-  function PrefToggle({
-    id,
-    checked,
-    title,
-    description,
-    onChange,
-  }: {
-    id: string;
-    checked: boolean;
-    title: string;
-    description: string;
-    onChange: (v: boolean) => void;
-  }) {
-    return (
-      <label
-        htmlFor={id}
-        className="flex cursor-pointer items-start justify-between gap-4 border border-paper/10 bg-chrome/20 px-3 py-3"
-      >
-        <span>
-          <span className="block text-sm text-paper">{title}</span>
-          <span className="mt-0.5 block text-xs text-paper/50">{description}</span>
-        </span>
-        <input
-          id={id}
-          type="checkbox"
-          className="mt-1 h-4 w-4 accent-brand"
-          checked={checked}
-          disabled={saving}
-          onChange={(e) => onChange(e.target.checked)}
-        />
-      </label>
-    );
-  }
+  const subheading =
+    "font-display text-[11px] tracking-[0.12em] text-paper/55 uppercase";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       {error ? (
         <p className="settings-surface border border-brand/40 bg-brand/10 px-3 py-2 text-sm text-paper">
           {error}
@@ -352,13 +356,14 @@ export function AccountSettingsForm({ user, onUpdated }: Props) {
         </p>
       ) : null}
 
-      <div className="grid gap-8 lg:grid-cols-2 lg:items-start">
-        <div className="space-y-6">
-          <section className={surface}>
-            <h2 className="font-display text-sm tracking-[0.16em] text-paper/70 uppercase">
-              Konto
-            </h2>
-            <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+      <div className="grid gap-3 lg:grid-cols-2 lg:items-start">
+        <div className="space-y-3">
+          <SettingsCategory
+            title="Profil"
+            description="Nazwa wyświetlana, zdjęcie i role konta"
+            defaultOpen
+          >
+            <dl className="grid gap-3 text-sm sm:grid-cols-2">
               <div>
                 <dt className="text-paper/40">E-mail</dt>
                 <dd className="mt-0.5 text-paper">{user.email}</dd>
@@ -377,47 +382,146 @@ export function AccountSettingsForm({ user, onUpdated }: Props) {
                 </dd>
               </div>
             </dl>
-          </section>
 
-          <form onSubmit={(e) => void submitEmailChange(e)} className={surface}>
-            <h2 className="font-display text-sm tracking-[0.16em] text-paper/70 uppercase">
-              Adres e-mail
-            </h2>
-            <p className="mt-2 text-sm text-paper/55">
-              Zmiana wymaga potwierdzenia linkiem (adresy .dev / .local są
-              weryfikowane automatycznie).
-            </p>
-            <div className="mt-4">
-              <label htmlFor="settings-email" className={label}>
-                E-mail
-              </label>
-              <input
-                id="settings-email"
-                type="email"
-                className={field}
-                value={changeEmail}
-                onChange={(e) => setChangeEmail(e.target.value)}
-                autoComplete="email"
-                required
+            <form onSubmit={saveProfile} className="mt-6">
+              <div>
+                <label htmlFor="settings-display-name" className={label}>
+                  Nazwa wyświetlana
+                </label>
+                <input
+                  id="settings-display-name"
+                  className={field}
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  autoComplete="nickname"
+                  required
+                />
+              </div>
+              <PhotoUploadField
+                className="mt-4"
+                value={photoUrl}
+                onChange={setPhotoUrl}
+                disabled={saving}
+                label="Zdjęcie konta"
+                hint={
+                  user.roles.includes("zawodnik")
+                    ? "Dla zawodnika to samo zdjęcie jest widoczne na profilu publicznym."
+                    : "Zdjęcie przypisane do konta (kadra nie ma osobnego profilu publicznego)."
+                }
+                inputClassName={field}
               />
-            </div>
-            <button
-              type="submit"
-              disabled={saving}
-              className="panel-control mt-5 border border-brand/50 bg-brand/15 px-4 py-2 font-display text-[11px] tracking-[0.12em] text-paper uppercase transition-colors hover:border-brand hover:bg-brand/25 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              {user.email_verified &&
-              changeEmail.trim().toLowerCase() === user.email.toLowerCase()
-                ? "Wyślij ponownie weryfikację"
-                : "Zapisz / wyślij weryfikację"}
-            </button>
-          </form>
+              <button
+                type="submit"
+                disabled={saving || !profileDirty}
+                className="panel-control mt-5 border border-brand/50 bg-brand/15 px-4 py-2 font-display text-[11px] tracking-[0.12em] text-paper uppercase transition-colors hover:border-brand hover:bg-brand/25 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Zapisz profil
+              </button>
+            </form>
+          </SettingsCategory>
 
-          <section className={surface}>
-            <h2 className="font-display text-sm tracking-[0.16em] text-paper/70 uppercase">
-              Powiadomienia e-mail
-            </h2>
-            <p className="mt-2 text-sm text-paper/55">
+          <SettingsCategory
+            title="E-mail i hasło"
+            description="Zmiana adresu, weryfikacja i hasło logowania"
+          >
+            <form onSubmit={(e) => void submitEmailChange(e)}>
+              <p className={subheading}>Adres e-mail</p>
+              <p className="mt-2 text-sm text-paper/55">
+                Zmiana wymaga potwierdzenia linkiem (adresy .dev / .local są
+                weryfikowane automatycznie).
+              </p>
+              <div className="mt-4">
+                <label htmlFor="settings-email" className={label}>
+                  E-mail
+                </label>
+                <input
+                  id="settings-email"
+                  type="email"
+                  className={field}
+                  value={changeEmail}
+                  onChange={(e) => setChangeEmail(e.target.value)}
+                  autoComplete="email"
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={saving}
+                className="panel-control mt-5 border border-brand/50 bg-brand/15 px-4 py-2 font-display text-[11px] tracking-[0.12em] text-paper uppercase transition-colors hover:border-brand hover:bg-brand/25 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {user.email_verified &&
+                changeEmail.trim().toLowerCase() === user.email.toLowerCase()
+                  ? "Wyślij ponownie weryfikację"
+                  : "Zapisz / wyślij weryfikację"}
+              </button>
+            </form>
+
+            <form
+              onSubmit={savePassword}
+              className="mt-8 border-t border-paper/10 pt-6"
+            >
+              <p className={subheading}>Hasło</p>
+              <div className="mt-4 grid gap-4">
+                <div>
+                  <label htmlFor="settings-current-password" className={label}>
+                    Aktualne hasło
+                  </label>
+                  <input
+                    id="settings-current-password"
+                    type="password"
+                    className={field}
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    autoComplete="current-password"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="settings-new-password" className={label}>
+                    Nowe hasło
+                  </label>
+                  <input
+                    id="settings-new-password"
+                    type="password"
+                    className={field}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    autoComplete="new-password"
+                    required
+                    minLength={6}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="settings-confirm-password" className={label}>
+                    Potwierdź nowe hasło
+                  </label>
+                  <input
+                    id="settings-confirm-password"
+                    type="password"
+                    className={field}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    autoComplete="new-password"
+                    required
+                    minLength={6}
+                  />
+                </div>
+              </div>
+              <button
+                type="submit"
+                disabled={saving}
+                className="panel-control mt-5 border border-brand/50 bg-brand/15 px-4 py-2 font-display text-[11px] tracking-[0.12em] text-paper uppercase transition-colors hover:border-brand hover:bg-brand/25 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Zmień hasło
+              </button>
+            </form>
+          </SettingsCategory>
+
+          <SettingsCategory
+            title="Powiadomienia"
+            description="Maile o składzie, planach i kontakcie"
+          >
+            <p className="text-sm text-paper/55">
               Powiadomienia w aplikacji (dzwonek) działają zawsze. Poniżej —
               dodatkowe wiadomości na zweryfikowany e-mail.
             </p>
@@ -427,6 +531,7 @@ export function AccountSettingsForm({ user, onUpdated }: Props) {
                 checked={prefs.email_squad ?? true}
                 title="Skład zawodów"
                 description="Przypisanie lub wypisanie ze składu zawodów."
+                disabled={saving}
                 onChange={(v) => void savePrefs({ ...prefs, email_squad: v })}
               />
               <PrefToggle
@@ -434,6 +539,7 @@ export function AccountSettingsForm({ user, onUpdated }: Props) {
                 checked={prefs.email_training_plans ?? true}
                 title="Plany treningowe"
                 description="Przypisanie do planu treningowego."
+                disabled={saving}
                 onChange={(v) =>
                   void savePrefs({ ...prefs, email_training_plans: v })
                 }
@@ -444,149 +550,55 @@ export function AccountSettingsForm({ user, onUpdated }: Props) {
                   checked={prefs.email_contact ?? true}
                   title="Formularz kontaktowy"
                   description="Nowa wiadomość ze strony kontaktu."
+                  disabled={saving}
                   onChange={(v) =>
                     void savePrefs({ ...prefs, email_contact: v })
                   }
                 />
               ) : null}
             </div>
-          </section>
-
-          <form onSubmit={saveProfile} className={surface}>
-            <h2 className="font-display text-sm tracking-[0.16em] text-paper/70 uppercase">
-              Profil
-            </h2>
-            <div className="mt-4">
-              <label htmlFor="settings-display-name" className={label}>
-                Nazwa wyświetlana
-              </label>
-              <input
-                id="settings-display-name"
-                className={field}
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                autoComplete="nickname"
-                required
-              />
-            </div>
-            <PhotoUploadField
-              className="mt-4"
-              value={photoUrl}
-              onChange={setPhotoUrl}
-              disabled={saving}
-              label="Zdjęcie konta"
-              hint={
-                user.roles.includes("zawodnik")
-                  ? "Dla zawodnika to samo zdjęcie jest widoczne na profilu publicznym."
-                  : "Zdjęcie przypisane do konta (kadra nie ma osobnego profilu publicznego)."
-              }
-              inputClassName={field}
-            />
-            <button
-              type="submit"
-              disabled={saving || !profileDirty}
-              className="panel-control mt-5 border border-brand/50 bg-brand/15 px-4 py-2 font-display text-[11px] tracking-[0.12em] text-paper uppercase transition-colors hover:border-brand hover:bg-brand/25 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              Zapisz profil
-            </button>
-          </form>
-
-          <form onSubmit={savePassword} className={surface}>
-            <h2 className="font-display text-sm tracking-[0.16em] text-paper/70 uppercase">
-              Hasło
-            </h2>
-            <div className="mt-4 grid gap-4">
-              <div>
-                <label htmlFor="settings-current-password" className={label}>
-                  Aktualne hasło
-                </label>
-                <input
-                  id="settings-current-password"
-                  type="password"
-                  className={field}
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  autoComplete="current-password"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="settings-new-password" className={label}>
-                  Nowe hasło
-                </label>
-                <input
-                  id="settings-new-password"
-                  type="password"
-                  className={field}
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  autoComplete="new-password"
-                  required
-                  minLength={6}
-                />
-              </div>
-              <div>
-                <label htmlFor="settings-confirm-password" className={label}>
-                  Potwierdź nowe hasło
-                </label>
-                <input
-                  id="settings-confirm-password"
-                  type="password"
-                  className={field}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  autoComplete="new-password"
-                  required
-                  minLength={6}
-                />
-              </div>
-            </div>
-            <button
-              type="submit"
-              disabled={saving}
-              className="panel-control mt-5 border border-brand/50 bg-brand/15 px-4 py-2 font-display text-[11px] tracking-[0.12em] text-paper uppercase transition-colors hover:border-brand hover:bg-brand/25 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              Zmień hasło
-            </button>
-          </form>
+          </SettingsCategory>
         </div>
 
-        <div className="space-y-6">
-          <section className={surface}>
-            <h2 className="font-display text-sm tracking-[0.16em] text-paper/70 uppercase">
-              Motywy stable
-            </h2>
-            <p className="mt-2 text-sm text-paper/55">
-              Kolorystyka paneli. Wybór jest zapisany na koncie i działa na
-              każdym urządzeniu.
+        <div className="space-y-3">
+          <SettingsCategory
+            title="Wygląd"
+            description="Kolorystyka paneli na wszystkich urządzeniach"
+            defaultOpen
+          >
+            <p className="text-sm text-paper/55">
+              Wybór jest zapisany na koncie i działa na każdym urządzeniu.
             </p>
+            <p className={`mt-5 ${subheading}`}>Motywy stable</p>
             <ThemeGrid
               themes={stableThemes}
               selectedId={uiTheme}
               saving={saving}
               onSelect={(id) => void saveTheme(id)}
             />
-          </section>
+            {allowExperimental ? (
+              <>
+                <p className={`mt-6 ${subheading}`}>Motywy experimental</p>
+                <p className="mt-2 text-sm text-paper/55">
+                  Zmieniają też układ i geometrię UI. Dostępne przez flagę
+                  DevTools.
+                </p>
+                <ThemeGrid
+                  themes={experimentalThemes}
+                  selectedId={uiTheme}
+                  saving={saving}
+                  onSelect={(id) => void saveTheme(id)}
+                />
+              </>
+            ) : null}
+          </SettingsCategory>
 
-          {allowExperimental ? (
-            <section className={surface}>
-              <h2 className="font-display text-sm tracking-[0.16em] text-paper/70 uppercase">
-                Motywy experimental
-              </h2>
-              <p className="mt-2 text-sm text-paper/55">
-                Zmieniają też układ i geometrię UI. Dostępne przez flagę
-                DevTools.
-              </p>
-              <ThemeGrid
-                themes={experimentalThemes}
-                selectedId={uiTheme}
-                saving={saving}
-                onSelect={(id) => void saveTheme(id)}
-              />
-            </section>
-          ) : null}
-
-          <CookieConsentSettings className={surface} />
+          <SettingsCategory
+            title="Prywatność"
+            description="Zgody RODO i cookies"
+          >
+            <CookieConsentSettings hideHeading />
+          </SettingsCategory>
         </div>
       </div>
     </div>

@@ -14,6 +14,46 @@ export const GENERATED_USER_CHANGELOG: UserChangelogEntry[] = [
     ]
   },
   {
+    "version": "1.0.0.2+11",
+    "date": "2026-08-04",
+    "title": "Kalendarz czytelniejszy",
+    "notes": [
+      "Na paskach wydarzeń w siatce miesiąca widać tylko tytuł — bez godziny (godzina jest w szczegółach dnia)."
+    ]
+  },
+  {
+    "version": "1.0.0.2+8",
+    "date": "2026-08-04",
+    "title": "Konta i profile",
+    "notes": [
+      "W panelu klubu dodawanie i edycja kont oraz profili zawodników odbywa się w oknach dialogowych — lista pozostaje czytelna."
+    ]
+  },
+  {
+    "version": "1.0.0.2+10",
+    "date": "2026-08-04",
+    "title": "Nawigacja wstecz w aplikacji zawodnika",
+    "notes": [
+      "Możesz wrócić wstecz przyciskiem w pasku, gestem/przyciskiem systemowym albo przyciskiem Back na myszy (Windows)."
+    ]
+  },
+  {
+    "version": "1.0.0.2+6",
+    "date": "2026-08-04",
+    "title": "Powiadomienia",
+    "notes": [
+      "W dzwonku możesz usunąć pojedyncze powiadomienie (ikona × przy wpisie)."
+    ]
+  },
+  {
+    "version": "1.0.0.2+7",
+    "date": "2026-08-04",
+    "title": "Ustawienia konta",
+    "notes": [
+      "Ustawienia są podzielone na kategorie (profil, e-mail, hasło, powiadomienia, wygląd, prywatność) — możesz je zwijać i rozwijać."
+    ]
+  },
+  {
     "version": "1.0.0.2+3",
     "date": "2026-08-03",
     "title": "Aplikacja mobilna dla zawodników",

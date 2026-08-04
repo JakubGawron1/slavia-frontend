@@ -12,6 +12,42 @@ Format sekcji:
 
 Opcjonalnie po dacie: `!breaking` (breaking API).
 
+## [1.0.0.2+11] - 2026-08-04
+
+### Kalendarz: tylko tytuł na paskach
+
+- Siatka miesiąca: w ramkach wydarzeń widoczny wyłącznie tytuł (bez godziny); godzina nadal w tooltipie i panelu dnia.
+
+## [1.0.0.2+10] - 2026-08-04
+
+### Ustawienia: E-mail i hasło w jednej kategorii
+
+- Sekcje e-mail i hasło połączone w zwijaną kategorię „E-mail i hasło”.
+
+## [1.0.0.2+9] - 2026-08-04
+
+### Ustawienia: dwa kolumny
+
+- Zwijane kategorie ustawień w układzie `lg:grid-cols-2` (konto | wygląd/prywatność).
+
+## [1.0.0.2+8] - 2026-08-04
+
+### Klub / Konta: formularze w modalach
+
+- `/klub/konta`: na stronie tylko tabele; tworzenie i edycja kont oraz profili w `Modal`.
+
+## [1.0.0.2+7] - 2026-08-04
+
+### Ustawienia: kategorie zwijane
+
+- Strona ustawień konta: układ w jednej kolumnie, sekcje Profil / E-mail / Hasło / Powiadomienia / Wygląd / Prywatność jako zwijane kategorie (`SettingsCategory`).
+
+## [1.0.0.2+6] - 2026-08-04
+
+### Dzwonek: usuwanie powiadomień
+
+- W skrzynce powiadomień (dzwonek) każdy wpis ma przycisk usuwania; klient OpenAPI: `DELETE /api/notifications/{id}`.
+
 ## [1.0.0.2+5] - 2026-08-04
 
 ### DevTools: test e-mail przez Brevo

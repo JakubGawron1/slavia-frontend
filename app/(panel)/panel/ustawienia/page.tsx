@@ -17,8 +17,8 @@ export default function PanelUstawieniaPage() {
           Ustawienia
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-paper/55">
-          Zarządzaj motywem paneli, nazwą wyświetlaną, hasłem oraz zgodami RODO
-          (cookies). Motyw jest przypisany do konta.
+          Profil, e-mail, hasło, powiadomienia, wygląd paneli i prywatność —
+          sekcje możesz zwijać i rozwijać.
         </p>
       </div>
 

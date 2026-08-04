@@ -30,6 +30,26 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
     ]
   },
   {
+    "version": "1.0.0.2+6",
+    "date": "2026-08-04",
+    "category": "frontend",
+    "title": "Dzwonek: usuwanie powiadomień",
+    "notes": [
+      "W skrzynce powiadomień (dzwonek) każdy wpis ma przycisk usuwania; klient OpenAPI: `DELETE /api/notifications/{id}`."
+    ]
+  },
+  {
+    "version": "1.0.0.2+10",
+    "date": "2026-08-04",
+    "category": "mobile",
+    "title": "Feature: nawigacja wstecz (desktop + Android)",
+    "notes": [
+      "Przycisk Back myszy, Alt+← / BrowserBack — `pop` ze stacku GoRouter.",
+      "Systemowy wstecz: z zakładki wraca na pulpit; podstrony mają `BackButton`.",
+      "`DetailScaffold` dla Sinclair / Co nowego / Ustawienia."
+    ]
+  },
+  {
     "version": "1.0.0.2+4",
     "date": "2026-08-04",
     "category": "mobile",
@@ -37,6 +57,17 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
     "notes": [
       "Usunięto `firebase_core` / `firebase_messaging` z `pubspec` — CMake padał na extract `firebase_cpp_sdk_windows_*.zip`.",
       "Push: inbox + lokalne toasty; FCM odłożone na plugin Android-only."
+    ]
+  },
+  {
+    "version": "1.0.0.2+7",
+    "date": "2026-08-04",
+    "category": "mobile",
+    "title": "Fix: logowanie Windows — komunikat zamiast „ciszy”",
+    "notes": [
+      "Konto bez roli `zawodnik` (np. superadmin) pokazuje błąd zamiast wracać na `/login` bez informacji.",
+      "GoRouter nie jest odtwarzany przy każdej zmianie auth (stabilniejsza nawigacja po loginie).",
+      "Czytelniejsze komunikaty przy braku połączenia z API."
     ]
   },
   {
@@ -50,6 +81,24 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
     ]
   },
   {
+    "version": "1.0.0.2+11",
+    "date": "2026-08-04",
+    "category": "frontend",
+    "title": "Kalendarz: tylko tytuł na paskach",
+    "notes": [
+      "Siatka miesiąca: w ramkach wydarzeń widoczny wyłącznie tytuł (bez godziny); godzina nadal w tooltipie i panelu dnia."
+    ]
+  },
+  {
+    "version": "1.0.0.2+8",
+    "date": "2026-08-04",
+    "category": "frontend",
+    "title": "Klub / Konta: formularze w modalach",
+    "notes": [
+      "`/klub/konta`: na stronie tylko tabele; tworzenie i edycja kont oraz profili w `Modal`."
+    ]
+  },
+  {
     "version": "1.0.0.2+5",
     "date": "2026-08-04",
     "category": "backend",
@@ -57,6 +106,42 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
     "notes": [
       "Provider e-mail: Brevo (`BREVO_API_KEY`, `EMAIL_FROM` jako zweryfikowany sender).",
       "Usunięto `RESEND_API_KEY` / klienta Resend."
+    ]
+  },
+  {
+    "version": "1.0.0.2+6",
+    "date": "2026-08-04",
+    "category": "backend",
+    "title": "Powiadomienia: usuwanie",
+    "notes": [
+      "`DELETE /api/notifications/{id}` — właściciel może usunąć swoje powiadomienie."
+    ]
+  },
+  {
+    "version": "1.0.0.2+9",
+    "date": "2026-08-04",
+    "category": "frontend",
+    "title": "Ustawienia: dwa kolumny",
+    "notes": [
+      "Zwijane kategorie ustawień w układzie `lg:grid-cols-2` (konto | wygląd/prywatność)."
+    ]
+  },
+  {
+    "version": "1.0.0.2+10",
+    "date": "2026-08-04",
+    "category": "frontend",
+    "title": "Ustawienia: E-mail i hasło w jednej kategorii",
+    "notes": [
+      "Sekcje e-mail i hasło połączone w zwijaną kategorię „E-mail i hasło”."
+    ]
+  },
+  {
+    "version": "1.0.0.2+7",
+    "date": "2026-08-04",
+    "category": "frontend",
+    "title": "Ustawienia: kategorie zwijane",
+    "notes": [
+      "Strona ustawień konta: układ w jednej kolumnie, sekcje Profil / E-mail / Hasło / Powiadomienia / Wygląd / Prywatność jako zwijane kategorie (`SettingsCategory`)."
     ]
   },
   {

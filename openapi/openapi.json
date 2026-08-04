@@ -6,7 +6,7 @@
     "license": {
       "name": ""
     },
-    "version": "1.0.0.2+3"
+    "version": "1.0.0.2+6"
   },
   "paths": {
     "/api/admin/db/tables": {
@@ -2990,6 +2990,70 @@
       }
     },
     "/api/notifications/{id}": {
+      "delete": {
+        "tags": [
+          "notifications"
+        ],
+        "operationId": "delete_notification",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID powiadomienia",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usunięto powiadomienie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Powiadomienie nie istnieje",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      },
       "patch": {
         "tags": [
           "notifications"

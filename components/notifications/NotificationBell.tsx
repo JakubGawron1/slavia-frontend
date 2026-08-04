@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   getListNotificationsQueryKey,
   getUnreadCountQueryKey,
+  useDeleteNotification,
   useListNotifications,
   useMarkAllRead,
   useUnreadCount,
@@ -60,6 +61,7 @@ type NotificationBellProps = {
 export function NotificationBell({ variant = "default" }: NotificationBellProps) {
   const toast = useToast();
   const [open, setOpen] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
 
@@ -83,6 +85,7 @@ export function NotificationBell({ variant = "default" }: NotificationBellProps)
 
   const updateMutation = useUpdateNotification();
   const markAllMutation = useMarkAllRead();
+  const deleteMutation = useDeleteNotification();
 
   async function invalidate() {
     await Promise.all([
@@ -132,6 +135,21 @@ export function NotificationBell({ variant = "default" }: NotificationBellProps)
         "Powiadomienia",
         err instanceof Error ? err.message : "Nie udało się oznaczyć",
       );
+    }
+  }
+
+  async function removeNotification(notification: Notification) {
+    setDeletingId(notification.id);
+    try {
+      await deleteMutation.mutateAsync({ id: notification.id });
+      await invalidate();
+    } catch (err) {
+      toast.error(
+        "Powiadomienia",
+        err instanceof Error ? err.message : "Nie udało się usunąć",
+      );
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -229,12 +247,15 @@ export function NotificationBell({ variant = "default" }: NotificationBellProps)
                 );
 
                 const itemClass = n.read
-                  ? "block w-full border-b border-paper/5 px-3 py-3 text-left transition-colors hover:bg-paper/5"
-                  : "block w-full border-b border-paper/5 bg-brand/5 px-3 py-3 text-left transition-colors hover:bg-brand/10";
+                  ? "block min-w-0 flex-1 px-3 py-3 text-left transition-colors hover:bg-paper/5"
+                  : "block min-w-0 flex-1 bg-brand/5 px-3 py-3 text-left transition-colors hover:bg-brand/10";
 
-                if (n.href) {
-                  return (
-                    <li key={n.id}>
+                return (
+                  <li
+                    key={n.id}
+                    className="group flex items-stretch border-b border-paper/5"
+                  >
+                    {n.href ? (
                       <Link
                         href={n.href}
                         className={itemClass}
@@ -245,18 +266,38 @@ export function NotificationBell({ variant = "default" }: NotificationBellProps)
                       >
                         {content}
                       </Link>
-                    </li>
-                  );
-                }
-
-                return (
-                  <li key={n.id}>
+                    ) : (
+                      <button
+                        type="button"
+                        className={itemClass}
+                        onClick={() => void markRead(n)}
+                      >
+                        {content}
+                      </button>
+                    )}
                     <button
                       type="button"
-                      className={itemClass}
-                      onClick={() => void markRead(n)}
+                      aria-label="Usuń powiadomienie"
+                      title="Usuń"
+                      disabled={deletingId === n.id}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        void removeNotification(n);
+                      }}
+                      className="flex w-9 shrink-0 items-start justify-center pt-3 text-paper/30 transition-colors hover:bg-paper/5 hover:text-paper/70 disabled:opacity-40"
                     >
-                      {content}
+                      <svg
+                        className="h-3.5 w-3.5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M18 6 6 18M6 6l12 12" />
+                      </svg>
                     </button>
                   </li>
                 );
