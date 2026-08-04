@@ -3,11 +3,17 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 0.1.0
+ * OpenAPI spec version: 1.0.0.2+3
  */
 
 export interface AttendanceSession {
   created_at: string;
+  /**
+     * Deprecated — stały QR klubowy nie jest powiązany z treningiem (trening rozwiązywany przy skanie).
+     * @deprecated
+     * @nullable
+     */
+  event_id?: string | null;
   label: string;
   refreshed_at: string;
   token: string;

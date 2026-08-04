@@ -3,7 +3,7 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 0.1.0
+ * OpenAPI spec version: 1.0.0.2+3
  */
 
 export interface AthleteStats {
@@ -12,19 +12,19 @@ export interface AthleteStats {
   /** @minimum 0 */
   attendance_window: number;
   /**
-   * Najlepszy zaakceptowany podrzut (kg)
-   * @nullable
-   */
+     * Najlepszy zaakceptowany podrzut (kg)
+     * @nullable
+     */
   best_clean_jerk_kg?: number | null;
   /**
-   * Najlepsze zaakceptowane rwanie (kg)
-   * @nullable
-   */
+     * Najlepsze zaakceptowane rwanie (kg)
+     * @nullable
+     */
   best_snatch_kg?: number | null;
   /**
-   * Najlepszy zaakceptowany dwubój (kg)
-   * @nullable
-   */
+     * Najlepszy zaakceptowany dwubój (kg)
+     * @nullable
+     */
   best_total_kg?: number | null;
   /** @nullable */
   bodyweight_kg?: number | null;
@@ -41,8 +41,8 @@ export interface AthleteStats {
   /** @minimum 0 */
   results_total: number;
   /**
-   * Liczba zaakceptowanych startów (wyniki z zawodów)
-   * @minimum 0
-   */
+     * Liczba zaakceptowanych startów (wyniki z zawodów)
+     * @minimum 0
+     */
   starts_count: number;
 }

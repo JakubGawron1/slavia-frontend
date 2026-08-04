@@ -6,7 +6,7 @@
     "license": {
       "name": ""
     },
-    "version": "0.1.0"
+    "version": "1.0.0.2+3"
   },
   "paths": {
     "/api/admin/db/tables": {
@@ -215,6 +215,81 @@
           },
           "403": {
             "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/admin/debug/send-test-email": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "operationId": "send_test_email",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendTestEmailBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Wysłano / zalogowano testowy e-mail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendTestEmailResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Nieprawidłowy e-mail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Błąd wysyłki",
             "content": {
               "application/json": {
                 "schema": {
@@ -562,6 +637,29 @@
                 "null"
               ]
             }
+          },
+          {
+            "name": "event_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filtr statusu, np. `pending_unauthorized`",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
           }
         ],
         "responses": {
@@ -629,7 +727,7 @@
             }
           },
           "400": {
-            "description": "Nieprawidłowe dane wejściowe",
+            "description": "Nieprawidłowe dane / brak treningu w terminie",
             "content": {
               "application/json": {
                 "schema": {
@@ -671,7 +769,7 @@
         "operationId": "get_session",
         "responses": {
           "200": {
-            "description": "Aktualna sesja obecności (kod QR)",
+            "description": "Stała sesja QR klubu (bez rotacji)",
             "content": {
               "application/json": {
                 "schema": {
@@ -692,16 +790,6 @@
           },
           "403": {
             "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorBody"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Brak sesji obecności",
             "content": {
               "application/json": {
                 "schema": {
@@ -731,7 +819,7 @@
         },
         "responses": {
           "200": {
-            "description": "Odświeżono kod QR obecności",
+            "description": "Odświeżono kod QR (nowy token)",
             "content": {
               "application/json": {
                 "schema": {
@@ -768,8 +856,302 @@
         ]
       }
     },
+    "/api/attendance/{id}/approve": {
+      "post": {
+        "operationId": "approve_attendance",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID rekordu obecności",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApproveAttendanceBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Zaakceptowano nieautoryzowany skan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttendanceRecord"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Nieprawidłowe dane",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nie znaleziono",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/attendance/{id}/reject": {
+      "post": {
+        "operationId": "reject_attendance",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID rekordu obecności",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Odrzucono nieautoryzowany skan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttendanceRecord"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Nieprawidłowe dane",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nie znaleziono",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/auth/email/confirm": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "operationId": "confirm_email",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmEmailBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "E-mail potwierdzony",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Nieprawidłowy lub wygasły token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/email/request-verification": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "operationId": "request_email_verification",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestVerificationBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Wysłano / pominięto (dev)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicUser"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Nieprawidłowe dane",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/auth/forgot-password": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "operationId": "forgot_password",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Jeśli konto istnieje — wysłano mail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Nieprawidłowe dane",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/auth/login": {
       "post": {
+        "tags": [
+          "auth"
+        ],
         "operationId": "login",
         "requestBody": {
           "content": {
@@ -817,6 +1199,9 @@
     },
     "/api/auth/me": {
       "get": {
+        "tags": [
+          "auth"
+        ],
         "operationId": "me",
         "responses": {
           "200": {
@@ -847,7 +1232,10 @@
         ]
       },
       "patch": {
-        "summary": "Aktualizacja własnego konta (nazwa / hasło / motyw) — dostępne dla zalogowanego użytkownika.",
+        "tags": [
+          "auth"
+        ],
+        "summary": "Aktualizacja własnego konta (nazwa / hasło / motyw / prefs) — dostępne dla zalogowanego użytkownika.",
         "operationId": "update_me",
         "requestBody": {
           "content": {
@@ -906,6 +1294,46 @@
             "bearer_auth": []
           }
         ]
+      }
+    },
+    "/api/auth/reset-password": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "operationId": "reset_password",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Hasło zmienione",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Nieprawidłowy token / hasło",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/cms/pages": {
@@ -1375,6 +1803,953 @@
         ]
       }
     },
+    "/api/devices": {
+      "post": {
+        "tags": [
+          "devices"
+        ],
+        "operationId": "register_device",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDeviceBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Zarejestrowano token urządzenia",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceToken"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "devices"
+        ],
+        "operationId": "unregister_device",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnregisterDeviceBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Usunięto token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/events": {
+      "get": {
+        "operationId": "list_events",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista wydarzeń (kadra)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CalendarEvent"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "create_event",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Utworzono wydarzenie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalendarEvent"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Nieprawidłowe dane",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/events/mine": {
+      "get": {
+        "operationId": "list_my_events",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Kalendarz zawodnika",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AthleteCalendarEvent"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/events/schedule": {
+      "get": {
+        "operationId": "get_schedule",
+        "responses": {
+          "200": {
+            "description": "Terminarz treningów",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrainingScheduleDefaults"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "update_schedule",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrainingScheduleDefaults"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Zapisano terminarz",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrainingScheduleDefaults"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Nieprawidłowe dane",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/events/{id}": {
+      "delete": {
+        "operationId": "delete_event",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID wydarzenia",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usunięto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nie znaleziono",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "update_event",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID wydarzenia",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Zaktualizowano wydarzenie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalendarEvent"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Nieprawidłowe dane",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nie znaleziono",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/events/{id}/cancel": {
+      "post": {
+        "operationId": "cancel_event",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID wydarzenia",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Odwołano",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalendarEvent"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nie znaleziono",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/events/{id}/restore": {
+      "post": {
+        "operationId": "restore_event",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID wydarzenia",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RestoreBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Przywrócono",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalendarEvent"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nie znaleziono",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Kolizja treningu",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestoreConflictResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/events/{id}/withdraw": {
+      "post": {
+        "operationId": "withdraw_from_event",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID wydarzenia",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WithdrawBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Złożono rezygnację",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalendarEvent"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Nieprawidłowe dane",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/events/{id}/withdrawals/{athlete_id}/accept": {
+      "post": {
+        "operationId": "accept_withdrawal",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID wydarzenia",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "athlete_id",
+            "in": "path",
+            "description": "ID profilu",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Zaakceptowano rezygnację",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalendarEvent"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nie znaleziono",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/events/{id}/withdrawals/{athlete_id}/clear": {
+      "post": {
+        "operationId": "clear_withdrawal",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID wydarzenia",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "athlete_id",
+            "in": "path",
+            "description": "ID profilu",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cofnięto rezygnację z treningu",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalendarEvent"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/events/{id}/withdrawals/{athlete_id}/reject": {
+      "post": {
+        "operationId": "reject_withdrawal",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID wydarzenia",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "athlete_id",
+            "in": "path",
+            "description": "ID profilu",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Odrzucono rezygnację",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalendarEvent"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nie znaleziono",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
     "/api/flags/public": {
       "get": {
         "operationId": "list_public_flags",
@@ -1408,6 +2783,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Baza niedostępna",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
                 }
               }
             }
@@ -2272,6 +3657,53 @@
         ]
       }
     },
+    "/api/public/events": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "operationId": "list_public_events",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Publiczne wydarzenia klubowe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicCalendarEvent"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/public/profiles": {
       "get": {
         "tags": [
@@ -2558,6 +3990,59 @@
             "bearer_auth": []
           }
         ]
+      },
+      "delete": {
+        "tags": [
+          "uploads"
+        ],
+        "operationId": "delete_image",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteImageBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Usunięto obraz (remote lub tylko lokalny URL)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteImageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Nieprawidłowy URL / błąd providera",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
       }
     },
     "/api/users": {
@@ -2802,6 +4287,125 @@
   },
   "components": {
     "schemas": {
+      "ApproveAttendanceBody": {
+        "type": "object",
+        "properties": {
+          "event_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Wymagane, gdy skan nie miał powiązanego treningu (`event_id` null)."
+          }
+        }
+      },
+      "AssignedAthleteBrief": {
+        "type": "object",
+        "required": [
+          "id",
+          "display_name"
+        ],
+        "properties": {
+          "display_name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          }
+        }
+      },
+      "AthleteCalendarEvent": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "event_type",
+          "date",
+          "status",
+          "club_assigned",
+          "all_athletes",
+          "assigned_athletes",
+          "i_am_assigned",
+          "roster_announced"
+        ],
+        "properties": {
+          "all_athletes": {
+            "type": "boolean"
+          },
+          "assigned_athletes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssignedAthleteBrief"
+            }
+          },
+          "attendance_status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "cancellation_note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "club_assigned": {
+            "type": "boolean"
+          },
+          "date": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "end_date": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "event_type": {
+            "type": "string"
+          },
+          "i_am_assigned": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string"
+          },
+          "location": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "my_withdrawal_status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "roster_announced": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string"
+          },
+          "time": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
       "AthleteProfile": {
         "type": "object",
         "required": [
@@ -2949,8 +4553,8 @@
           },
           "starts_count": {
             "type": "integer",
-            "minimum": 0,
-            "description": "Liczba zaakceptowanych startów (wyniki z zawodów)"
+            "description": "Liczba zaakceptowanych startów (wyniki z zawodów)",
+            "minimum": 0
           }
         }
       },
@@ -2970,11 +4574,25 @@
           "display_name": {
             "type": "string"
           },
+          "event_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "id": {
             "type": "string"
           },
           "session_token": {
             "type": "string"
+          },
+          "source": {
+            "type": "string",
+            "description": "\"qr\" | \"auto\" | \"manual\""
+          },
+          "status": {
+            "type": "string",
+            "description": "\"present\" | \"absent\" | \"pending_unauthorized\" | \"rejected\""
           },
           "user_id": {
             "type": "string"
@@ -2993,6 +4611,14 @@
           "created_at": {
             "type": "string"
           },
+          "event_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Deprecated — stały QR klubowy nie jest powiązany z treningiem (trening rozwiązywany przy skanie).",
+            "deprecated": true
+          },
           "label": {
             "type": "string"
           },
@@ -3001,6 +4627,120 @@
           },
           "token": {
             "type": "string"
+          }
+        }
+      },
+      "CalendarEvent": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "event_type",
+          "date",
+          "status",
+          "club_assigned",
+          "source",
+          "locked",
+          "all_athletes",
+          "created_by",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "all_athletes": {
+            "type": "boolean",
+            "description": "true = wszyscy aktywni zawodnicy (treningi)"
+          },
+          "assigned_athlete_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "cancellation_note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "club_assigned": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "description": "YYYY-MM-DD — początek"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "end_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "YYYY-MM-DD — koniec (włącznie). Brak / None = jednodniowe (`date`)."
+          },
+          "event_type": {
+            "type": "string",
+            "description": "\"zawody\" | \"trening\""
+          },
+          "id": {
+            "type": "string"
+          },
+          "location": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "locked": {
+            "type": "boolean"
+          },
+          "source": {
+            "type": "string",
+            "description": "\"seeded\" | \"manual\""
+          },
+          "status": {
+            "type": "string",
+            "description": "\"scheduled\" | \"cancelled\""
+          },
+          "time": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          },
+          "withdrawals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventWithdrawal"
+            }
+          }
+        }
+      },
+      "CancelBody": {
+        "type": "object",
+        "properties": {
+          "cancellation_note": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
@@ -3195,6 +4935,17 @@
           }
         }
       },
+      "ConfirmEmailBody": {
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "properties": {
+          "token": {
+            "type": "string"
+          }
+        }
+      },
       "ContactMessage": {
         "type": "object",
         "required": [
@@ -3383,6 +5134,58 @@
           }
         }
       },
+      "DeleteImageBody": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "DeleteImageResponse": {
+        "type": "object",
+        "required": [
+          "ok",
+          "deleted_remote"
+        ],
+        "properties": {
+          "deleted_remote": {
+            "type": "boolean",
+            "description": "true = usunięto z providera; false = tylko lokalne czyszczenie URL (zewnętrzny host)"
+          },
+          "ok": {
+            "type": "boolean"
+          }
+        }
+      },
+      "DeviceToken": {
+        "type": "object",
+        "description": "Token urządzenia do push (FCM).",
+        "required": [
+          "token",
+          "user_id",
+          "platform",
+          "updated_at"
+        ],
+        "properties": {
+          "platform": {
+            "type": "string",
+            "description": "\"android\" | \"windows\" | \"ios\""
+          },
+          "token": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          }
+        }
+      },
       "ErrorBody": {
         "type": "object",
         "required": [
@@ -3391,6 +5194,88 @@
         "properties": {
           "error": {
             "type": "string"
+          }
+        }
+      },
+      "EventBody": {
+        "type": "object",
+        "required": [
+          "title",
+          "event_type",
+          "date"
+        ],
+        "properties": {
+          "assigned_athlete_ids": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "date": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "end_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Koniec (włącznie). Puste / brak = jednodniowe."
+          },
+          "event_type": {
+            "type": "string"
+          },
+          "location": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "time": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
+      "EventWithdrawal": {
+        "type": "object",
+        "required": [
+          "athlete_id",
+          "reason",
+          "at",
+          "status"
+        ],
+        "properties": {
+          "at": {
+            "type": "string"
+          },
+          "athlete_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/WithdrawalStatus"
+          },
+          "user_id": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
@@ -3447,6 +5332,17 @@
           "stub",
           "planned"
         ]
+      },
+      "ForgotPasswordBody": {
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        }
       },
       "HealthResponse": {
         "type": "object",
@@ -3568,6 +5464,21 @@
           },
           "user_id": {
             "type": "string"
+          }
+        }
+      },
+      "NotificationPrefs": {
+        "type": "object",
+        "description": "Preferencje powiadomień e-mail (opt-out: brakujące = włączone).",
+        "properties": {
+          "email_contact": {
+            "type": "boolean"
+          },
+          "email_squad": {
+            "type": "boolean"
+          },
+          "email_training_plans": {
+            "type": "boolean"
           }
         }
       },
@@ -3768,6 +5679,63 @@
           }
         }
       },
+      "PublicCalendarEvent": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "event_type",
+          "date",
+          "status"
+        ],
+        "properties": {
+          "cancellation_note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "date": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "end_date": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "event_type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "location": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string"
+          },
+          "time": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
       "PublicFlag": {
         "type": "object",
         "required": [
@@ -3798,11 +5766,23 @@
           "email": {
             "type": "string"
           },
+          "email_verified": {
+            "type": "boolean"
+          },
           "id": {
             "type": "string"
           },
           "is_active": {
             "type": "boolean"
+          },
+          "notification_prefs": {
+            "$ref": "#/components/schemas/NotificationPrefs"
+          },
+          "pending_email": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "photo_url": {
             "type": [
@@ -3834,6 +5814,75 @@
           }
         }
       },
+      "RegisterDeviceBody": {
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "properties": {
+          "platform": {
+            "type": "string",
+            "description": "\"android\" | \"windows\" | \"ios\""
+          },
+          "token": {
+            "type": "string"
+          }
+        }
+      },
+      "RequestVerificationBody": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Nowy adres (opcjonalnie). Brak / null = weryfikuj aktualny e-mail."
+          }
+        }
+      },
+      "ResetPasswordBody": {
+        "type": "object",
+        "required": [
+          "token",
+          "new_password"
+        ],
+        "properties": {
+          "new_password": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          }
+        }
+      },
+      "RestoreBody": {
+        "type": "object",
+        "properties": {
+          "force": {
+            "type": "boolean",
+            "description": "Wymuś przywrócenie mimo kolizji treningu tego samego dnia"
+          }
+        }
+      },
+      "RestoreConflictResponse": {
+        "type": "object",
+        "required": [
+          "warning",
+          "conflicting_event_ids"
+        ],
+        "properties": {
+          "conflicting_event_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "warning": {
+            "type": "string"
+          }
+        }
+      },
       "ResultStatus": {
         "type": "string",
         "enum": [
@@ -3852,6 +5901,41 @@
           "admin",
           "superadmin"
         ]
+      },
+      "SendTestEmailBody": {
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "SendTestEmailResponse": {
+        "type": "object",
+        "required": [
+          "ok",
+          "to",
+          "delivered",
+          "message"
+        ],
+        "properties": {
+          "delivered": {
+            "type": "boolean",
+            "description": "true gdy EMAIL_ENABLED i jest klucz — faktyczna próba Resend; false = tylko log."
+          },
+          "message": {
+            "type": "string"
+          },
+          "ok": {
+            "type": "boolean"
+          },
+          "to": {
+            "type": "string"
+          }
+        }
       },
       "SiteStats": {
         "type": "object",
@@ -4022,6 +6106,45 @@
           }
         }
       },
+      "TrainingScheduleDefaults": {
+        "type": "object",
+        "required": [
+          "weekdays",
+          "time",
+          "end_time",
+          "location",
+          "title",
+          "attendance_buffer_minutes"
+        ],
+        "properties": {
+          "attendance_buffer_minutes": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "end_time": {
+            "type": "string"
+          },
+          "location": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "weekdays": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "ISO weekdays 1=Mon … 7=Sun"
+          }
+        }
+      },
       "UnreadCountResponse": {
         "type": "object",
         "required": [
@@ -4031,6 +6154,17 @@
           "count": {
             "type": "integer",
             "minimum": 0
+          }
+        }
+      },
+      "UnregisterDeviceBody": {
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "properties": {
+          "token": {
+            "type": "string"
           }
         }
       },
@@ -4075,6 +6209,16 @@
             "type": [
               "string",
               "null"
+            ]
+          },
+          "notification_prefs": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/NotificationPrefs"
+              }
             ]
           },
           "photo_url": {
@@ -4197,6 +6341,25 @@
             "description": "Dowolny obiekt JSON reprezentujący wiersz tabeli."
           }
         }
+      },
+      "WithdrawBody": {
+        "type": "object",
+        "required": [
+          "reason"
+        ],
+        "properties": {
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "WithdrawalStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "accepted",
+          "rejected"
+        ]
       }
     },
     "securitySchemes": {
@@ -4230,6 +6393,10 @@
     {
       "name": "notifications",
       "description": "Powiadomienia in-app"
+    },
+    {
+      "name": "devices",
+      "description": "Tokeny push (FCM)"
     },
     {
       "name": "uploads",

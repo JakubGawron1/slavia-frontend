@@ -12,6 +12,31 @@ Format sekcji:
 
 Opcjonalnie po dacie: `!breaking` (breaking API).
 
+## [1.0.0.2+5] - 2026-08-04
+
+### DevTools: test e-mail przez Brevo
+
+- Zakładka Debug: copy i podpowiedzi pod Brevo (zamiast Resend).
+
+## [1.0.0.2+4] - 2026-08-04
+
+### DevTools: test e-mail
+
+- Zakładka Debug: formularz wysyłki testowego maila na podany adres (superadmin).
+
+## [1.0.0.2+3] - 2026-08-03
+
+### Sync „Co nowego” → Flutter
+
+- `scripts/sync-changelog.mjs` generuje `slavia-mobile/lib/generated/user_changelog.g.dart` z `CHANGELOG.user.md`.
+
+### E-mail: weryfikacja, reset hasła, preferencje
+
+- Bramka weryfikacji e-mail po logowaniu (panel + klub); strony `/weryfikacja-emaila`, `/zapomniane-haslo`, `/reset-hasla`.
+- Link „Nie pamiętam hasła” na logowaniu.
+- Ustawienia: zmiana e-maila + przełączniki powiadomień (skład, plany, kontakt dla kadry).
+- Klient OpenAPI / Orval: nowe endpointy auth e-mail.
+
 ## [1.0.0.1+1] - 2026-08-03
 
 ### Zawody wielodniowe w kalendarzu

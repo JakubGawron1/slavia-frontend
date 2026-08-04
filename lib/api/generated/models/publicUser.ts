@@ -3,15 +3,20 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 0.1.0
+ * OpenAPI spec version: 1.0.0.2+3
  */
+import type { NotificationPrefs } from './notificationPrefs';
 import type { Role } from './role';
 
 export interface PublicUser {
   display_name: string;
   email: string;
+  email_verified?: boolean;
   id: string;
   is_active?: boolean;
+  notification_prefs?: NotificationPrefs;
+  /** @nullable */
+  pending_email?: string | null;
   /**
      * Zdjęcie konta (dla zawodnika = zdjęcie profilu publicznego).
      * @nullable

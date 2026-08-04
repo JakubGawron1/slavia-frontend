@@ -3,25 +3,32 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 0.1.0
+ * OpenAPI spec version: 1.0.0.2+3
  */
 import {
+  useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
   DefinedUseQueryResult,
+  MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult
 } from '@tanstack/react-query';
 
 import type {
-  HealthResponse
+  ErrorBody,
+  HealthResponse,
+  SendTestEmailBody,
+  SendTestEmailResponse
 } from '../models';
 
 import { customFetch } from '../../mutator';
@@ -46,17 +53,122 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   return result;
 };
 
-export type healthResponse200 = {
+export type sendTestEmailResponse200 = {
+  data: SendTestEmailResponse
+  status: 200
+}
+
+export type sendTestEmailResponse400 = {
+  data: ErrorBody
+  status: 400
+}
+
+export type sendTestEmailResponse401 = {
+  data: ErrorBody
+  status: 401
+}
+
+export type sendTestEmailResponse403 = {
+  data: ErrorBody
+  status: 403
+}
+
+export type sendTestEmailResponse500 = {
+  data: ErrorBody
+  status: 500
+}
+
+export type sendTestEmailResponseSuccess = (sendTestEmailResponse200) & {
+  headers: Headers;
+};
+export type sendTestEmailResponseError = (sendTestEmailResponse400 | sendTestEmailResponse401 | sendTestEmailResponse403 | sendTestEmailResponse500) & {
+  headers: Headers;
+};
+
+export type sendTestEmailResponse = (sendTestEmailResponseSuccess | sendTestEmailResponseError)
+
+export const getSendTestEmailUrl = () => {
+
+
+
+
+  return `/api/admin/debug/send-test-email`
+}
+
+export const sendTestEmail = async (sendTestEmailBody: SendTestEmailBody, options?: Parameters<typeof customFetch>[1]): Promise<sendTestEmailResponse> => {
+
+  return customFetch<sendTestEmailResponse>(getSendTestEmailUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(sendTestEmailBody)
+  }
+);}
+
+
+
+
+
+export const getSendTestEmailMutationOptions = <TError = ErrorBody,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sendTestEmail>>, TError,{data: SendTestEmailBody}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof sendTestEmail>>, TError,{data: SendTestEmailBody}, TContext> => {
+
+const mutationKey = ['sendTestEmail'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof sendTestEmail>>, {data: SendTestEmailBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  sendTestEmail(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SendTestEmailMutationResult = NonNullable<Awaited<ReturnType<typeof sendTestEmail>>>
+    export type SendTestEmailMutationBody = SendTestEmailBody
+    export type SendTestEmailMutationError = ErrorBody
+
+    export const useSendTestEmail = <TError = ErrorBody,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sendTestEmail>>, TError,{data: SendTestEmailBody}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof sendTestEmail>>,
+        TError,
+        {data: SendTestEmailBody},
+        TContext
+      > => {
+      return useMutation(getSendTestEmailMutationOptions(options), queryClient);
+    }
+    export type healthResponse200 = {
   data: HealthResponse
   status: 200
+}
+
+export type healthResponse500 = {
+  data: ErrorBody
+  status: 500
 }
 
 export type healthResponseSuccess = (healthResponse200) & {
   headers: Headers;
 };
-;
+export type healthResponseError = (healthResponse500) & {
+  headers: Headers;
+};
 
-export type healthResponse = (healthResponseSuccess)
+export type healthResponse = (healthResponseSuccess | healthResponseError)
 
 export const getHealthUrl = () => {
 
@@ -88,7 +200,7 @@ export const getHealthQueryKey = () => {
     }
 
 
-export const getHealthQueryOptions = <TData = Awaited<ReturnType<typeof health>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof health>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getHealthQueryOptions = <TData = Awaited<ReturnType<typeof health>>, TError = ErrorBody>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof health>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -107,10 +219,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type HealthQueryResult = NonNullable<Awaited<ReturnType<typeof health>>>
-export type HealthQueryError = unknown
+export type HealthQueryError = ErrorBody
 
 
-export function useHealth<TData = Awaited<ReturnType<typeof health>>, TError = unknown>(
+export function useHealth<TData = Awaited<ReturnType<typeof health>>, TError = ErrorBody>(
   options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof health>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof health>>,
@@ -120,7 +232,7 @@ export function useHealth<TData = Awaited<ReturnType<typeof health>>, TError = u
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useHealth<TData = Awaited<ReturnType<typeof health>>, TError = unknown>(
+export function useHealth<TData = Awaited<ReturnType<typeof health>>, TError = ErrorBody>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof health>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof health>>,
@@ -130,12 +242,12 @@ export function useHealth<TData = Awaited<ReturnType<typeof health>>, TError = u
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useHealth<TData = Awaited<ReturnType<typeof health>>, TError = unknown>(
+export function useHealth<TData = Awaited<ReturnType<typeof health>>, TError = ErrorBody>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof health>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useHealth<TData = Awaited<ReturnType<typeof health>>, TError = unknown>(
+export function useHealth<TData = Awaited<ReturnType<typeof health>>, TError = ErrorBody>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof health>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {

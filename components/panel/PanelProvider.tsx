@@ -22,6 +22,10 @@ import {
   type AuthUser,
 } from "@/lib/auth";
 import { canAccessAthletePanel } from "@/lib/panel-nav";
+import {
+  EmailVerificationGate,
+  needsEmailVerification,
+} from "@/components/settings/EmailVerificationGate";
 
 type PanelContextValue = {
   user: AuthUser | null;
@@ -133,7 +137,15 @@ export function PanelProvider({ children }: { children: ReactNode }) {
   );
 
   return (
-    <PanelContext.Provider value={value}>{children}</PanelContext.Provider>
+    <PanelContext.Provider value={value}>
+      {children}
+      {user && !loading && needsEmailVerification(user) ? (
+        <EmailVerificationGate
+          user={user}
+          onUpdated={(next) => void refreshUser(next)}
+        />
+      ) : null}
+    </PanelContext.Provider>
   );
 }
 

@@ -135,6 +135,14 @@ export function LoginForm() {
             className="mt-2 w-full border border-paper/20 bg-chrome/40 px-4 py-3.5 text-paper outline-none transition-[border-color,background-color] placeholder:text-paper/35 focus:border-brand focus:bg-chrome/60 disabled:opacity-60"
             placeholder="••••••••"
           />
+          <p className="mt-2 text-right">
+            <Link
+              href="/zapomniane-haslo"
+              className="text-xs text-paper/55 underline-offset-4 hover:text-paper hover:underline"
+            >
+              Nie pamiętam hasła
+            </Link>
+          </p>
         </div>
       </div>
 

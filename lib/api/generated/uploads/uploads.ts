@@ -3,7 +3,7 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 0.1.0
+ * OpenAPI spec version: 1.0.0.2+3
  */
 import {
   useMutation
@@ -16,6 +16,8 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  DeleteImageBody,
+  DeleteImageResponse,
   ErrorBody,
   UploadImageResponse
 } from '../models';
@@ -114,4 +116,92 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getUploadImageMutationOptions(options), queryClient);
+    }
+    export type deleteImageResponse200 = {
+  data: DeleteImageResponse
+  status: 200
+}
+
+export type deleteImageResponse400 = {
+  data: ErrorBody
+  status: 400
+}
+
+export type deleteImageResponse401 = {
+  data: ErrorBody
+  status: 401
+}
+
+export type deleteImageResponseSuccess = (deleteImageResponse200) & {
+  headers: Headers;
+};
+export type deleteImageResponseError = (deleteImageResponse400 | deleteImageResponse401) & {
+  headers: Headers;
+};
+
+export type deleteImageResponse = (deleteImageResponseSuccess | deleteImageResponseError)
+
+export const getDeleteImageUrl = () => {
+
+
+
+
+  return `/api/uploads/image`
+}
+
+export const deleteImage = async (deleteImageBody: DeleteImageBody, options?: Parameters<typeof customFetch>[1]): Promise<deleteImageResponse> => {
+
+  return customFetch<deleteImageResponse>(getDeleteImageUrl(),
+  {
+    ...options,
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(deleteImageBody)
+  }
+);}
+
+
+
+
+
+export const getDeleteImageMutationOptions = <TError = ErrorBody,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteImage>>, TError,{data: DeleteImageBody}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteImage>>, TError,{data: DeleteImageBody}, TContext> => {
+
+const mutationKey = ['deleteImage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteImage>>, {data: DeleteImageBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  deleteImage(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteImageMutationResult = NonNullable<Awaited<ReturnType<typeof deleteImage>>>
+    export type DeleteImageMutationBody = DeleteImageBody
+    export type DeleteImageMutationError = ErrorBody
+
+    export const useDeleteImage = <TError = ErrorBody,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteImage>>, TError,{data: DeleteImageBody}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteImage>>,
+        TError,
+        {data: DeleteImageBody},
+        TContext
+      > => {
+      return useMutation(getDeleteImageMutationOptions(options), queryClient);
     }

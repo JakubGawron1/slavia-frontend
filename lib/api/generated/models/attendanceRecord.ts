@@ -3,13 +3,19 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 0.1.0
+ * OpenAPI spec version: 1.0.0.2+3
  */
 
 export interface AttendanceRecord {
   checked_at: string;
   display_name: string;
+  /** @nullable */
+  event_id?: string | null;
   id: string;
   session_token: string;
+  /** "qr" | "auto" | "manual" */
+  source?: string;
+  /** "present" | "absent" | "pending_unauthorized" | "rejected" */
+  status?: string;
   user_id: string;
 }

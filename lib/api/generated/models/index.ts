@@ -3,36 +3,52 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 0.1.0
+ * OpenAPI spec version: 1.0.0.2+3
  */
 
+export * from './approveAttendanceBody';
+export * from './assignedAthleteBrief';
+export * from './athleteCalendarEvent';
 export * from './athleteProfile';
 export * from './athleteStats';
 export * from './attendanceRecord';
 export * from './attendanceSession';
+export * from './calendarEvent';
+export * from './cancelBody';
 export * from './checkInBody';
 export * from './cmsBlock';
 export * from './cmsPage';
 export * from './cmsPageBody';
 export * from './cmsStatus';
 export * from './competitionResult';
+export * from './confirmEmailBody';
 export * from './contactMessage';
 export * from './contactMessageBody';
 export * from './createResultBody';
 export * from './createUserBody';
+export * from './deleteImageBody';
+export * from './deleteImageResponse';
+export * from './deviceToken';
 export * from './errorBody';
+export * from './eventBody';
+export * from './eventWithdrawal';
 export * from './featureFlag';
 export * from './flagKind';
 export * from './flagRolloutStatus';
+export * from './forgotPasswordBody';
 export * from './healthResponse';
 export * from './imageProvider';
 export * from './listAttendanceParams';
+export * from './listEventsParams';
 export * from './listLogsParams';
+export * from './listMyEventsParams';
+export * from './listPublicEventsParams';
 export * from './listResultsParams';
 export * from './loginRequest';
 export * from './loginResponse';
 export * from './logLevel';
 export * from './notification';
+export * from './notificationPrefs';
 export * from './okResponse';
 export * from './planBody';
 export * from './planExercise';
@@ -40,16 +56,26 @@ export * from './planProgressEntry';
 export * from './previewStartBody';
 export * from './profileBody';
 export * from './progressBody';
+export * from './publicCalendarEvent';
 export * from './publicFlag';
 export * from './publicUser';
 export * from './refreshSessionBody';
+export * from './registerDeviceBody';
+export * from './requestVerificationBody';
+export * from './resetPasswordBody';
+export * from './restoreBody';
+export * from './restoreConflictResponse';
 export * from './resultStatus';
 export * from './role';
+export * from './sendTestEmailBody';
+export * from './sendTestEmailResponse';
 export * from './siteStats';
 export * from './systemLog';
 export * from './trainingPlan';
 export * from './trainingPlanProgress';
+export * from './trainingScheduleDefaults';
 export * from './unreadCountResponse';
+export * from './unregisterDeviceBody';
 export * from './updateContactMessageBody';
 export * from './updateFlagBody';
 export * from './updateMeBody';
@@ -59,3 +85,5 @@ export * from './updateUserBody';
 export * from './uploadImageResponse';
 export * from './upsertRowBody';
 export * from './upsertRowBodyRow';
+export * from './withdrawalStatus';
+export * from './withdrawBody';

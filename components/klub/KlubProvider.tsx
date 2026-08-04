@@ -28,6 +28,10 @@ import {
   defaultActiveRole,
   STAFF_ROLES,
 } from "@/lib/klub-nav";
+import {
+  EmailVerificationGate,
+  needsEmailVerification,
+} from "@/components/settings/EmailVerificationGate";
 
 const ACTIVE_ROLE_KEY = "slavia_klub_active_role";
 const VIEW_AS_KEY = "slavia_klub_view_as";
@@ -281,7 +285,17 @@ export function KlubProvider({ children }: { children: ReactNode }) {
     ],
   );
 
-  return <KlubContext.Provider value={value}>{children}</KlubContext.Provider>;
+  return (
+    <KlubContext.Provider value={value}>
+      {children}
+      {user && !loading && needsEmailVerification(user) ? (
+        <EmailVerificationGate
+          user={user}
+          onUpdated={(next) => void refreshUser(next)}
+        />
+      ) : null}
+    </KlubContext.Provider>
+  );
 }
 
 export function useKlub() {

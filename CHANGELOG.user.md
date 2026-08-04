@@ -11,6 +11,23 @@ Format:
 - zdanie zrozumiałe dla zwykłego użytkownika
 ```
 
+## [1.0.0.2+5] - 2026-08-04
+
+### E-mail i powiadomienia
+
+- Po pierwszym logowaniu możesz potwierdzić adres e-mail albo podać swój prawdziwy — potem maile klubowe trafią właśnie tam.
+- Jeśli zapomnisz hasła, na stronie logowania jest link do resetu przez e-mail.
+- W ustawieniach konta włączysz lub wyłączysz maile o składzie zawodów, planach treningowych (oraz — dla kadry — o wiadomościach z formularza kontaktowego).
+- Po wysłaniu wiadomości przez formularz kontaktowy dostaniesz potwierdzenie na podany e-mail; kadra dostaje mail o nowej wiadomości.
+
+## [1.0.0.2+3] - 2026-08-03
+
+### Aplikacja mobilna dla zawodników
+
+- Jest aplikacja CKS Slavia na Androida i Windows — logowanie, pulpit, wyniki, obecność QR, kalendarz, plany treningowe i ustawienia.
+- Możesz zgłaszać wyniki, skanować obecność, liczyć punkty Sinclair i czytać „Co nowego” także w aplikacji.
+- Powiadomienia docierają do telefonu (push), a w aplikacji masz skrzynkę z historią.
+
 ## [1.0.0.1+1] - 2026-08-03
 
 ### Zawody przez kilka dni

@@ -3,7 +3,7 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 0.1.0
+ * OpenAPI spec version: 1.0.0.2+3
  */
 import {
   useQuery
@@ -22,7 +22,9 @@ import type {
 
 import type {
   AthleteProfile,
-  CompetitionResult
+  CompetitionResult,
+  ListPublicEventsParams,
+  PublicCalendarEvent
 } from '../models';
 
 import { customFetch } from '../../mutator';
@@ -46,6 +48,119 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export type listPublicEventsResponse200 = {
+  data: PublicCalendarEvent[]
+  status: 200
+}
+
+export type listPublicEventsResponseSuccess = (listPublicEventsResponse200) & {
+  headers: Headers;
+};
+;
+
+export type listPublicEventsResponse = (listPublicEventsResponseSuccess)
+
+export const getListPublicEventsUrl = (params?: ListPublicEventsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/public/events?${stringifiedParams}` : `/api/public/events`
+}
+
+export const listPublicEvents = async (params?: ListPublicEventsParams, options?: Parameters<typeof customFetch>[1]): Promise<listPublicEventsResponse> => {
+
+  return customFetch<listPublicEventsResponse>(getListPublicEventsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListPublicEventsQueryKey = (params?: ListPublicEventsParams,) => {
+    return [
+    `/api/public/events`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListPublicEventsQueryOptions = <TData = Awaited<ReturnType<typeof listPublicEvents>>, TError = unknown>(params?: ListPublicEventsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPublicEvents>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListPublicEventsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listPublicEvents>>> = ({ signal }) => listPublicEvents(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listPublicEvents>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListPublicEventsQueryResult = NonNullable<Awaited<ReturnType<typeof listPublicEvents>>>
+export type ListPublicEventsQueryError = unknown
+
+
+export function useListPublicEvents<TData = Awaited<ReturnType<typeof listPublicEvents>>, TError = unknown>(
+ params: undefined |  ListPublicEventsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPublicEvents>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listPublicEvents>>,
+          TError,
+          Awaited<ReturnType<typeof listPublicEvents>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListPublicEvents<TData = Awaited<ReturnType<typeof listPublicEvents>>, TError = unknown>(
+ params?: ListPublicEventsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPublicEvents>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listPublicEvents>>,
+          TError,
+          Awaited<ReturnType<typeof listPublicEvents>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListPublicEvents<TData = Awaited<ReturnType<typeof listPublicEvents>>, TError = unknown>(
+ params?: ListPublicEventsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPublicEvents>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useListPublicEvents<TData = Awaited<ReturnType<typeof listPublicEvents>>, TError = unknown>(
+ params?: ListPublicEventsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPublicEvents>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListPublicEventsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
 
 export type listPublicProfilesResponse200 = {
   data: AthleteProfile[]
