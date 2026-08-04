@@ -12,6 +12,12 @@ Format sekcji:
 
 Opcjonalnie po dacie: `!breaking` (breaking API).
 
+## [1.0.0.2+12] - 2026-08-04
+
+### Fix: SettingsCategory i typy details
+
+- `SettingsCategory`: stan `open` zamiast nieobsługiwanego w typach React `defaultOpen` na `<details>` (build TypeScript).
+
 ## [1.0.0.2+11] - 2026-08-04
 
 ### Kalendarz: tylko tytuł na paskach

@@ -71,6 +71,15 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
     ]
   },
   {
+    "version": "1.0.0.2+12",
+    "date": "2026-08-04",
+    "category": "frontend",
+    "title": "Fix: SettingsCategory i typy details",
+    "notes": [
+      "`SettingsCategory`: stan `open` zamiast nieobsługiwanego w typach React `defaultOpen` na `<details>` (build TypeScript)."
+    ]
+  },
+  {
     "version": "1.0.0.2+5",
     "date": "2026-08-04",
     "category": "mobile",

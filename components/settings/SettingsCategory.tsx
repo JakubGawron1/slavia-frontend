@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 type Props = {
   title: string;
   description?: string;
@@ -14,10 +16,14 @@ export function SettingsCategory({
   defaultOpen = false,
   children,
 }: Props) {
+  // React DOM types for <details> expose `open`, not `defaultOpen`.
+  const [open, setOpen] = useState(defaultOpen);
+
   return (
     <details
       className="settings-surface group border border-paper/10 bg-chrome/30"
-      defaultOpen={defaultOpen}
+      open={open}
+      onToggle={(e) => setOpen(e.currentTarget.open)}
     >
       <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 transition-colors hover:bg-chrome/20 md:px-6 [&::-webkit-details-marker]:hidden">
         <div className="min-w-0">
