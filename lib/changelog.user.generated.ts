@@ -43,6 +43,23 @@ export const GENERATED_USER_CHANGELOG: UserChangelogEntry[] = [
     ]
   },
   {
+    "version": "1.0.0.3+23",
+    "date": "2026-08-05",
+    "title": "Poprawianie wyników",
+    "notes": [
+      "Trener może poprawić wynik (także już zaakceptowany, gdy wkradł się błąd).",
+      "Zawodnik może poprawić wynik oczekujący albo odesłany do edycji — wraca wtedy do weryfikacji."
+    ]
+  },
+  {
+    "version": "1.0.0.3+24",
+    "date": "2026-08-05",
+    "title": "Poprawka już zaakceptowanego wyniku",
+    "notes": [
+      "Jeśli zauważysz błąd w zaakceptowanym wyniku, możesz go poprawić — wtedy znowu trafia do trenera do weryfikacji."
+    ]
+  },
+  {
     "version": "1.0.0.3+15",
     "date": "2026-08-05",
     "title": "Powiadomienia na telefonie",

@@ -62,6 +62,27 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
     ]
   },
   {
+    "version": "1.0.0.3+23",
+    "date": "2026-08-05",
+    "category": "backend",
+    "title": "Feature: edycja wyników (kadra + zawodnik)",
+    "notes": [
+      "`PATCH /api/results/{id}`: opcjonalne pola wyniku (nazwa, data, ciężary, masa, miejsce) + opcjonalny status.",
+      "Kadra: edycja `pending` / `needs_edit` / `accepted` (poprawki); po zapisie zaakceptowanego — sync kategorii w profilu.",
+      "Zawodnik: edycja własnych `pending` / `needs_edit` → wraca do `pending`."
+    ]
+  },
+  {
+    "version": "1.0.0.3+23",
+    "date": "2026-08-05",
+    "category": "frontend",
+    "title": "Feature: edycja wyników w UI",
+    "notes": [
+      "`/klub/weryfikacja-wynikow`: modal edycji wyników oczekujących, do poprawy i zaakceptowanych.",
+      "`/panel/wyniki`: „Popraw” dla wyników oczekujących / do edycji (z notatką trenera)."
+    ]
+  },
+  {
     "version": "1.0.0.3+21",
     "date": "2026-08-05",
     "category": "backend",
@@ -89,6 +110,24 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
       "CORS: dozwolony nagłówek `X-View-As-User` (wcześniej przeglądarka go blokowała).",
       "Czyszczenie cache React Query przy zmianie `viewAs`.",
       "Panel (pulpit/plany/wyniki/obecność/kalendarz): przeładowanie przy zmianie podglądanego konta."
+    ]
+  },
+  {
+    "version": "1.1.0.5+1",
+    "date": "2026-08-05",
+    "category": "frontend",
+    "title": "Fix: ponowna weryfikacja po poprawce zaakceptowanego",
+    "notes": [
+      "Panel: „Popraw” także przy zaakceptowanym wyniku — po zapisie wraca do kolejki weryfikacji."
+    ]
+  },
+  {
+    "version": "1.1.0.5+1",
+    "date": "2026-08-05",
+    "category": "backend",
+    "title": "Fix: poprawka zaakceptowanego wyniku przez zawodnika",
+    "notes": [
+      "Zawodnik może edytować też wynik `accepted`; po zapisie status → `pending` + powiadomienie kadry."
     ]
   },
   {

@@ -12,6 +12,19 @@ Format sekcji:
 
 Opcjonalnie po dacie: `!breaking` (breaking API).
 
+## [1.1.0.5+1] - 2026-08-05
+
+### Fix: ponowna weryfikacja po poprawce zaakceptowanego
+
+- Panel: „Popraw” także przy zaakceptowanym wyniku — po zapisie wraca do kolejki weryfikacji.
+
+## [1.0.0.3+23] - 2026-08-05
+
+### Feature: edycja wyników w UI
+
+- `/klub/weryfikacja-wynikow`: modal edycji wyników oczekujących, do poprawy i zaakceptowanych.
+- `/panel/wyniki`: „Popraw” dla wyników oczekujących / do edycji (z notatką trenera).
+
 ## [1.0.0.3+22] - 2026-08-05
 
 ### UX: auto kategoria w formularzu profilu

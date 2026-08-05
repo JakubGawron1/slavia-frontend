@@ -9,6 +9,25 @@ import type { ResultStatus } from './resultStatus';
 
 export interface UpdateResultBody {
   /** @nullable */
+  bodyweight_kg?: number | null;
+  /** @nullable */
+  clean_jerk_kg?: number | null;
+  /**
+     * YYYY-MM-DD
+     * @nullable
+     */
+  event_date?: string | null;
+  /** @nullable */
+  event_name?: string | null;
+  /** @nullable */
   reviewer_note?: string | null;
-  status: ResultStatus;
+  /** @nullable */
+  snatch_kg?: number | null;
+  /**
+     * Gdy brak — status bez zmian (sama edycja pól).
+     * @nullable
+     */
+  status?: ResultStatus;
+  /** @nullable */
+  venue?: string | null;
 }

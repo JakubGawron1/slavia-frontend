@@ -11,6 +11,19 @@ Format:
 - zdanie zrozumiałe dla zwykłego użytkownika
 ```
 
+## [1.0.0.3+24] - 2026-08-05
+
+### Poprawka już zaakceptowanego wyniku
+
+- Jeśli zauważysz błąd w zaakceptowanym wyniku, możesz go poprawić — wtedy znowu trafia do trenera do weryfikacji.
+
+## [1.0.0.3+23] - 2026-08-05
+
+### Poprawianie wyników
+
+- Trener może poprawić wynik (także już zaakceptowany, gdy wkradł się błąd).
+- Zawodnik może poprawić wynik oczekujący albo odesłany do edycji — wraca wtedy do weryfikacji.
+
 ## [1.0.0.3+22] - 2026-08-05
 
 ### Kategoria w profilu sama się ustawia

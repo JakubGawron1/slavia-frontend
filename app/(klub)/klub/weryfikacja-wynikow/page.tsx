@@ -9,6 +9,7 @@ import type {
 import { klubFetch } from "@/lib/klub-api";
 import { useKlub } from "@/components/klub/KlubProvider";
 import { useToast } from "@/components/toast/ToastProvider";
+import { Modal } from "@/components/ui/Modal";
 import { formatResultDate } from "@/lib/athletes";
 import { resolveWeightCategory } from "@/lib/weightlifting-categories";
 
@@ -30,6 +31,25 @@ function todayIsoDate() {
   return `${y}-${m}-${day}`;
 }
 
+function isCompetitionResult(r: CompetitionResult) {
+  return r.kind !== "training";
+}
+
+function canStaffEdit(status: ResultStatus) {
+  return status === "pending" || status === "needs_edit" || status === "accepted";
+}
+
+function findProfileForResult(
+  profiles: AthleteProfile[],
+  r: CompetitionResult,
+): AthleteProfile | null {
+  if (r.user_id) {
+    const byUser = profiles.find((p) => p.user_id === r.user_id);
+    if (byUser) return byUser;
+  }
+  return profiles.find((p) => p.display_name === r.athlete_name) ?? null;
+}
+
 export default function WeryfikacjaPage() {
   const toast = useToast();
   const { viewAs } = useKlub();
@@ -47,6 +67,15 @@ export default function WeryfikacjaPage() {
   const [cj, setCj] = useState("");
   const [bodyweight, setBodyweight] = useState("");
   const [venue, setVenue] = useState("");
+
+  const [editing, setEditing] = useState<CompetitionResult | null>(null);
+  const [editEventName, setEditEventName] = useState("");
+  const [editEventDate, setEditEventDate] = useState("");
+  const [editSnatch, setEditSnatch] = useState("");
+  const [editCj, setEditCj] = useState("");
+  const [editBodyweight, setEditBodyweight] = useState("");
+  const [editVenue, setEditVenue] = useState("");
+  const [editSaving, setEditSaving] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -90,6 +119,96 @@ export default function WeryfikacjaPage() {
       bodyweightKg: bwNum,
     });
   }, [selectedProfile, bwNum]);
+
+  const editingProfile = useMemo(
+    () => (editing ? findProfileForResult(profiles, editing) : null),
+    [editing, profiles],
+  );
+
+  const editBwNum = editBodyweight ? Number(editBodyweight) : NaN;
+  const editPreviewCategory = useMemo(() => {
+    if (!editingProfile || !Number.isFinite(editBwNum) || editBwNum <= 0) {
+      return null;
+    }
+    return resolveWeightCategory({
+      birthDate: editingProfile.birth_date,
+      sex: editingProfile.sex,
+      bodyweightKg: editBwNum,
+    });
+  }, [editingProfile, editBwNum]);
+
+  function openEdit(r: CompetitionResult) {
+    setEditing(r);
+    setEditEventName(isCompetitionResult(r) ? r.event_name : "");
+    setEditEventDate(r.event_date ?? todayIsoDate());
+    setEditSnatch(r.snatch_kg != null ? String(r.snatch_kg) : "");
+    setEditCj(r.clean_jerk_kg != null ? String(r.clean_jerk_kg) : "");
+    setEditBodyweight(
+      r.bodyweight_kg != null ? String(r.bodyweight_kg) : "",
+    );
+    setEditVenue(r.venue ?? "");
+  }
+
+  function closeEdit() {
+    setEditing(null);
+  }
+
+  async function saveEdit(e: FormEvent) {
+    e.preventDefault();
+    if (!editing) return;
+    setError(null);
+    const isComp = isCompetitionResult(editing);
+    if (!editEventDate.trim()) {
+      const msg = "Podaj datę.";
+      setError(msg);
+      toast.error("Edycja wyniku", msg);
+      return;
+    }
+    if (isComp) {
+      if (!editEventName.trim()) {
+        const msg = "Podaj nazwę zawodów.";
+        setError(msg);
+        toast.error("Edycja wyniku", msg);
+        return;
+      }
+      if (!Number.isFinite(editBwNum) || editBwNum <= 0) {
+        const msg = "Podaj masę ciała (kg).";
+        setError(msg);
+        toast.error("Edycja wyniku", msg);
+        return;
+      }
+    }
+    setEditSaving(true);
+    try {
+      const body: Record<string, unknown> = {
+        event_date: editEventDate,
+        snatch_kg: editSnatch ? Number(editSnatch) : null,
+        clean_jerk_kg: editCj ? Number(editCj) : null,
+        venue: editVenue.trim() || null,
+      };
+      if (isComp) {
+        body.event_name = editEventName.trim();
+        body.bodyweight_kg = editBwNum;
+      }
+      await klubFetch(`/api/results/${editing.id}`, {
+        method: "PATCH",
+        body,
+      });
+      toast.success(
+        "Zapisano zmiany",
+        editPreviewCategory ?? editing.athlete_name,
+      );
+      closeEdit();
+      await load();
+    } catch (err) {
+      const msg =
+        err instanceof Error ? err.message : "Nie udało się zapisać wyniku";
+      setError(msg);
+      toast.error("Edycja wyniku", msg);
+    } finally {
+      setEditSaving(false);
+    }
+  }
 
   async function review(id: string, status: ResultStatus) {
     try {
@@ -359,6 +478,15 @@ export default function WeryfikacjaPage() {
                   }
                 />
                 <div className="flex flex-wrap gap-2">
+                  {canStaffEdit(r.status) ? (
+                    <button
+                      type="button"
+                      onClick={() => openEdit(r)}
+                      className="border border-paper/25 px-4 py-2 font-display text-[11px] tracking-[0.12em] uppercase"
+                    >
+                      Edytuj
+                    </button>
+                  ) : null}
                   <button
                     type="button"
                     onClick={() => void review(r.id, "accepted")}
@@ -419,15 +547,150 @@ export default function WeryfikacjaPage() {
                       </p>
                     ) : null}
                   </div>
-                  <span className="font-display text-[10px] tracking-[0.12em] uppercase text-paper/50">
-                    {STATUS_LABEL[r.status]}
-                  </span>
+                  <div className="flex flex-wrap items-start gap-2">
+                    {canStaffEdit(r.status) ? (
+                      <button
+                        type="button"
+                        onClick={() => openEdit(r)}
+                        className="border border-paper/25 px-3 py-1.5 font-display text-[10px] tracking-[0.12em] uppercase"
+                      >
+                        Edytuj
+                      </button>
+                    ) : null}
+                    <span className="font-display text-[10px] tracking-[0.12em] uppercase text-paper/50">
+                      {STATUS_LABEL[r.status]}
+                    </span>
+                  </div>
                 </div>
               </li>
             ))}
           </ul>
         </section>
       ) : null}
+
+      <Modal
+        open={editing != null}
+        title={
+          editing
+            ? `Edycja — ${editing.athlete_name}`
+            : "Edycja wyniku"
+        }
+        onClose={closeEdit}
+        wide
+      >
+        {editing ? (
+          <form
+            onSubmit={(e) => void saveEdit(e)}
+            className="grid gap-3 sm:grid-cols-2"
+          >
+            <p className="text-sm text-paper/60 sm:col-span-2">
+              {isCompetitionResult(editing) ? "Zawody" : "Trening"} · status:{" "}
+              {STATUS_LABEL[editing.status]}
+            </p>
+            {isCompetitionResult(editing) ? (
+              <input
+                className={`${inputClass} sm:col-span-2`}
+                placeholder="Nazwa zawodów"
+                value={editEventName}
+                onChange={(e) => setEditEventName(e.target.value)}
+                required
+              />
+            ) : null}
+            <label className="flex flex-col gap-1.5 sm:col-span-2">
+              <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
+                {isCompetitionResult(editing)
+                  ? "Data zawodów"
+                  : "Data treningu"}
+              </span>
+              <input
+                className={inputClass}
+                type="date"
+                value={editEventDate}
+                onChange={(e) => setEditEventDate(e.target.value)}
+                required
+              />
+            </label>
+            <input
+              className={inputClass}
+              placeholder="Rwanie (kg)"
+              type="number"
+              step="0.5"
+              value={editSnatch}
+              onChange={(e) => setEditSnatch(e.target.value)}
+            />
+            <input
+              className={inputClass}
+              placeholder="Podrzut (kg)"
+              type="number"
+              step="0.5"
+              value={editCj}
+              onChange={(e) => setEditCj(e.target.value)}
+            />
+            {isCompetitionResult(editing) ? (
+              <>
+                <input
+                  className={inputClass}
+                  placeholder="Masa ciała (kg)"
+                  type="number"
+                  step="0.1"
+                  value={editBodyweight}
+                  onChange={(e) => setEditBodyweight(e.target.value)}
+                  required
+                />
+                <div className="flex flex-col justify-center border border-paper/10 bg-chrome/20 px-3 py-2 text-sm text-paper/70">
+                  {editPreviewCategory ? (
+                    <>
+                      Kategoria:{" "}
+                      <span className="font-medium text-paper">
+                        {editPreviewCategory}
+                      </span>
+                    </>
+                  ) : editingProfile &&
+                    (!editingProfile.birth_date?.trim() ||
+                      !editingProfile.sex?.trim()) ? (
+                    <span className="text-paper/50">
+                      Brak daty urodzenia lub płci w profilu
+                    </span>
+                  ) : (
+                    <span className="text-paper/50">
+                      Kategoria po podaniu wagi
+                    </span>
+                  )}
+                </div>
+                <input
+                  className={`${inputClass} sm:col-span-2`}
+                  placeholder="Miejsce zawodów"
+                  value={editVenue}
+                  onChange={(e) => setEditVenue(e.target.value)}
+                />
+              </>
+            ) : (
+              <input
+                className={`${inputClass} sm:col-span-2`}
+                placeholder="Miejsce (opcjonalnie)"
+                value={editVenue}
+                onChange={(e) => setEditVenue(e.target.value)}
+              />
+            )}
+            <div className="flex flex-wrap gap-2 sm:col-span-2">
+              <button
+                type="submit"
+                disabled={editSaving}
+                className="bg-brand px-4 py-2 font-display text-xs tracking-[0.12em] uppercase disabled:opacity-50"
+              >
+                {editSaving ? "Zapisywanie…" : "Zapisz zmiany"}
+              </button>
+              <button
+                type="button"
+                onClick={closeEdit}
+                className="border border-paper/25 px-4 py-2 font-display text-xs tracking-[0.12em] uppercase"
+              >
+                Anuluj
+              </button>
+            </div>
+          </form>
+        ) : null}
+      </Modal>
     </div>
   );
 }
