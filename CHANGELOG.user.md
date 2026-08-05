@@ -11,6 +11,12 @@ Format:
 - zdanie zrozumiałe dla zwykłego użytkownika
 ```
 
+## [1.0.0.3+22] - 2026-08-05
+
+### Kategoria w profilu sama się ustawia
+
+- Przy dodawaniu lub edycji profilu zawodnika kategoria wagowa wylicza się z wagi, płci i daty urodzenia.
+
 ## [1.0.0.3+21] - 2026-08-05
 
 ### Kategoria po zawodach w profilu

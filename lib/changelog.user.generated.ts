@@ -27,6 +27,14 @@ export const GENERATED_USER_CHANGELOG: UserChangelogEntry[] = [
     ]
   },
   {
+    "version": "1.0.0.3+22",
+    "date": "2026-08-05",
+    "title": "Kategoria w profilu sama się ustawia",
+    "notes": [
+      "Przy dodawaniu lub edycji profilu zawodnika kategoria wagowa wylicza się z wagi, płci i daty urodzenia."
+    ]
+  },
+  {
     "version": "1.0.0.3+19",
     "date": "2026-08-05",
     "title": "Kategoria wagowa sama się ustawia",

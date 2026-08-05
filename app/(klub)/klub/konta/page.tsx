@@ -10,6 +10,7 @@ import { PhotoUploadField } from "@/components/settings/PhotoUploadField";
 import { ImageHolder } from "@/components/settings/ImageHolder";
 import { useToast } from "@/components/toast/ToastProvider";
 import { Modal } from "@/components/ui/Modal";
+import { resolveWeightCategory } from "@/lib/weightlifting-categories";
 
 const ALL_ROLES: Role[] = ["zawodnik", "trener", "admin", "superadmin"];
 
@@ -72,6 +73,16 @@ export default function KontaPage() {
   const [profileModal, setProfileModal] = useState<ProfileModalMode>("closed");
   const [editingProfileId, setEditingProfileId] = useState<string | null>(null);
   const [profileForm, setProfileForm] = useState(emptyProfileForm);
+
+  const computedCategory = useMemo(() => {
+    const bw = profileForm.weight ? Number(profileForm.weight) : NaN;
+    if (!Number.isFinite(bw) || bw <= 0) return null;
+    return resolveWeightCategory({
+      birthDate: profileForm.birthDate || null,
+      sex: profileForm.sex || null,
+      bodyweightKg: bw,
+    });
+  }, [profileForm.weight, profileForm.birthDate, profileForm.sex]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -308,7 +319,7 @@ export default function KontaPage() {
         user_id: userId,
         display_name: profileForm.name,
         bodyweight_kg: profileForm.weight ? Number(profileForm.weight) : null,
-        category: profileForm.category || null,
+        category: computedCategory,
         notes: profileForm.notes.trim() || null,
         photo_url: profileForm.photoUrl.trim() || null,
         birth_date: profileForm.birthDate || null,
@@ -857,18 +868,29 @@ export default function KontaPage() {
 
           <input
             className={inputClass}
-            placeholder="Kategoria (np. −73 kg)"
-            value={profileForm.category}
-            onChange={(e) => setProfileField("category", e.target.value)}
-          />
-          <input
-            className={inputClass}
             placeholder="Masa ciała (kg)"
             type="number"
             step="0.1"
             value={profileForm.weight}
             onChange={(e) => setProfileField("weight", e.target.value)}
           />
+          <div className="flex flex-col justify-center border border-paper/10 bg-chrome/20 px-3 py-2 text-sm text-paper/70">
+            {computedCategory ? (
+              <>
+                Kategoria:{" "}
+                <span className="font-medium text-paper">{computedCategory}</span>
+              </>
+            ) : profileForm.weight &&
+              (!profileForm.birthDate.trim() || !profileForm.sex) ? (
+              <span className="text-paper/50">
+                Podaj płeć i datę urodzenia, by wyliczyć kategorię
+              </span>
+            ) : (
+              <span className="text-paper/50">
+                Kategoria po podaniu wagi, płci i daty urodzenia
+              </span>
+            )}
+          </div>
           <label className="flex flex-col gap-1.5">
             <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
               Płeć (Sinclair)

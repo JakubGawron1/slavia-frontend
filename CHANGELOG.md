@@ -12,6 +12,12 @@ Format sekcji:
 
 Opcjonalnie po dacie: `!breaking` (breaking API).
 
+## [1.0.0.3+22] - 2026-08-05
+
+### UX: auto kategoria w formularzu profilu
+
+- `/klub/konta`: kategoria wyliczana z masy + płci + daty urodzenia (bez ręcznego pola).
+
 ## [1.0.0.3+21] - 2026-08-05
 
 ### Sync: kategoria po weryfikacji zawodów

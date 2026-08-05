@@ -13,6 +13,15 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
     ]
   },
   {
+    "version": "1.0.0.3+22",
+    "date": "2026-08-05",
+    "category": "backend",
+    "title": "Feature: auto kategoria przy zapisie profilu",
+    "notes": [
+      "`POST/PATCH /api/profiles`: gdy są masa, data urodzenia i płeć — `category` wyliczana z tabel 2026 (nadpisuje ręczną wartość)."
+    ]
+  },
+  {
     "version": "1.0.0.3+19",
     "date": "2026-08-05",
     "category": "backend",
@@ -120,6 +129,15 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
     "title": "Sync: kategoria po weryfikacji zawodów",
     "notes": [
       "Po zaakceptowaniu wyniku z zawodów oficjalna kategoria/masa w profilu aktualizuje się automatycznie (widać na pulpicie i w kontach)."
+    ]
+  },
+  {
+    "version": "1.0.0.3+22",
+    "date": "2026-08-05",
+    "category": "frontend",
+    "title": "UX: auto kategoria w formularzu profilu",
+    "notes": [
+      "`/klub/konta`: kategoria wyliczana z masy + płci + daty urodzenia (bez ręcznego pola)."
     ]
   },
   {
