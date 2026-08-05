@@ -50,14 +50,23 @@ export function ageGroupLabel(group: AgeGroupKey): string {
   }
 }
 
-function sexKey(
+function weightClassesFor(
   group: AgeGroupKey,
   sex: SinclairSex,
-): "men" | "women" | "boys" | "girls" {
-  if (group === "u15" || group === "u17") {
-    return sex === "male" ? "boys" : "girls";
+): readonly string[] {
+  switch (group) {
+    case "senior":
+    case "u23":
+    case "u20":
+      return sex === "male"
+        ? WEIGHTLIFTING_CATEGORIES_2026[group].men
+        : WEIGHTLIFTING_CATEGORIES_2026[group].women;
+    case "u17":
+    case "u15":
+      return sex === "male"
+        ? WEIGHTLIFTING_CATEGORIES_2026[group].boys
+        : WEIGHTLIFTING_CATEGORIES_2026[group].girls;
   }
-  return sex === "male" ? "men" : "women";
 }
 
 function sexLabel(group: AgeGroupKey, sex: SinclairSex): string {
@@ -98,8 +107,7 @@ export function resolveWeightCategory(
   if (age == null || sex == null) return null;
 
   const group = ageGroupFromAge(age);
-  const key = sexKey(group, sex);
-  const classes = WEIGHTLIFTING_CATEGORIES_2026[group][key] as readonly string[];
+  const classes = weightClassesFor(group, sex);
   const weight = pickWeightClass(input.bodyweightKg, classes);
   if (!weight) return null;
 
