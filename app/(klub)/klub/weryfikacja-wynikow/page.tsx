@@ -10,7 +10,7 @@ import { klubFetch } from "@/lib/klub-api";
 import { useKlub } from "@/components/klub/KlubProvider";
 import { useToast } from "@/components/toast/ToastProvider";
 import { Modal } from "@/components/ui/Modal";
-import { formatResultDate } from "@/lib/athletes";
+import { formatResultDate, resultEventInstant } from "@/lib/athletes";
 import { resolveWeightCategory } from "@/lib/weightlifting-categories";
 
 const STATUS_LABEL: Record<ResultStatus, string> = {
@@ -76,6 +76,8 @@ export default function WeryfikacjaPage() {
   const [editBodyweight, setEditBodyweight] = useState("");
   const [editVenue, setEditVenue] = useState("");
   const [editSaving, setEditSaving] = useState(false);
+  /** Filtr listy: "" = wszyscy; inaczej user_id lub `__name__:Nazwa` dla manual. */
+  const [filterAthlete, setFilterAthlete] = useState("");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -298,11 +300,68 @@ export default function WeryfikacjaPage() {
     }
   }
 
-  const pending = results.filter(
-    (r) => r.status === "pending" || r.status === "needs_edit",
+  const athleteFilterOptions = useMemo(() => {
+    const byKey = new Map<string, string>();
+    for (const p of profiles) {
+      if (p.user_id && p.user_id !== "manual") {
+        byKey.set(p.user_id, p.display_name);
+      } else {
+        byKey.set(`__name__:${p.display_name}`, p.display_name);
+      }
+    }
+    for (const r of results) {
+      if (r.user_id) {
+        if (!byKey.has(r.user_id)) byKey.set(r.user_id, r.athlete_name);
+      } else {
+        const key = `__name__:${r.athlete_name}`;
+        if (!byKey.has(key)) byKey.set(key, r.athlete_name);
+      }
+    }
+    return [...byKey.entries()]
+      .map(([value, label]) => ({ value, label }))
+      .sort((a, b) => a.label.localeCompare(b.label, "pl"));
+  }, [profiles, results]);
+
+  const matchesAthleteFilter = useCallback(
+    (r: CompetitionResult) => {
+      if (!filterAthlete) return true;
+      if (filterAthlete.startsWith("__name__:")) {
+        return r.athlete_name === filterAthlete.slice("__name__:".length);
+      }
+      return r.user_id === filterAthlete;
+    },
+    [filterAthlete],
   );
-  const others = results.filter(
-    (r) => r.status !== "pending" && r.status !== "needs_edit",
+
+  const byNewest = useCallback(
+    (a: CompetitionResult, b: CompetitionResult) =>
+      resultEventInstant(b) - resultEventInstant(a),
+    [],
+  );
+
+  const pending = useMemo(
+    () =>
+      results
+        .filter(
+          (r) =>
+            (r.status === "pending" || r.status === "needs_edit") &&
+            matchesAthleteFilter(r),
+        )
+        .sort(byNewest),
+    [results, matchesAthleteFilter, byNewest],
+  );
+
+  const others = useMemo(
+    () =>
+      results
+        .filter(
+          (r) =>
+            r.status !== "pending" &&
+            r.status !== "needs_edit" &&
+            matchesAthleteFilter(r),
+        )
+        .sort(byNewest),
+    [results, matchesAthleteFilter, byNewest],
   );
 
   return (
@@ -434,6 +493,24 @@ export default function WeryfikacjaPage() {
       </form>
 
       {loading ? <p className="text-paper/50">Ładowanie…</p> : null}
+
+      <label className="flex max-w-md flex-col gap-1.5">
+        <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
+          Filtruj według zawodnika
+        </span>
+        <select
+          className={inputClass}
+          value={filterAthlete}
+          onChange={(e) => setFilterAthlete(e.target.value)}
+        >
+          <option value="">Wszyscy zawodnicy</option>
+          {athleteFilterOptions.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      </label>
 
       <section className="space-y-4">
         <h2 className="font-display text-sm tracking-[0.14em] uppercase">

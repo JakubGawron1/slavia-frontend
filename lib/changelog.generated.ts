@@ -227,6 +227,15 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
     ]
   },
   {
+    "version": "1.1.0.5+2",
+    "date": "2026-08-05",
+    "category": "frontend",
+    "title": "UX: sortowanie i filtr zawodnika na weryfikacji",
+    "notes": [
+      "`/klub/weryfikacja-wynikow`: listy do weryfikacji i pozostałe sortowane od najnowszej daty wydarzenia; filtr według zawodnika."
+    ]
+  },
+  {
     "version": "1.0.0.3+16",
     "date": "2026-08-05",
     "category": "backend",

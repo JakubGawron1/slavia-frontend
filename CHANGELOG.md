@@ -12,6 +12,12 @@ Format sekcji:
 
 Opcjonalnie po dacie: `!breaking` (breaking API).
 
+## [1.1.0.5+2] - 2026-08-05
+
+### UX: sortowanie i filtr zawodnika na weryfikacji
+
+- `/klub/weryfikacja-wynikow`: listy do weryfikacji i pozostałe sortowane od najnowszej daty wydarzenia; filtr według zawodnika.
+
 ## [1.1.0.5+1] - 2026-08-05
 
 ### Fix: ponowna weryfikacja po poprawce zaakceptowanego
