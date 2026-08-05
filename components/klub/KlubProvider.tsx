@@ -28,21 +28,23 @@ import {
   defaultActiveRole,
   STAFF_ROLES,
 } from "@/lib/klub-nav";
+import { klubFetch } from "@/lib/klub-api";
+import {
+  clearViewAsStorage,
+  readViewAs,
+  writeViewAs,
+  type ViewAsState,
+} from "@/lib/view-as";
+import { useInvalidateQueriesOnViewAs } from "@/lib/view-as-query";
 import {
   EmailVerificationGate,
   needsEmailVerification,
 } from "@/components/settings/EmailVerificationGate";
 
 const ACTIVE_ROLE_KEY = "slavia_klub_active_role";
-const VIEW_AS_KEY = "slavia_klub_view_as";
 const NAV_COLLAPSE_KEY = "slavia_klub_nav_collapse";
 
-export type ViewAsState = {
-  userId: string;
-  displayName: string;
-  email: string;
-  roles: Role[];
-} | null;
+export type { ViewAsState };
 
 type KlubContextValue = {
   user: AuthUser | null;
@@ -54,7 +56,7 @@ type KlubContextValue = {
   toggleCategory: (id: string) => void;
   viewAs: ViewAsState;
   setViewAs: (value: ViewAsState) => void;
-  clearViewAs: () => void;
+  clearViewAs: () => Promise<void>;
   mobileNavOpen: boolean;
   setMobileNavOpen: (open: boolean) => void;
   logout: () => void;
@@ -71,17 +73,6 @@ function readActiveRole(roles: Role[]): Role {
     return raw;
   }
   return defaultActiveRole(roles);
-}
-
-function readViewAs(): ViewAsState {
-  if (typeof window === "undefined") return null;
-  const raw = localStorage.getItem(VIEW_AS_KEY);
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw) as ViewAsState;
-  } catch {
-    return null;
-  }
 }
 
 function readCollapsed(): Record<string, boolean> {
@@ -109,6 +100,8 @@ export function KlubProvider({ children }: { children: ReactNode }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const cookieSyncedFor = useRef<string | null>(null);
 
+  useInvalidateQueriesOnViewAs(viewAs?.userId ?? null);
+
   const refreshUser = useCallback(async (next?: AuthUser) => {
     if (next) {
       const token = getStoredToken();
@@ -123,7 +116,8 @@ export function KlubProvider({ children }: { children: ReactNode }) {
       router.replace("/logowanie");
       return;
     }
-    const me = await fetchMe(token);
+    // Zawsze prawdziwy actor — bez X-View-As-User.
+    const me = await fetchMe(token, { viewAsUserId: null });
     storeSession(token, me);
     setUser(me);
     setActiveRoleState(readActiveRole(me.roles));
@@ -136,7 +130,6 @@ export function KlubProvider({ children }: { children: ReactNode }) {
     async function load() {
       const token = getStoredToken();
       if (!token) {
-        // Cookie bez localStorage → proxy wpuszcza na /klub, a UI wisi na „Ładowanie…”
         clearSession();
         try {
           await destroySession();
@@ -157,7 +150,7 @@ export function KlubProvider({ children }: { children: ReactNode }) {
       }
 
       try {
-        const me = await fetchMe(token);
+        const me = await fetchMe(token, { viewAsUserId: null });
         if (cancelled) return;
         if (!hasAnyRole(me, STAFF_ROLES)) {
           if (!cancelled) setLoading(false);
@@ -168,11 +161,21 @@ export function KlubProvider({ children }: { children: ReactNode }) {
         setUser(me);
         setActiveRoleState(readActiveRole(me.roles));
         setCollapsed(readCollapsed());
-        setViewAsState(readViewAs());
+        const preview = readViewAs();
+        setViewAsState(preview);
+        if (preview?.roles.length) {
+          const pick =
+            preview.roles.find((r) => r === localStorage.getItem(ACTIVE_ROLE_KEY)) ??
+            preview.roles.find((r) => r !== "superadmin") ??
+            preview.roles[0];
+          if (pick) {
+            setActiveRoleState(pick);
+            localStorage.setItem(ACTIVE_ROLE_KEY, pick);
+          }
+        }
         setError(null);
       } catch (err) {
         if (cancelled) return;
-        // Najpierw lokalnie, potem cookie — żeby proxy nie odbijało /logowanie → /klub
         clearSession();
         try {
           await destroySession();
@@ -194,14 +197,12 @@ export function KlubProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!user || loading) return;
-    // Unikaj pętli replace → RSC refetch na samym /klub
     if (pathname === "/klub" || pathname === "/klub/") return;
     if (!canAccessPath(pathname, user.roles)) {
       router.replace("/klub");
     }
   }, [user, loading, pathname, router]);
 
-  // syncSessionCookie tylko raz na token — ponowne Set-Cookie potrafi wywołać RSC refresh
   useEffect(() => {
     if (!user || loading) return;
     const token = getStoredToken();
@@ -231,21 +232,33 @@ export function KlubProvider({ children }: { children: ReactNode }) {
 
   const setViewAs = useCallback((value: ViewAsState) => {
     setViewAsState(value);
-    if (value) {
-      localStorage.setItem(VIEW_AS_KEY, JSON.stringify(value));
-    } else {
-      localStorage.removeItem(VIEW_AS_KEY);
-    }
+    writeViewAs(value);
   }, []);
 
-  const clearViewAs = useCallback(() => {
-    setViewAs(null);
-  }, [setViewAs]);
+  const clearViewAs = useCallback(async () => {
+    try {
+      await klubFetch("/api/admin/preview/stop", {
+        method: "POST",
+        body: {},
+        viewAsUserId: null,
+      });
+    } catch {
+      /* ignore — i tak czyścimy lokalnie */
+    }
+    setViewAsState(null);
+    clearViewAsStorage();
+    const real = getStoredUser();
+    if (real) {
+      const role = defaultActiveRole(real.roles);
+      setActiveRoleState(role);
+      localStorage.setItem(ACTIVE_ROLE_KEY, role);
+    }
+  }, []);
 
   const logout = useCallback(() => {
     void destroySession().then(() => {
       localStorage.removeItem(ACTIVE_ROLE_KEY);
-      localStorage.removeItem(VIEW_AS_KEY);
+      clearViewAsStorage();
       router.push("/logowanie");
       router.refresh();
     });

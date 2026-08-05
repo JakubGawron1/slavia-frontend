@@ -8,6 +8,9 @@ export const CLUB_CALENDAR_FLAG = "club_calendar";
 export const ATHLETE_CALENDAR_FLAG = "athlete_calendar";
 /** Globalne powiadomienia toast (panele + witryna) */
 export const UI_TOASTS_FLAG = "ui_toasts";
+/** E-maile powiadomień (skład / plany / kontakt) — experimental */
+export const EXPERIMENTAL_NOTIFICATION_EMAILS_FLAG =
+  "experimental_notification_emails";
 
 /**
  * Egzekwuje flagi funkcji na podstawie listy publicznej (`/api/flags/public`).

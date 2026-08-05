@@ -9,6 +9,8 @@ import type {
 import { klubFetch } from "@/lib/klub-api";
 import { useKlub } from "@/components/klub/KlubProvider";
 import { useToast } from "@/components/toast/ToastProvider";
+import { formatResultDate } from "@/lib/athletes";
+import { resolveWeightCategory } from "@/lib/weightlifting-categories";
 
 const STATUS_LABEL: Record<ResultStatus, string> = {
   pending: "Oczekuje",
@@ -19,6 +21,14 @@ const STATUS_LABEL: Record<ResultStatus, string> = {
 
 const inputClass =
   "border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand";
+
+function todayIsoDate() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
 
 export default function WeryfikacjaPage() {
   const toast = useToast();
@@ -32,20 +42,19 @@ export default function WeryfikacjaPage() {
 
   const [profileId, setProfileId] = useState("");
   const [eventName, setEventName] = useState("");
+  const [eventDate, setEventDate] = useState(todayIsoDate);
   const [snatch, setSnatch] = useState("");
   const [cj, setCj] = useState("");
   const [bodyweight, setBodyweight] = useState("");
-  const [category, setCategory] = useState("");
   const [venue, setVenue] = useState("");
 
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const viewAsUserId = viewAs?.userId;
       const [data, profileList] = await Promise.all([
-        klubFetch<CompetitionResult[]>("/api/results", { viewAsUserId }),
-        klubFetch<AthleteProfile[]>("/api/profiles", { viewAsUserId }),
+        klubFetch<CompetitionResult[]>("/api/results"),
+        klubFetch<AthleteProfile[]>("/api/profiles"),
       ]);
       setResults(data);
       setProfiles(profileList);
@@ -67,11 +76,20 @@ export default function WeryfikacjaPage() {
 
   useEffect(() => {
     if (!selectedProfile) return;
-    if (selectedProfile.category) setCategory(selectedProfile.category);
     if (selectedProfile.bodyweight_kg != null) {
       setBodyweight(String(selectedProfile.bodyweight_kg));
     }
   }, [selectedProfile]);
+
+  const bwNum = bodyweight ? Number(bodyweight) : NaN;
+  const previewCategory = useMemo(() => {
+    if (!selectedProfile || !Number.isFinite(bwNum) || bwNum <= 0) return null;
+    return resolveWeightCategory({
+      birthDate: selectedProfile.birth_date,
+      sex: selectedProfile.sex,
+      bodyweightKg: bwNum,
+    });
+  }, [selectedProfile, bwNum]);
 
   async function review(id: string, status: ResultStatus) {
     try {
@@ -106,33 +124,49 @@ export default function WeryfikacjaPage() {
       toast.error("Wynik", "Wybierz profil zawodnika.");
       return;
     }
+    if (!Number.isFinite(bwNum) || bwNum <= 0) {
+      setError("Podaj masę ciała (kg).");
+      toast.error("Wynik", "Podaj masę ciała (kg).");
+      return;
+    }
+    if (!eventDate.trim()) {
+      setError("Podaj datę zawodów.");
+      toast.error("Wynik", "Podaj datę zawodów.");
+      return;
+    }
     setSaving(true);
     try {
       await klubFetch("/api/results", {
         method: "POST",
         body: {
           event_name: eventName.trim(),
+          event_date: eventDate,
           kind: "competition",
           athlete_name: selectedProfile.display_name,
+          profile_id: selectedProfile.id,
           user_id:
             selectedProfile.user_id && selectedProfile.user_id !== "manual"
               ? selectedProfile.user_id
               : null,
           snatch_kg: snatch ? Number(snatch) : null,
           clean_jerk_kg: cj ? Number(cj) : null,
-          bodyweight_kg: bodyweight ? Number(bodyweight) : null,
-          category: category.trim() || null,
+          bodyweight_kg: bwNum,
           venue: venue.trim() || null,
           auto_accept: true,
         },
       });
-      toast.success("Dodano wynik", selectedProfile.display_name);
+      toast.success(
+        "Dodano wynik",
+        previewCategory
+          ? `${selectedProfile.display_name} · ${previewCategory}`
+          : selectedProfile.display_name,
+      );
       setProfileId("");
       setEventName("");
+      setEventDate(todayIsoDate());
       setSnatch("");
       setCj("");
       setBodyweight("");
-      setCategory("");
       setVenue("");
       await load();
     } catch (err) {
@@ -163,7 +197,8 @@ export default function WeryfikacjaPage() {
         </h1>
         <p className="mt-2 text-sm text-paper/55">
           Akceptuj zgłoszenia zawodników albo wpisz wynik samodzielnie — wtedy
-          od razu trafia jako zaakceptowany.
+          od razu trafia jako zaakceptowany. Kategoria wagowa wylicza się z
+          profilu (wiek, płeć) i masy ciała.
         </p>
       </div>
 
@@ -211,6 +246,18 @@ export default function WeryfikacjaPage() {
           onChange={(e) => setEventName(e.target.value)}
           required
         />
+        <label className="flex flex-col gap-1.5 sm:col-span-2">
+          <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
+            Data zawodów
+          </span>
+          <input
+            className={inputClass}
+            type="date"
+            value={eventDate}
+            onChange={(e) => setEventDate(e.target.value)}
+            required
+          />
+        </label>
         <input
           className={inputClass}
           placeholder="Rwanie (kg)"
@@ -234,13 +281,24 @@ export default function WeryfikacjaPage() {
           step="0.1"
           value={bodyweight}
           onChange={(e) => setBodyweight(e.target.value)}
+          required
         />
-        <input
-          className={inputClass}
-          placeholder="Kategoria wagowa"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-        />
+        <div className="flex flex-col justify-center border border-paper/10 bg-chrome/20 px-3 py-2 text-sm text-paper/70">
+          {previewCategory ? (
+            <>
+              Kategoria:{" "}
+              <span className="font-medium text-paper">{previewCategory}</span>
+            </>
+          ) : selectedProfile &&
+            (!selectedProfile.birth_date?.trim() ||
+              !selectedProfile.sex?.trim()) ? (
+            <span className="text-paper/50">
+              Brak daty urodzenia lub płci w profilu
+            </span>
+          ) : (
+            <span className="text-paper/50">Kategoria po podaniu wagi</span>
+          )}
+        </div>
         <input
           className={`${inputClass} sm:col-span-2`}
           placeholder="Miejsce zawodów"
@@ -271,7 +329,10 @@ export default function WeryfikacjaPage() {
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <p className="font-display text-lg uppercase">{r.athlete_name}</p>
-                  <p className="mt-1 text-sm text-paper/60">{r.event_name}</p>
+                  <p className="mt-1 text-sm text-paper/60">
+                    {r.event_name}
+                    {r.event_date ? ` · ${formatResultDate(r.event_date)}` : ""}
+                  </p>
                   {r.venue ? (
                     <p className="mt-0.5 text-xs text-paper/45">{r.venue}</p>
                   ) : null}
@@ -279,6 +340,7 @@ export default function WeryfikacjaPage() {
                     Rwanie {r.snatch_kg ?? "—"} · Podrzut {r.clean_jerk_kg ?? "—"}{" "}
                     · Total {r.total_kg ?? "—"} kg
                     {r.category ? ` · ${r.category}` : ""}
+                    {r.bodyweight_kg != null ? ` · ${r.bodyweight_kg} kg` : ""}
                   </p>
                 </div>
                 <span className="border border-paper/20 px-2 py-1 font-display text-[10px] tracking-[0.12em] uppercase">
@@ -342,10 +404,14 @@ export default function WeryfikacjaPage() {
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
                     <p className="font-medium">{r.athlete_name}</p>
-                    <p className="text-paper/60">{r.event_name}</p>
+                    <p className="text-paper/60">
+                      {r.event_name}
+                      {r.event_date ? ` · ${formatResultDate(r.event_date)}` : ""}
+                    </p>
                     <p className="mt-1 text-paper/70">
                       {r.snatch_kg ?? "—"} / {r.clean_jerk_kg ?? "—"} · total{" "}
                       {r.total_kg ?? "—"} kg
+                      {r.category ? ` · ${r.category}` : ""}
                     </p>
                     {r.reviewer_note ? (
                       <p className="mt-1 text-xs text-paper/45">

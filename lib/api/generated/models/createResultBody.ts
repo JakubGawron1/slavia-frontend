@@ -20,9 +20,19 @@ export interface CreateResultBody {
   category?: string | null;
   /** @nullable */
   clean_jerk_kg?: number | null;
+  /**
+     * Data zawodów / treningu (YYYY-MM-DD)
+     * @nullable
+     */
+  event_date?: string | null;
   event_name: string;
   /** @nullable */
   kind?: string | null;
+  /**
+     * Profil zawodnika (staff) — do wyliczenia kategorii gdy brak user_id
+     * @nullable
+     */
+  profile_id?: string | null;
   /** @nullable */
   snatch_kg?: number | null;
   /** @nullable */

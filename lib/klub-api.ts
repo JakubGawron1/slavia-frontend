@@ -1,4 +1,5 @@
 import { getApiBaseUrl, getStoredToken } from "@/lib/auth";
+import { readViewAsUserId } from "@/lib/view-as";
 
 type ApiErrorBody = { error?: string };
 
@@ -21,6 +22,11 @@ export type ApiMutatorOptions = {
   signal?: AbortSignal;
   /** Gdy false — nie wymagaj Bearer (endpointy publiczne). */
   auth?: boolean;
+  /**
+   * `undefined` — automatycznie z localStorage (aktywny podgląd).
+   * `null` — wymuś brak nagłówka (np. /me actora w KlubProvider).
+   * string — konkretny target.
+   */
   viewAsUserId?: string | null;
 };
 
@@ -54,8 +60,10 @@ export async function apiMutator<T>(options: ApiMutatorOptions): Promise<T> {
     headers["Content-Type"] = "application/json";
   }
 
-  if (viewAsUserId) {
-    headers["X-View-As-User"] = viewAsUserId;
+  const resolvedViewAs =
+    viewAsUserId === undefined ? readViewAsUserId() : viewAsUserId;
+  if (resolvedViewAs) {
+    headers["X-View-As-User"] = resolvedViewAs;
   }
 
   let fullUrl = url.startsWith("http") ? url : `${getApiBaseUrl()}${url}`;

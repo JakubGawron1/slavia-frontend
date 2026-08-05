@@ -12,6 +12,77 @@ Format sekcji:
 
 Opcjonalnie po dacie: `!breaking` (breaking API).
 
+## [1.0.0.3+21] - 2026-08-05
+
+### Sync: kategoria po weryfikacji zawodów
+
+- Po zaakceptowaniu wyniku z zawodów oficjalna kategoria/masa w profilu aktualizuje się automatycznie (widać na pulpicie i w kontach).
+
+## [1.0.0.3+20] - 2026-08-05
+
+### Feature: data zawodów / treningu w wynikach
+
+- Formularze panelu i weryfikacji: wymagane pole daty (`event_date`).
+- Kategoria wagowa bez zmian: z podanej masy + tabel 2026 i wieku/płci z profilu.
+
+## [1.0.0.3+19] - 2026-08-05
+
+### Feature: auto kategoria wagowa przy zawodach
+
+- Panel `/panel/wyniki` i weryfikacja: zawodnik podaje tylko masę ciała; kategoria z wieku/płci profilu + tabeli 2026.
+- Podgląd kategorii w formularzu (`U20 M 75` itd.).
+
+## [1.0.0.3+18] - 2026-08-05
+
+### Flagi: e-maile powiadomień vs transakcyjne
+
+- Nowa flaga experimental `experimental_notification_emails` (domyślnie OFF) — przełączniki w ustawieniach i wysyłka maili o składzie / planach / kontakcie.
+- Nowe flagi stable (domyślnie ON): `email_password_reset`, `email_verification`, `email_contact_confirmation`, `email_test`.
+
+## [1.0.0.3+17] - 2026-08-05
+
+### UX: kalendarz / agenda
+
+- `CalendarMonthGrid`: desktop domyślnie siatka miesiąca, poniżej `lg` zawsze agenda; toggle „Agenda / Kalendarz” tylko na desktopie.
+- Dotyczy publicznego `/kalendarz`, kadry `/klub/kalendarz` i panelu `/panel/kalendarz`.
+- Hook `useIsDesktop` (`lib/use-media-query.ts`).
+
+## [1.0.0.3+16] - 2026-08-05
+
+### UX: rekord treningowy bez nazwy
+
+- Panel `/panel/wyniki`: przy rodzaju „Rekord treningowy” brak pola nazwy — wysyłane jako „Trening”.
+
+## [1.0.0.3+15] - 2026-08-05
+
+### Fix: podgląd konta — dane targetu
+
+- CORS: dozwolony nagłówek `X-View-As-User` (wcześniej przeglądarka go blokowała).
+- Czyszczenie cache React Query przy zmianie `viewAs`.
+- Panel (pulpit/plany/wyniki/obecność/kalendarz): przeładowanie przy zmianie podglądanego konta.
+
+## [1.0.0.3+15] - 2026-08-05
+
+### Fix: skrzynka powiadomień na mobile
+
+- `NotificationBell`: panel przez portal `fixed` z clampem do viewportu (nie ucieka poza ekran / nie jest ucinany przez `overflow-hidden` w shellach).
+- Nagłówki `KlubShell` / `PanelShell`: zawijanie i krótsze etykiety akcji na wąskich ekranach.
+
+## [1.0.0.3+14] - 2026-08-04
+
+### Podgląd kont / ról — pełny pakiet
+
+- Automatyczny nagłówek `X-View-As-User` w `apiMutator` / `fetchMe` (sesja actora bez nagłówka).
+- Nav i RoleSwitcher pokazują target; banner kończy podgląd przez `preview/stop`.
+- `/klub/podglad`: wyszukiwanie, filtr roli, redirect do `/klub` lub `/panel`.
+- Panel zawodnika: banner podglądu, dane targetu, powrót do `/klub/podglad`.
+
+## [1.0.0.2+13] - 2026-08-04
+
+### Baza danych: modal zamiast confirm
+
+- `/klub/baza-danych`: potwierdzenie usunięcia rekordu w `Modal` zamiast natywnego `window.confirm`.
+
 ## [1.0.0.2+12] - 2026-08-04
 
 ### Fix: SettingsCategory i typy details

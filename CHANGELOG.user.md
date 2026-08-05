@@ -11,6 +11,43 @@ Format:
 - zdanie zrozumiałe dla zwykłego użytkownika
 ```
 
+## [1.0.0.3+21] - 2026-08-05
+
+### Kategoria po zawodach w profilu
+
+- Gdy trener zaakceptuje wynik z zawodów (albo sam go wpisze), Twoja kategoria wagowa i masa w profilu aktualizują się według tego ważenia.
+
+## [1.0.0.3+20] - 2026-08-05
+
+### Data zawodów i treningu
+
+- Przy zgłaszaniu wyniku podajesz też datę zawodów albo treningu.
+
+## [1.0.0.3+19] - 2026-08-05
+
+### Kategoria wagowa sama się ustawia
+
+- Przy zgłaszaniu wyniku z zawodów podajesz tylko aktualną wagę — kategorię dobieramy z Twojego wieku i płci w profilu.
+
+## [1.0.0.3+17] - 2026-08-05
+
+### Kalendarz czytelniejszy na telefonie
+
+- Na wąskim ekranie kalendarz otwiera się jako lista (agenda); na komputerze domyślnie siatka miesiąca, z przełącznikiem Agenda / Kalendarz.
+
+## [1.0.0.3+16] - 2026-08-05
+
+### Prostsze zgłaszanie rekordu treningowego
+
+- Przy rekordzie z treningu nie trzeba już podawać nazwy — wystarczy rwanie i podrzut.
+
+## [1.0.0.3+15] - 2026-08-05
+
+### Powiadomienia na telefonie
+
+- Lista po kliknięciu dzwonka mieści się na ekranie — nie ucieka poza krawędź.
+- Przyciski w nagłówku paneli są czytelniejsze na wąskim ekranie.
+
 ## [1.0.0.2+11] - 2026-08-04
 
 ### Kalendarz czytelniejszy

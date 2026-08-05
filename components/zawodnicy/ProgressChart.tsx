@@ -43,7 +43,7 @@ function Tooltip({
       }}
     >
       <p className="font-display text-[11px] tracking-[0.14em] text-brand uppercase">
-        {formatResultDate(point.result.submitted_at)}
+        {formatResultDate(point.result.event_date || point.result.submitted_at)}
       </p>
       <p
         className={`mt-1 font-display text-sm tracking-wide uppercase ${

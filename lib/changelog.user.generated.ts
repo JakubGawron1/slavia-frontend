@@ -3,6 +3,55 @@ import type { UserChangelogEntry } from "@/lib/user-changelog";
 
 export const GENERATED_USER_CHANGELOG: UserChangelogEntry[] = [
   {
+    "version": "1.0.0.3+20",
+    "date": "2026-08-05",
+    "title": "Data zawodów i treningu",
+    "notes": [
+      "Przy zgłaszaniu wyniku podajesz też datę zawodów albo treningu."
+    ]
+  },
+  {
+    "version": "1.0.0.3+17",
+    "date": "2026-08-05",
+    "title": "Kalendarz czytelniejszy na telefonie",
+    "notes": [
+      "Na wąskim ekranie kalendarz otwiera się jako lista (agenda); na komputerze domyślnie siatka miesiąca, z przełącznikiem Agenda / Kalendarz."
+    ]
+  },
+  {
+    "version": "1.0.0.3+21",
+    "date": "2026-08-05",
+    "title": "Kategoria po zawodach w profilu",
+    "notes": [
+      "Gdy trener zaakceptuje wynik z zawodów (albo sam go wpisze), Twoja kategoria wagowa i masa w profilu aktualizują się według tego ważenia."
+    ]
+  },
+  {
+    "version": "1.0.0.3+19",
+    "date": "2026-08-05",
+    "title": "Kategoria wagowa sama się ustawia",
+    "notes": [
+      "Przy zgłaszaniu wyniku z zawodów podajesz tylko aktualną wagę — kategorię dobieramy z Twojego wieku i płci w profilu."
+    ]
+  },
+  {
+    "version": "1.0.0.3+15",
+    "date": "2026-08-05",
+    "title": "Powiadomienia na telefonie",
+    "notes": [
+      "Lista po kliknięciu dzwonka mieści się na ekranie — nie ucieka poza krawędź.",
+      "Przyciski w nagłówku paneli są czytelniejsze na wąskim ekranie."
+    ]
+  },
+  {
+    "version": "1.0.0.3+16",
+    "date": "2026-08-05",
+    "title": "Prostsze zgłaszanie rekordu treningowego",
+    "notes": [
+      "Przy rekordzie z treningu nie trzeba już podawać nazwy — wystarczy rwanie i podrzut."
+    ]
+  },
+  {
     "version": "1.0.0.2+5",
     "date": "2026-08-04",
     "title": "E-mail i powiadomienia",

@@ -8,14 +8,20 @@ import { useKlub } from "./KlubProvider";
 /** Chipy przełącznika roli — etykieta bieżącej roli jest w nagłówku nav. */
 export function RoleSwitcher() {
   const router = useRouter();
-  const { user, activeRole, setActiveRole } = useKlub();
+  const { user, activeRole, setActiveRole, viewAs } = useKlub();
   if (!user) return null;
 
-  const roles = viewableRolesFor(user.roles);
-  if (roles.length <= 1) return null;
+  const roles = viewAs
+    ? viewAs.roles.length > 0
+      ? viewAs.roles
+      : (["zawodnik"] as Role[])
+    : viewableRolesFor(user.roles);
+  if (roles.length <= 1 && !viewAs) return null;
+  if (roles.length === 0) return null;
 
   function selectRole(role: Role) {
     if (role === "zawodnik") {
+      setActiveRole(role);
       router.push("/panel");
       return;
     }
@@ -25,7 +31,7 @@ export function RoleSwitcher() {
   return (
     <div className="mt-4">
       <p className="font-display text-[10px] tracking-[0.16em] text-paper/40 uppercase">
-        Widok roli
+        {viewAs ? "Rola podglądu" : "Widok roli"}
       </p>
       <div className="mt-2 flex flex-wrap gap-1.5">
         {roles.map((role) => {

@@ -6,6 +6,7 @@ import { Html5Qrcode } from "html5-qrcode";
 import type { AttendanceRecord } from "@/lib/api/generated/models";
 import { klubFetch } from "@/lib/klub-api";
 import { useToast } from "@/components/toast/ToastProvider";
+import { usePanel } from "@/components/panel/PanelProvider";
 
 function extractToken(raw: string): string {
   try {
@@ -20,6 +21,8 @@ function extractToken(raw: string): string {
 export default function ObecnoscScanClient() {
   const search = useSearchParams();
   const toast = useToast();
+  const { viewAs, user } = usePanel();
+  const scopeKey = viewAs?.userId ?? user?.id ?? "self";
   const scannerRegionId = useId().replace(/:/g, "");
   const [token, setToken] = useState("");
   const [message, setMessage] = useState<string | null>(null);
@@ -40,7 +43,7 @@ export default function ObecnoscScanClient() {
     const fromUrl = search.get("code") || search.get("token");
     if (fromUrl) setToken(fromUrl);
     void load();
-  }, [search, load]);
+  }, [search, load, scopeKey]);
 
   useEffect(() => {
     return () => {

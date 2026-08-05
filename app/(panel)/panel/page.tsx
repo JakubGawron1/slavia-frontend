@@ -13,7 +13,7 @@ import type {
   AthleteStats,
   CompetitionResult,
 } from "@/lib/api/generated/models";
-import { formatKg } from "@/lib/athletes";
+import { formatKg, resultEventInstant } from "@/lib/athletes";
 import {
   ATHLETE_STAT_LINKS,
   PANEL_MODULES,
@@ -107,9 +107,15 @@ function buildChartProfile(
 }
 
 export default function PanelHomePage() {
-  const { user } = usePanel();
-  const statsQuery = useAthleteStats();
-  const resultsQuery = useListResults({ mine: true });
+  const { user, viewAs } = usePanel();
+  const scopeKey = viewAs?.userId ?? user?.id ?? "self";
+  const statsQuery = useAthleteStats({
+    query: { queryKey: ["/api/athlete/stats", scopeKey] },
+  });
+  const resultsQuery = useListResults(
+    { mine: true },
+    { query: { queryKey: ["/api/results", { mine: true }, scopeKey] } },
+  );
   const profilesQuery = useListPublicProfiles({ query: { staleTime: 60_000 } });
   const flagsQuery = useListPublicFlags({ query: { staleTime: 60_000 } });
   const flags = flagsQuery.data?.data;
@@ -132,10 +138,7 @@ export default function PanelHomePage() {
           r.status === "accepted" &&
           (r.kind ?? "competition").toLowerCase() === "competition",
       )
-      .sort(
-        (a, b) =>
-          new Date(a.submitted_at).getTime() - new Date(b.submitted_at).getTime(),
-      );
+      .sort((a, b) => resultEventInstant(a) - resultEventInstant(b));
   }, [resultsQuery.data]);
 
   const chartProfile = useMemo(() => {

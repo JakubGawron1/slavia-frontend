@@ -15,6 +15,7 @@ import {
   type ClubEvent,
 } from "@/lib/events";
 import { klubFetch } from "@/lib/klub-api";
+import { usePanel } from "@/components/panel/PanelProvider";
 
 function eventsRangeAroundToday(): { from: string; to: string } {
   const today = new Date();
@@ -25,6 +26,8 @@ function eventsRangeAroundToday(): { from: string; to: string } {
 
 export function AthleteCalendar() {
   const toast = useToast();
+  const { viewAs, user } = usePanel();
+  const scopeKey = viewAs?.userId ?? user?.id ?? "self";
   const todayKey = toDateKey(new Date());
   const [events, setEvents] = useState<AthleteCalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,12 +54,11 @@ export function AthleteCalendar() {
     } finally {
       setLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     void load();
-  }, [load]);
+  }, [load, scopeKey]);
 
   useEffect(() => {
     if (!selected) return;

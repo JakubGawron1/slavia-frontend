@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { klubFetch } from "@/lib/klub-api";
 import { useToast } from "@/components/toast/ToastProvider";
+import { Modal } from "@/components/ui/Modal";
 
 export default function BazaDanychPage() {
   const toast = useToast();
@@ -12,6 +13,8 @@ export default function BazaDanychPage() {
   const [editJson, setEditJson] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const loadTables = useCallback(async () => {
     const data = await klubFetch<string[]>("/api/admin/db/tables");
@@ -69,16 +72,22 @@ export default function BazaDanychPage() {
     }
   }
 
-  async function deleteRow(id: string) {
-    if (!confirm(`Usunąć rekord ${id}?`)) return;
+  async function confirmDelete() {
+    if (!deleteId) return;
+    setDeleting(true);
     try {
-      await klubFetch(`/api/admin/db/${table}/${id}`, { method: "DELETE" });
-      toast.success("Usunięto rekord", id);
+      await klubFetch(`/api/admin/db/${table}/${deleteId}`, {
+        method: "DELETE",
+      });
+      toast.success("Usunięto rekord", deleteId);
+      setDeleteId(null);
       await loadRows(table);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Usuwanie nieudane";
       setError(msg);
       toast.error("Baza danych", msg);
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -162,7 +171,7 @@ export default function BazaDanychPage() {
                         <button
                           type="button"
                           className="text-left text-brand underline-offset-2 hover:underline"
-                          onClick={() => void deleteRow(id)}
+                          onClick={() => setDeleteId(id)}
                         >
                           Usuń
                         </button>
@@ -201,6 +210,40 @@ export default function BazaDanychPage() {
           Zapisz do {table || "…"}
         </button>
       </div>
+
+      <Modal
+        open={deleteId !== null}
+        title="Usuń rekord"
+        onClose={() => {
+          if (!deleting) setDeleteId(null);
+        }}
+      >
+        <p className="text-sm text-paper/70">
+          Na pewno usunąć rekord z tabeli{" "}
+          <span className="font-mono text-paper">{table}</span>?
+        </p>
+        <p className="mt-3 break-all font-mono text-xs text-paper/55">
+          {deleteId}
+        </p>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <button
+            type="button"
+            disabled={deleting}
+            onClick={() => void confirmDelete()}
+            className="bg-brand px-4 py-2 font-display text-xs tracking-[0.12em] text-paper uppercase disabled:opacity-50"
+          >
+            {deleting ? "Usuwanie…" : "Usuń"}
+          </button>
+          <button
+            type="button"
+            disabled={deleting}
+            onClick={() => setDeleteId(null)}
+            className="border border-paper/20 px-4 py-2 font-display text-xs tracking-[0.12em] text-paper/70 uppercase hover:border-paper/40 hover:text-paper disabled:opacity-50"
+          >
+            Anuluj
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 }

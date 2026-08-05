@@ -33,6 +33,11 @@ export const customFetch = async <T>(
     const token = getStoredToken();
     if (!token) throw new Error("Brak sesji.");
     headers.Authorization = `Bearer ${token}`;
+    const { readViewAsUserId } = await import("@/lib/view-as");
+    const viewAsUserId = readViewAsUserId();
+    if (viewAsUserId) {
+      headers["X-View-As-User"] = viewAsUserId;
+    }
   }
 
   if (options.data !== undefined && !headers["Content-Type"]) {

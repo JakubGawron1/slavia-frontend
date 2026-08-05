@@ -23,7 +23,7 @@ export function ConfirmEmailClient() {
         const auth = getStoredToken();
         if (auth) {
           try {
-            const me = await fetchMe(auth);
+            const me = await fetchMe(auth, { viewAsUserId: null });
             storeSession(auth, me);
           } catch {
             /* ignore */

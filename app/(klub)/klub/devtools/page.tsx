@@ -433,7 +433,8 @@ function TestEmailPanel({
         Test e-mail (Brevo)
       </h2>
       <p className="mt-2 text-sm text-paper/55">
-        Wysyła prostą wiadomość testową przez Brevo.{" "}
+        Wysyła prostą wiadomość testową przez Brevo (flaga{" "}
+        <span className="font-mono text-paper/70">email_test</span>).{" "}
         <span className="font-mono text-paper/70">EMAIL_FROM</span> musi być
         zweryfikowanym senderem w Brevo (bez domeny zwykle Twój Gmail z konta).
         Przy{" "}

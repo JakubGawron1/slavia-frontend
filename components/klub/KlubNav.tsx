@@ -28,7 +28,8 @@ function GearIcon({ className }: { className?: string }) {
 
 function NavBody({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
-  const { user, activeRole, collapsedCategories, toggleCategory } = useKlub();
+  const { user, activeRole, collapsedCategories, toggleCategory, viewAs } =
+    useKlub();
   const flagsQuery = useListPublicFlags({ query: { staleTime: 60_000 } });
   const flags = flagsQuery.data?.data;
   if (!user) return null;
@@ -45,6 +46,9 @@ function NavBody({ onNavigate }: { onNavigate?: () => void }) {
     pathname === "/klub/ustawienia" ||
     pathname.startsWith("/klub/ustawienia/");
 
+  const displayName = viewAs?.displayName ?? user.display_name;
+  const roleLabel = ROLE_LABELS[activeRole];
+
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="shrink-0 border-b border-paper/10 px-4 py-5">
@@ -58,10 +62,15 @@ function NavBody({ onNavigate }: { onNavigate?: () => void }) {
 
         <div className="mt-3 flex items-start gap-2">
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm text-paper">{user.display_name}</p>
+            <p className="truncate text-sm text-paper">{displayName}</p>
             <p className="mt-0.5 truncate font-display text-[11px] tracking-[0.14em] text-paper/45 uppercase">
-              {ROLE_LABELS[activeRole]}
+              {viewAs ? `Podgląd · ${roleLabel}` : roleLabel}
             </p>
+            {viewAs ? (
+              <p className="mt-0.5 truncate text-[11px] text-amber-200/70">
+                {viewAs.email}
+              </p>
+            ) : null}
           </div>
           <Link
             href="/klub/ustawienia"

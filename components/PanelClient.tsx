@@ -39,7 +39,7 @@ export function PanelClient() {
       }
 
       try {
-        const me = await fetchMe(token);
+        const me = await fetchMe(token, { viewAsUserId: null });
         if (cancelled) return;
         storeSession(token, me);
         setUser(me);

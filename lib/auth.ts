@@ -1,4 +1,5 @@
 import type { LoginResponse, PublicUser, Role } from "@/lib/api/generated/models";
+import { readViewAsUserId } from "@/lib/view-as";
 
 export type { LoginResponse, Role };
 
@@ -117,17 +118,38 @@ export async function loginRequest(
   return (await response.json()) as LoginResponse;
 }
 
-export async function fetchMe(token?: string): Promise<AuthUser> {
+export type FetchMeOptions = {
+  /**
+   * `undefined` — nagłówek z aktywnego podglądu (localStorage).
+   * `null` — bez nagłówka (prawdziwy actor, np. KlubProvider).
+   */
+  viewAsUserId?: string | null;
+};
+
+export async function fetchMe(
+  token?: string,
+  options: FetchMeOptions = {},
+): Promise<AuthUser> {
   const authToken = token ?? getStoredToken();
   if (!authToken) {
     throw new Error("Brak sesji.");
   }
 
+  const headers: Record<string, string> = {
+    Accept: "application/json",
+    Authorization: `Bearer ${authToken}`,
+  };
+
+  const resolvedViewAs =
+    options.viewAsUserId === undefined
+      ? readViewAsUserId()
+      : options.viewAsUserId;
+  if (resolvedViewAs) {
+    headers["X-View-As-User"] = resolvedViewAs;
+  }
+
   const response = await fetch(`${getApiBaseUrl()}/api/auth/me`, {
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${authToken}`,
-    },
+    headers,
   });
 
   if (!response.ok) {

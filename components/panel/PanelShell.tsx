@@ -36,13 +36,14 @@ function useVisiblePanelModules() {
 }
 
 export function PanelShell({ children }: { children: ReactNode }) {
-  const { user, loading, error, logout } = usePanel();
+  const { user, actor, viewAs, loading, error, logout, clearViewAs } = usePanel();
   const pathname = usePathname();
   const theme = useResolvedPanelTheme(user?.ui_theme);
   const layout = getPanelTheme(theme).layout;
   const wideContent = pathname.startsWith("/panel/kalendarz");
   const contentMax = wideContent ? "max-w-[96rem]" : "max-w-6xl";
-  const isSuperadmin = Boolean(user?.roles.includes("superadmin"));
+  const effectiveRoles = user?.roles ?? [];
+  const isSuperadmin = effectiveRoles.includes("superadmin");
   const modules = useVisiblePanelModules().filter(
     (mod) => !(isSuperadmin && mod.href === "/panel/co-nowego"),
   );
@@ -64,29 +65,49 @@ export function PanelShell({ children }: { children: ReactNode }) {
     );
   }
 
-  const isStaff = hasAnyRole(user, STAFF_ROLES);
+  const staffSource = actor ?? user;
+  const isStaff = hasAnyRole(staffSource, STAFF_ROLES);
+
+  const previewBanner = viewAs ? (
+    <div className="relative z-50 flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-amber-500/40 bg-amber-500/15 px-4 py-2.5 text-sm">
+      <p>
+        Tryb podglądu:{" "}
+        <span className="font-medium text-paper">{viewAs.displayName}</span>{" "}
+        <span className="text-paper/55">({viewAs.email})</span>
+        <span className="ml-2 text-paper/45">· tylko odczyt</span>
+      </p>
+      <button
+        type="button"
+        onClick={() => void clearViewAs()}
+        className="panel-control border border-paper/30 px-3 py-1 font-display text-[11px] tracking-[0.12em] uppercase transition-colors hover:border-paper hover:bg-paper/10"
+      >
+        Zakończ podgląd
+      </button>
+    </div>
+  ) : null;
 
   const actions = (bellVariant: "default" | "onBrand" = "default") => (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex max-w-full flex-wrap items-center justify-end gap-1.5 sm:gap-2">
       <NotificationBell variant={bellVariant} />
       {isStaff ? (
         <Link
           href="/klub"
-          className="panel-control border border-paper/20 px-3 py-1.5 font-display text-[11px] tracking-[0.1em] uppercase transition-colors hover:border-brand"
+          className="panel-control border border-paper/20 px-2.5 py-1.5 font-display text-[10px] tracking-[0.1em] uppercase transition-colors hover:border-brand sm:px-3 sm:text-[11px]"
         >
-          Panel klubowy
+          <span className="sm:hidden">Klub</span>
+          <span className="hidden sm:inline">Panel klubowy</span>
         </Link>
       ) : null}
       <Link
         href="/"
-        className="panel-control border border-paper/15 px-3 py-1.5 font-display text-[11px] tracking-[0.1em] text-paper/70 uppercase"
+        className="panel-control border border-paper/15 px-2.5 py-1.5 font-display text-[10px] tracking-[0.1em] text-paper/70 uppercase sm:px-3 sm:text-[11px]"
       >
         Witryna
       </Link>
       <button
         type="button"
         onClick={logout}
-        className="panel-control border border-paper/15 px-3 py-1.5 font-display text-[11px] tracking-[0.1em] text-paper/70 uppercase"
+        className="panel-control border border-paper/15 px-2.5 py-1.5 font-display text-[10px] tracking-[0.1em] text-paper/70 uppercase sm:px-3 sm:text-[11px]"
       >
         Wyloguj
       </button>
@@ -112,8 +133,18 @@ export function PanelShell({ children }: { children: ReactNode }) {
     return pathname === href || pathname.startsWith(`${href}/`);
   }
 
-  if (layout === "studio") {
+  function wrap(node: ReactNode) {
+    if (!previewBanner) return node;
     return (
+      <div className="flex min-h-[100svh] flex-col">
+        {previewBanner}
+        <div className="min-h-0 flex-1">{node}</div>
+      </div>
+    );
+  }
+
+  if (layout === "studio") {
+    return wrap(
       <div
         data-panel-theme={theme}
         data-panel-layout={layout}
@@ -153,9 +184,11 @@ export function PanelShell({ children }: { children: ReactNode }) {
           <div className="mt-4 hidden flex-col gap-2 px-1 md:flex">{actions()}</div>
         </aside>
         <div className="relative z-10 flex min-w-0 flex-1 flex-col">
-          <header className="flex items-center justify-between gap-3 border-b border-paper/10 px-4 py-3 md:px-6">
-            <p className="text-sm text-paper/55 md:hidden">{user.display_name}</p>
-            <div className="ml-auto md:hidden">{actions()}</div>
+          <header className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-paper/10 px-3 py-3 sm:px-4 md:px-6">
+            <p className="min-w-0 truncate text-sm text-paper/55 md:hidden">
+              {user.display_name}
+            </p>
+            <div className="ml-auto min-w-0 max-w-full md:hidden">{actions()}</div>
             <p className="hidden text-sm text-paper/45 md:block">
               Układ Studio · eksperymentalny
             </p>
@@ -171,7 +204,7 @@ export function PanelShell({ children }: { children: ReactNode }) {
   }
 
   if (layout === "dock") {
-    return (
+    return wrap(
       <div
         data-panel-theme={theme}
         data-panel-layout={layout}
@@ -223,7 +256,7 @@ export function PanelShell({ children }: { children: ReactNode }) {
   }
 
   if (layout === "frame") {
-    return (
+    return wrap(
       <div
         data-panel-theme={theme}
         data-panel-layout={layout}
@@ -272,7 +305,7 @@ export function PanelShell({ children }: { children: ReactNode }) {
   }
 
   if (layout === "ribbon") {
-    return (
+    return wrap(
       <div
         data-panel-theme={theme}
         data-panel-layout={layout}
@@ -335,7 +368,7 @@ export function PanelShell({ children }: { children: ReactNode }) {
         ? "shrink-0 border-b-2 border-brand px-3 py-2 font-display text-[11px] tracking-[0.12em] text-paper uppercase"
         : "shrink-0 border-b-2 border-transparent px-3 py-2 font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase hover:text-paper";
 
-  return (
+  return wrap(
     <div
       data-panel-theme={theme}
       data-panel-layout={layout}

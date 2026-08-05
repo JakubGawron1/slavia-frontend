@@ -53,7 +53,7 @@ export default function KontaPage() {
   const { user, activeRole, viewAs } = useKlub();
   const showUsersSection =
     activeRole === "admin" || activeRole === "superadmin";
-  const canManageUsers = showUsersSection;
+  const canManageUsers = showUsersSection && !viewAs;
 
   const [users, setUsers] = useState<PublicUser[]>([]);
   const [profiles, setProfiles] = useState<AthleteProfile[]>([]);
@@ -77,10 +77,9 @@ export default function KontaPage() {
     setLoading(true);
     setError(null);
     try {
-      const viewAsUserId = viewAs?.userId ?? null;
       const [u, p] = await Promise.all([
-        klubFetch<PublicUser[]>("/api/users", { viewAsUserId }),
-        klubFetch<AthleteProfile[]>("/api/profiles", { viewAsUserId }),
+        klubFetch<PublicUser[]>("/api/users"),
+        klubFetch<AthleteProfile[]>("/api/profiles"),
       ]);
       setUsers(u);
       setProfiles(p);

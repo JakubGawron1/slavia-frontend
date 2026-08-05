@@ -10,6 +10,7 @@ import {
   getWeekdayLabels,
   isMultiDay,
   shiftMonth,
+  toDateKey,
 } from "@/lib/calendar";
 import {
   ATTENDANCE_COUNTS_CHIP,
@@ -21,6 +22,9 @@ import {
   type ClubEvent,
   type EventType,
 } from "@/lib/events";
+import { useIsDesktop } from "@/lib/use-media-query";
+
+type CalendarViewMode = "calendar" | "agenda";
 
 export const TYPE_STYLES: Record<EventType, string> = {
   zawody: "bg-brand text-paper",
@@ -126,6 +130,7 @@ export function CalendarMonthGrid({
   hideAside = false,
 }: CalendarGridProps) {
   const t = TONES[tone];
+  const isDesktop = useIsDesktop();
   const initial = (() => {
     const [y, m] = todayKey.split("-").map(Number);
     return { year: y, monthIndex: m - 1 };
@@ -135,6 +140,12 @@ export function CalendarMonthGrid({
   const [monthIndex, setMonthIndex] = useState(initial.monthIndex);
   const [selectedKey, setSelectedKey] = useState(todayKey);
   const [filter, setFilter] = useState<EventType | "all">("all");
+  /** Preferencja tylko na desktopie; mobile (i SSR) zawsze agenda. */
+  const [desktopView, setDesktopView] = useState<CalendarViewMode>("calendar");
+  const view: CalendarViewMode =
+    isDesktop === true ? desktopView : "agenda";
+  const showCalendar = view === "calendar";
+  const showViewToggle = isDesktop === true;
 
   const types = filterTypes ?? (Object.keys(EVENT_TYPE_LABELS) as EventType[]);
   const large = size === "large";
@@ -219,19 +230,40 @@ export function CalendarMonthGrid({
 
   const eventsById = new Map(filtered.map((e) => [e.id, e]));
 
+  const monthStartKey = `${year}-${String(monthIndex + 1).padStart(2, "0")}-01`;
+  const monthEndKey = toDateKey(new Date(year, monthIndex + 1, 0));
+  const agendaByDay = (() => {
+    const map = new Map<string, ClubEvent[]>();
+    for (const event of filtered) {
+      if (eventEndKey(event) < monthStartKey || event.date > monthEndKey) {
+        continue;
+      }
+      const groupKey =
+        event.date < monthStartKey ? monthStartKey : event.date;
+      const list = map.get(groupKey) ?? [];
+      if (!list.some((x) => x.id === event.id)) {
+        list.push(event);
+        map.set(groupKey, list);
+      }
+    }
+    return [...map.entries()].sort(([a], [b]) => a.localeCompare(b));
+  })();
+
+  const showAside = !hideAside && showCalendar;
+
   return (
     <div
       className={`grid h-full gap-5 ${
-        hideAside
+        !showAside
           ? ""
           : wide
             ? "xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-stretch xl:gap-5"
             : "xl:grid-cols-[minmax(0,1fr)_22rem] xl:gap-6"
-      } ${roomy ? "min-h-[min(48rem,calc(100svh-10.5rem))]" : ""}`}
+      } ${roomy && showCalendar ? "min-h-[min(48rem,calc(100svh-10.5rem))]" : ""}`}
     >
       <div
         className={`flex min-h-0 min-w-0 flex-col border ${t.rootBorder} ${t.rootBg} ${
-          roomy ? "h-full" : ""
+          roomy && showCalendar ? "h-full" : ""
         }`}
       >
         <div
@@ -242,7 +274,33 @@ export function CalendarMonthGrid({
           >
             {getMonthLabel(year, monthIndex)}
           </h2>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            {showViewToggle ? (
+              <div
+                className="mr-1 flex"
+                role="group"
+                aria-label="Widok kalendarza"
+              >
+                <button
+                  type="button"
+                  onClick={() => setDesktopView("agenda")}
+                  className={`border px-3 py-2.5 font-display text-xs tracking-[0.1em] uppercase transition-colors sm:text-sm ${
+                    view === "agenda" ? t.chipActive : t.chipIdle
+                  }`}
+                >
+                  Agenda
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDesktopView("calendar")}
+                  className={`border px-3 py-2.5 font-display text-xs tracking-[0.1em] uppercase transition-colors sm:text-sm ${
+                    view === "calendar" ? t.chipActive : t.chipIdle
+                  }`}
+                >
+                  Kalendarz
+                </button>
+              </div>
+            ) : null}
             <button
               type="button"
               onClick={() => goMonth(-1)}
@@ -302,20 +360,101 @@ export function CalendarMonthGrid({
           {extraFilters}
         </div>
 
-        <div
-          className={`grid border-b text-center ${t.rootBorder} ${t.headerBg}`}
-          style={{ gridTemplateColumns: colTemplate }}
-        >
-          {getWeekdayLabels().map((label) => (
-            <div
-              key={label}
-              className={`py-3 font-display tracking-[0.16em] uppercase ${t.muted} ${weekdayClass}`}
-            >
-              {label}
-            </div>
-          ))}
-        </div>
+        {!showCalendar ? (
+          <div
+            className={`min-h-0 flex-1 overflow-y-auto border-b ${t.rootBorder}`}
+          >
+            {agendaByDay.length === 0 ? (
+              <p className={`px-4 py-8 text-sm sm:px-5 ${t.muted}`}>
+                Brak wydarzeń w tym miesiącu.
+                {onSelectDay ? (
+                  <button
+                    type="button"
+                    className="mt-3 block font-display text-xs tracking-wide text-brand uppercase"
+                    onClick={() => onSelectDay(selectedKey)}
+                  >
+                    + Dodaj wydarzenie
+                  </button>
+                ) : null}
+              </p>
+            ) : (
+              <ul>
+                {agendaByDay.map(([dayKey, dayEvents]) => (
+                  <li key={dayKey} className={`border-b ${t.rootBorder}`}>
+                    <div
+                      className={`flex flex-wrap items-center justify-between gap-2 px-4 py-3 sm:px-5 ${t.headerBg}`}
+                    >
+                      <h3
+                        className={`font-display text-sm tracking-wide uppercase sm:text-base ${t.title}`}
+                      >
+                        {formatPolishDate(dayKey)}
+                      </h3>
+                      {dayKey === todayKey ? (
+                        <span className="font-display text-[0.65rem] tracking-[0.14em] text-brand uppercase">
+                          Dziś
+                        </span>
+                      ) : null}
+                    </div>
+                    <ul
+                      className={`divide-y ${
+                        tone === "panel" ? "divide-paper/10" : "divide-mist"
+                      }`}
+                    >
+                      {dayEvents.map((event) => (
+                        <li key={event.id} className="px-4 py-3.5 sm:px-5">
+                          {onSelectEvent ? (
+                            <button
+                              type="button"
+                              className="w-full text-left transition-opacity hover:opacity-80"
+                              onClick={(e) => {
+                                setSelectedKey(dayKey);
+                                onSelectEvent(
+                                  event,
+                                  (
+                                    e.currentTarget as HTMLElement
+                                  ).getBoundingClientRect(),
+                                );
+                              }}
+                            >
+                              <EventRow
+                                event={event}
+                                dark={tone === "panel"}
+                              />
+                            </button>
+                          ) : (
+                            <EventRow
+                              event={event}
+                              dark={tone === "panel"}
+                            />
+                          )}
+                          {renderEventDetails?.(event)}
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        ) : null}
 
+        {showCalendar ? (
+          <div
+            className={`grid border-b text-center ${t.rootBorder} ${t.headerBg}`}
+            style={{ gridTemplateColumns: colTemplate }}
+          >
+            {getWeekdayLabels().map((label) => (
+              <div
+                key={label}
+                className={`py-3 font-display tracking-[0.16em] uppercase ${t.muted} ${weekdayClass}`}
+              >
+                {label}
+              </div>
+            ))}
+          </div>
+        ) : null}
+
+        {showCalendar ? (
         <div
           className={`flex min-h-0 flex-1 flex-col border-b ${t.rootBorder}`}
         >
@@ -468,9 +607,10 @@ export function CalendarMonthGrid({
             );
           })}
         </div>
+        ) : null}
       </div>
 
-      {!hideAside ? (
+      {showAside ? (
         <aside
           className={`flex flex-col gap-4 ${
             roomy

@@ -3,6 +3,191 @@ import type { ChangelogEntry } from "@/lib/changelog";
 
 export const GENERATED_CHANGELOG: ChangelogEntry[] = [
   {
+    "version": "1.0.0.3+20",
+    "date": "2026-08-05",
+    "category": "backend",
+    "title": "Feature: `event_date` w wynikach",
+    "notes": [
+      "`CompetitionResult.event_date` (YYYY-MM-DD) + wymagane w `POST /api/results` (zawody i trening).",
+      "Kategoria wagowa nadal z podanej masy ciała + tabel JSON i wieku/płci z profilu — data wydarzenia jej nie zmienia."
+    ]
+  },
+  {
+    "version": "1.0.0.3+19",
+    "date": "2026-08-05",
+    "category": "backend",
+    "title": "Feature: auto kategoria wagowa (2026)",
+    "notes": [
+      "`POST /api/results` (zawody): kategoria z profilu (`birth_date`, `sex`) + `bodyweight_kg` wg tabel U15–Senior.",
+      "Opcjonalne `profile_id` (staff); masa ciała wymagana; ręczne `category` ignorowane dla zawodów.",
+      "Moduł `weightlifting_categories` + testy jednostkowe."
+    ]
+  },
+  {
+    "version": "1.0.0.3+19",
+    "date": "2026-08-05",
+    "category": "frontend",
+    "title": "Feature: auto kategoria wagowa przy zawodach",
+    "notes": [
+      "Panel `/panel/wyniki` i weryfikacja: zawodnik podaje tylko masę ciała; kategoria z wieku/płci profilu + tabeli 2026.",
+      "Podgląd kategorii w formularzu (`U20 M 75` itd.)."
+    ]
+  },
+  {
+    "version": "1.0.0.3+20",
+    "date": "2026-08-05",
+    "category": "mobile",
+    "title": "Feature: data zawodów / treningu",
+    "notes": [
+      "Formularz wyników: wybór daty wydarzenia (wymagana) dla zawodów i rekordów treningowych."
+    ]
+  },
+  {
+    "version": "1.0.0.3+20",
+    "date": "2026-08-05",
+    "category": "frontend",
+    "title": "Feature: data zawodów / treningu w wynikach",
+    "notes": [
+      "Formularze panelu i weryfikacji: wymagane pole daty (`event_date`).",
+      "Kategoria wagowa bez zmian: z podanej masy + tabel 2026 i wieku/płci z profilu."
+    ]
+  },
+  {
+    "version": "1.0.0.3+21",
+    "date": "2026-08-05",
+    "category": "backend",
+    "title": "Feature: kategoria z zawodów → profil",
+    "notes": [
+      "Po akceptacji wyniku z zawodów (weryfikacja albo wpis kadry) `category` + `bodyweight_kg` trafiają do `AthleteProfile`.",
+      "Statystyki panelu i listy kont biorą kategorię z profilu — wahania wagi przy krawędzi kategorii rozwiązane ważeniem na zawodach."
+    ]
+  },
+  {
+    "version": "1.0.0.3+15",
+    "date": "2026-08-05",
+    "category": "backend",
+    "title": "Fix: CORS dla X-View-As-User",
+    "notes": [
+      "`CorsLayer.allow_headers` obejmuje `x-view-as-user` — bez tego przeglądarka nie wysyłała nagłówka podglądu."
+    ]
+  },
+  {
+    "version": "1.0.0.3+15",
+    "date": "2026-08-05",
+    "category": "frontend",
+    "title": "Fix: podgląd konta — dane targetu",
+    "notes": [
+      "CORS: dozwolony nagłówek `X-View-As-User` (wcześniej przeglądarka go blokowała).",
+      "Czyszczenie cache React Query przy zmianie `viewAs`.",
+      "Panel (pulpit/plany/wyniki/obecność/kalendarz): przeładowanie przy zmianie podglądanego konta."
+    ]
+  },
+  {
+    "version": "1.0.0.3+15",
+    "date": "2026-08-05",
+    "category": "frontend",
+    "title": "Fix: skrzynka powiadomień na mobile",
+    "notes": [
+      "`NotificationBell`: panel przez portal `fixed` z clampem do viewportu (nie ucieka poza ekran / nie jest ucinany przez `overflow-hidden` w shellach).",
+      "Nagłówki `KlubShell` / `PanelShell`: zawijanie i krótsze etykiety akcji na wąskich ekranach."
+    ]
+  },
+  {
+    "version": "1.0.0.3+18",
+    "date": "2026-08-05",
+    "category": "backend",
+    "title": "Flagi e-mail",
+    "notes": [
+      "Katalog: `experimental_notification_emails` (OFF) — gate w `notify_user` dla kanałów Squad/TrainingPlan/Contact.",
+      "Stable ON: `email_password_reset`, `email_verification`, `email_contact_confirmation`, `email_test` + `Database::is_flag_enabled`.",
+      "Public flags: ekspozycja `experimental_notification_emails`."
+    ]
+  },
+  {
+    "version": "1.0.0.3+18",
+    "date": "2026-08-05",
+    "category": "frontend",
+    "title": "Flagi: e-maile powiadomień vs transakcyjne",
+    "notes": [
+      "Nowa flaga experimental `experimental_notification_emails` (domyślnie OFF) — przełączniki w ustawieniach i wysyłka maili o składzie / planach / kontakcie.",
+      "Nowe flagi stable (domyślnie ON): `email_password_reset`, `email_verification`, `email_contact_confirmation`, `email_test`."
+    ]
+  },
+  {
+    "version": "1.0.0.3+21",
+    "date": "2026-08-05",
+    "category": "frontend",
+    "title": "Sync: kategoria po weryfikacji zawodów",
+    "notes": [
+      "Po zaakceptowaniu wyniku z zawodów oficjalna kategoria/masa w profilu aktualizuje się automatycznie (widać na pulpicie i w kontach)."
+    ]
+  },
+  {
+    "version": "1.0.0.3+17",
+    "date": "2026-08-05",
+    "category": "frontend",
+    "title": "UX: kalendarz / agenda",
+    "notes": [
+      "`CalendarMonthGrid`: desktop domyślnie siatka miesiąca, poniżej `lg` zawsze agenda; toggle „Agenda / Kalendarz” tylko na desktopie.",
+      "Dotyczy publicznego `/kalendarz`, kadry `/klub/kalendarz` i panelu `/panel/kalendarz`.",
+      "Hook `useIsDesktop` (`lib/use-media-query.ts`)."
+    ]
+  },
+  {
+    "version": "1.0.0.3+17",
+    "date": "2026-08-05",
+    "category": "mobile",
+    "title": "UX: kalendarz = agenda",
+    "notes": [
+      "Ekran kalendarza: lista wydarzeń według dni (bez siatki miesiąca), nawigacja miesiącami."
+    ]
+  },
+  {
+    "version": "1.0.0.3+19",
+    "date": "2026-08-05",
+    "category": "mobile",
+    "title": "UX: kategoria wagowa z profilu",
+    "notes": [
+      "Przy zawodach tylko masa ciała — kategoria wyliczana na serwerze z wieku/płci w profilu."
+    ]
+  },
+  {
+    "version": "1.0.0.3+16",
+    "date": "2026-08-05",
+    "category": "frontend",
+    "title": "UX: rekord treningowy bez nazwy",
+    "notes": [
+      "Panel `/panel/wyniki`: przy rodzaju „Rekord treningowy” brak pola nazwy — wysyłane jako „Trening”."
+    ]
+  },
+  {
+    "version": "1.0.0.3+16",
+    "date": "2026-08-05",
+    "category": "mobile",
+    "title": "UX: rekord treningowy bez nazwy",
+    "notes": [
+      "Formularz wyników: przy „Trening” brak pola nazwy (wysyłane jako „Trening”); masa/miejsce/kategoria tylko przy zawodach."
+    ]
+  },
+  {
+    "version": "1.0.0.3+16",
+    "date": "2026-08-05",
+    "category": "backend",
+    "title": "Wyniki: trening bez wymaganej nazwy",
+    "notes": [
+      "`POST /api/results` przy `kind=training`: puste `event_name` → domyślnie „Trening”; nazwa wymagana tylko dla zawodów."
+    ]
+  },
+  {
+    "version": "1.0.0.2+13",
+    "date": "2026-08-04",
+    "category": "frontend",
+    "title": "Baza danych: modal zamiast confirm",
+    "notes": [
+      "`/klub/baza-danych`: potwierdzenie usunięcia rekordu w `Modal` zamiast natywnego `window.confirm`."
+    ]
+  },
+  {
     "version": "1.0.0.2+4",
     "date": "2026-08-04",
     "category": "frontend",
@@ -115,6 +300,30 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
     "notes": [
       "Provider e-mail: Brevo (`BREVO_API_KEY`, `EMAIL_FROM` jako zweryfikowany sender).",
       "Usunięto `RESEND_API_KEY` / klienta Resend."
+    ]
+  },
+  {
+    "version": "1.0.0.3+14",
+    "date": "2026-08-04",
+    "category": "backend",
+    "title": "Podgląd kont — View-As (read-only)",
+    "notes": [
+      "`AuthUser.view_as` + nagłówek `X-View-As-User` (tylko superadmin).",
+      "`GET /api/auth/me` i scoped reads (`plans`, `notifications`, `athlete/stats`, `results?mine`, `my-events`, attendance) używają `effective_id`.",
+      "Mutacje przy aktywnym View-As → 403 (wyjątek: `preview/start|stop`).",
+      "`preview/start` odrzuca nieaktywne / własne konto."
+    ]
+  },
+  {
+    "version": "1.0.0.3+14",
+    "date": "2026-08-04",
+    "category": "frontend",
+    "title": "Podgląd kont / ról — pełny pakiet",
+    "notes": [
+      "Automatyczny nagłówek `X-View-As-User` w `apiMutator` / `fetchMe` (sesja actora bez nagłówka).",
+      "Nav i RoleSwitcher pokazują target; banner kończy podgląd przez `preview/stop`.",
+      "`/klub/podglad`: wyszukiwanie, filtr roli, redirect do `/klub` lub `/panel`.",
+      "Panel zawodnika: banner podglądu, dane targetu, powrót do `/klub/podglad`."
     ]
   },
   {

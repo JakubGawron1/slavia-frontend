@@ -17,7 +17,10 @@ import {
   stablePanelThemes,
   type PanelThemeId,
 } from "@/lib/panel-themes";
-import { isFlagEnabled } from "@/lib/public-flags";
+import {
+  EXPERIMENTAL_NOTIFICATION_EMAILS_FLAG,
+  isFlagEnabled,
+} from "@/lib/public-flags";
 import { PhotoUploadField } from "@/components/settings/PhotoUploadField";
 import { CookieConsentSettings } from "@/components/settings/CookieConsentSettings";
 import { SettingsCategory } from "@/components/settings/SettingsCategory";
@@ -138,6 +141,10 @@ export function AccountSettingsForm({ user, onUpdated }: Props) {
   const allowExperimental = isFlagEnabled(
     flagsQuery.data?.data ?? [],
     EXPERIMENTAL_PANEL_THEMES_FLAG,
+  );
+  const allowNotificationEmails = isFlagEnabled(
+    flagsQuery.data?.data ?? [],
+    EXPERIMENTAL_NOTIFICATION_EMAILS_FLAG,
   );
   const stableThemes = stablePanelThemes();
   const experimentalThemes = allowExperimental ? experimentalPanelThemes() : [];
@@ -517,47 +524,49 @@ export function AccountSettingsForm({ user, onUpdated }: Props) {
             </form>
           </SettingsCategory>
 
-          <SettingsCategory
-            title="Powiadomienia"
-            description="Maile o składzie, planach i kontakcie"
-          >
-            <p className="text-sm text-paper/55">
-              Powiadomienia w aplikacji (dzwonek) działają zawsze. Poniżej —
-              dodatkowe wiadomości na zweryfikowany e-mail.
-            </p>
-            <div className="mt-4 space-y-2">
-              <PrefToggle
-                id="pref-squad"
-                checked={prefs.email_squad ?? true}
-                title="Skład zawodów"
-                description="Przypisanie lub wypisanie ze składu zawodów."
-                disabled={saving}
-                onChange={(v) => void savePrefs({ ...prefs, email_squad: v })}
-              />
-              <PrefToggle
-                id="pref-plans"
-                checked={prefs.email_training_plans ?? true}
-                title="Plany treningowe"
-                description="Przypisanie do planu treningowego."
-                disabled={saving}
-                onChange={(v) =>
-                  void savePrefs({ ...prefs, email_training_plans: v })
-                }
-              />
-              {isStaff ? (
+          {allowNotificationEmails ? (
+            <SettingsCategory
+              title="Powiadomienia"
+              description="Maile o składzie, planach i kontakcie"
+            >
+              <p className="text-sm text-paper/55">
+                Powiadomienia w aplikacji (dzwonek) działają zawsze. Poniżej —
+                dodatkowe wiadomości na zweryfikowany e-mail.
+              </p>
+              <div className="mt-4 space-y-2">
                 <PrefToggle
-                  id="pref-contact"
-                  checked={prefs.email_contact ?? true}
-                  title="Formularz kontaktowy"
-                  description="Nowa wiadomość ze strony kontaktu."
+                  id="pref-squad"
+                  checked={prefs.email_squad ?? true}
+                  title="Skład zawodów"
+                  description="Przypisanie lub wypisanie ze składu zawodów."
+                  disabled={saving}
+                  onChange={(v) => void savePrefs({ ...prefs, email_squad: v })}
+                />
+                <PrefToggle
+                  id="pref-plans"
+                  checked={prefs.email_training_plans ?? true}
+                  title="Plany treningowe"
+                  description="Przypisanie do planu treningowego."
                   disabled={saving}
                   onChange={(v) =>
-                    void savePrefs({ ...prefs, email_contact: v })
+                    void savePrefs({ ...prefs, email_training_plans: v })
                   }
                 />
-              ) : null}
-            </div>
-          </SettingsCategory>
+                {isStaff ? (
+                  <PrefToggle
+                    id="pref-contact"
+                    checked={prefs.email_contact ?? true}
+                    title="Formularz kontaktowy"
+                    description="Nowa wiadomość ze strony kontaktu."
+                    disabled={saving}
+                    onChange={(v) =>
+                      void savePrefs({ ...prefs, email_contact: v })
+                    }
+                  />
+                ) : null}
+              </div>
+            </SettingsCategory>
+          ) : null}
         </div>
 
         <div className="space-y-3">

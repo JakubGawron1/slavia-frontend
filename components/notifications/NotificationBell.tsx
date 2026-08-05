@@ -1,7 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import { createPortal } from "react-dom";
 import {
   getListNotificationsQueryKey,
   getUnreadCountQueryKey,
@@ -14,6 +21,18 @@ import {
 import type { Notification } from "@/lib/api/generated/models";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/toast/ToastProvider";
+
+const PANEL_MARGIN = 12;
+const PANEL_MAX_WIDTH = 22 * 16; // 22rem
+const PANEL_MAX_HEIGHT = 24 * 16; // 24rem
+const PANEL_GAP = 8;
+
+type PanelCoords = {
+  top: number;
+  left: number;
+  width: number;
+  maxHeight: number;
+};
 
 function BellIcon({ className }: { className?: string }) {
   return (
@@ -53,6 +72,36 @@ function formatRelative(iso: string): string {
   }
 }
 
+function computePanelCoords(anchor: DOMRect): PanelCoords {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const width = Math.min(PANEL_MAX_WIDTH, vw - PANEL_MARGIN * 2);
+
+  let left = anchor.right - width;
+  left = Math.max(PANEL_MARGIN, Math.min(left, vw - PANEL_MARGIN - width));
+
+  const spaceBelow = vh - anchor.bottom - PANEL_MARGIN - PANEL_GAP;
+  const spaceAbove = anchor.top - PANEL_MARGIN - PANEL_GAP;
+  const preferred = Math.min(PANEL_MAX_HEIGHT, vh * 0.7);
+
+  let top: number;
+  let maxHeight: number;
+
+  if (spaceBelow >= Math.min(preferred, 200) || spaceBelow >= spaceAbove) {
+    top = anchor.bottom + PANEL_GAP;
+    maxHeight = Math.max(140, Math.min(preferred, spaceBelow));
+  } else {
+    maxHeight = Math.max(140, Math.min(preferred, spaceAbove));
+    top = anchor.top - PANEL_GAP - maxHeight;
+    if (top < PANEL_MARGIN) {
+      top = PANEL_MARGIN;
+      maxHeight = Math.max(140, anchor.top - PANEL_MARGIN - PANEL_GAP);
+    }
+  }
+
+  return { top, left, width, maxHeight };
+}
+
 type NotificationBellProps = {
   /** Dla layoutów na tle brand (np. ribbon) — jaśniejsza ramka. */
   variant?: "default" | "onBrand";
@@ -62,7 +111,10 @@ export function NotificationBell({ variant = "default" }: NotificationBellProps)
   const toast = useToast();
   const [open, setOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [coords, setCoords] = useState<PanelCoords | null>(null);
+  const [mounted, setMounted] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
 
   const unreadQuery = useUnreadCount({
@@ -94,12 +146,37 @@ export function NotificationBell({ variant = "default" }: NotificationBellProps)
     ]);
   }
 
+  const updatePosition = useCallback(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    setCoords(computePanelCoords(el.getBoundingClientRect()));
+  }, []);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!open) {
+      setCoords(null);
+      return;
+    }
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
+  }, [open, updatePosition]);
+
   useEffect(() => {
     if (!open) return;
     function onPointerDown(event: MouseEvent) {
-      if (!rootRef.current?.contains(event.target as Node)) {
-        setOpen(false);
-      }
+      const target = event.target as Node;
+      if (rootRef.current?.contains(target)) return;
+      if (panelRef.current?.contains(target)) return;
+      setOpen(false);
     }
     function onKey(event: KeyboardEvent) {
       if (event.key === "Escape") setOpen(false);
@@ -162,8 +239,143 @@ export function NotificationBell({ variant = "default" }: NotificationBellProps)
         ? "border-brand bg-brand/20 text-paper"
         : "border-paper/15 text-paper/55 hover:border-paper/40 hover:text-paper";
 
+  const panel =
+    open && coords && mounted
+      ? createPortal(
+          <div
+            ref={panelRef}
+            role="dialog"
+            aria-label="Skrzynka powiadomień"
+            style={{
+              position: "fixed",
+              top: coords.top,
+              left: coords.left,
+              width: coords.width,
+              maxHeight: coords.maxHeight,
+              zIndex: 60,
+            }}
+            className="flex flex-col border border-paper/15 bg-chrome shadow-[0_16px_48px_rgba(0,0,0,0.45)]"
+          >
+            <div className="flex shrink-0 items-center justify-between gap-2 border-b border-paper/10 px-3 py-2.5">
+              <p className="font-display text-[11px] tracking-[0.14em] text-paper uppercase">
+                Powiadomienia
+              </p>
+              {unread > 0 ? (
+                <button
+                  type="button"
+                  onClick={() => void markAll()}
+                  disabled={markAllMutation.isPending}
+                  className="font-display text-[10px] tracking-[0.1em] text-brand uppercase transition-colors hover:text-paper disabled:opacity-50"
+                >
+                  Oznacz wszystkie
+                </button>
+              ) : null}
+            </div>
+
+            <ul className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+              {listQuery.isLoading ? (
+                <li className="px-3 py-6 text-center text-sm text-paper/45">
+                  Ładowanie…
+                </li>
+              ) : items.length === 0 ? (
+                <li className="px-3 py-6 text-center text-sm text-paper/45">
+                  Brak powiadomień.
+                </li>
+              ) : (
+                items.map((n) => {
+                  const content = (
+                    <>
+                      <div className="flex items-start justify-between gap-2">
+                        <p
+                          className={
+                            n.read
+                              ? "text-sm text-paper/70"
+                              : "text-sm font-medium text-paper"
+                          }
+                        >
+                          {n.title}
+                        </p>
+                        {!n.read ? (
+                          <span
+                            className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand"
+                            aria-hidden="true"
+                          />
+                        ) : null}
+                      </div>
+                      <p className="mt-0.5 line-clamp-2 text-xs text-paper/50">
+                        {n.body}
+                      </p>
+                      <p className="mt-1.5 font-display text-[10px] tracking-[0.08em] text-paper/35 uppercase">
+                        {formatRelative(n.created_at)}
+                      </p>
+                    </>
+                  );
+
+                  const itemClass = n.read
+                    ? "block min-w-0 flex-1 px-3 py-3 text-left transition-colors hover:bg-paper/5"
+                    : "block min-w-0 flex-1 bg-brand/5 px-3 py-3 text-left transition-colors hover:bg-brand/10";
+
+                  return (
+                    <li
+                      key={n.id}
+                      className="group flex items-stretch border-b border-paper/5"
+                    >
+                      {n.href ? (
+                        <Link
+                          href={n.href}
+                          className={itemClass}
+                          onClick={() => {
+                            void markRead(n);
+                            setOpen(false);
+                          }}
+                        >
+                          {content}
+                        </Link>
+                      ) : (
+                        <button
+                          type="button"
+                          className={itemClass}
+                          onClick={() => void markRead(n)}
+                        >
+                          {content}
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        aria-label="Usuń powiadomienie"
+                        title="Usuń"
+                        disabled={deletingId === n.id}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          void removeNotification(n);
+                        }}
+                        className="flex w-9 shrink-0 items-start justify-center pt-3 text-paper/30 transition-colors hover:bg-paper/5 hover:text-paper/70 disabled:opacity-40"
+                      >
+                        <svg
+                          className="h-3.5 w-3.5"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          aria-hidden="true"
+                        >
+                          <path d="M18 6 6 18M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </li>
+                  );
+                })
+              )}
+            </ul>
+          </div>,
+          document.body,
+        )
+      : null;
+
   return (
-    <div ref={rootRef} className="relative">
+    <div ref={rootRef} className="relative shrink-0">
       <button
         type="button"
         aria-label={
@@ -184,128 +396,7 @@ export function NotificationBell({ variant = "default" }: NotificationBellProps)
           </span>
         ) : null}
       </button>
-
-      {open ? (
-        <div
-          role="dialog"
-          aria-label="Skrzynka powiadomień"
-          className="absolute top-full right-0 z-50 mt-2 flex w-[min(100vw-2rem,22rem)] flex-col border border-paper/15 bg-chrome shadow-[0_16px_48px_rgba(0,0,0,0.45)]"
-        >
-          <div className="flex items-center justify-between gap-2 border-b border-paper/10 px-3 py-2.5">
-            <p className="font-display text-[11px] tracking-[0.14em] text-paper uppercase">
-              Powiadomienia
-            </p>
-            {unread > 0 ? (
-              <button
-                type="button"
-                onClick={() => void markAll()}
-                disabled={markAllMutation.isPending}
-                className="font-display text-[10px] tracking-[0.1em] text-brand uppercase transition-colors hover:text-paper disabled:opacity-50"
-              >
-                Oznacz wszystkie
-              </button>
-            ) : null}
-          </div>
-
-          <ul className="max-h-[min(70vh,24rem)] overflow-y-auto overscroll-contain">
-            {listQuery.isLoading ? (
-              <li className="px-3 py-6 text-center text-sm text-paper/45">
-                Ładowanie…
-              </li>
-            ) : items.length === 0 ? (
-              <li className="px-3 py-6 text-center text-sm text-paper/45">
-                Brak powiadomień.
-              </li>
-            ) : (
-              items.map((n) => {
-                const content = (
-                  <>
-                    <div className="flex items-start justify-between gap-2">
-                      <p
-                        className={
-                          n.read
-                            ? "text-sm text-paper/70"
-                            : "text-sm font-medium text-paper"
-                        }
-                      >
-                        {n.title}
-                      </p>
-                      {!n.read ? (
-                        <span
-                          className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand"
-                          aria-hidden="true"
-                        />
-                      ) : null}
-                    </div>
-                    <p className="mt-0.5 line-clamp-2 text-xs text-paper/50">
-                      {n.body}
-                    </p>
-                    <p className="mt-1.5 font-display text-[10px] tracking-[0.08em] text-paper/35 uppercase">
-                      {formatRelative(n.created_at)}
-                    </p>
-                  </>
-                );
-
-                const itemClass = n.read
-                  ? "block min-w-0 flex-1 px-3 py-3 text-left transition-colors hover:bg-paper/5"
-                  : "block min-w-0 flex-1 bg-brand/5 px-3 py-3 text-left transition-colors hover:bg-brand/10";
-
-                return (
-                  <li
-                    key={n.id}
-                    className="group flex items-stretch border-b border-paper/5"
-                  >
-                    {n.href ? (
-                      <Link
-                        href={n.href}
-                        className={itemClass}
-                        onClick={() => {
-                          void markRead(n);
-                          setOpen(false);
-                        }}
-                      >
-                        {content}
-                      </Link>
-                    ) : (
-                      <button
-                        type="button"
-                        className={itemClass}
-                        onClick={() => void markRead(n)}
-                      >
-                        {content}
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      aria-label="Usuń powiadomienie"
-                      title="Usuń"
-                      disabled={deletingId === n.id}
-                      onClick={(event) => {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        void removeNotification(n);
-                      }}
-                      className="flex w-9 shrink-0 items-start justify-center pt-3 text-paper/30 transition-colors hover:bg-paper/5 hover:text-paper/70 disabled:opacity-40"
-                    >
-                      <svg
-                        className="h-3.5 w-3.5"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        aria-hidden="true"
-                      >
-                        <path d="M18 6 6 18M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </li>
-                );
-              })
-            )}
-          </ul>
-        </div>
-      ) : null}
+      {panel}
     </div>
   );
 }

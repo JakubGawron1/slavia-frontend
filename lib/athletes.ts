@@ -89,11 +89,7 @@ export function buildAthleteViews(
     .map((profile) => {
       const athleteResults = results
         .filter((r) => resultBelongsToProfile(r, profile))
-        .sort(
-          (a, b) =>
-            new Date(a.submitted_at).getTime() -
-            new Date(b.submitted_at).getTime(),
-        );
+        .sort((a, b) => resultEventInstant(a) - resultEventInstant(b));
 
       let bestSinclair: number | null = null;
       let bestTotalKg: number | null = null;
@@ -136,13 +132,20 @@ export function formatSinclair(value: number | null | undefined): string {
 }
 
 export function formatResultDate(iso: string): string {
-  const d = new Date(iso);
+  const d = new Date(iso.length === 10 ? `${iso}T12:00:00` : iso);
   if (Number.isNaN(d.getTime())) return iso;
   return d.toLocaleDateString("pl-PL", {
     day: "numeric",
     month: "short",
     year: "numeric",
   });
+}
+
+/** Data wydarzenia (zawody/trening) albo fallback do czasu zgłoszenia. */
+export function resultEventInstant(result: CompetitionResult): number {
+  const raw = result.event_date?.trim() || result.submitted_at;
+  const d = new Date(raw.length === 10 ? `${raw}T12:00:00` : raw);
+  return Number.isNaN(d.getTime()) ? 0 : d.getTime();
 }
 
 /** Punkty wykresu progresu (oś Y = dwubój). */
@@ -158,7 +161,7 @@ export function buildChartPoints(
   );
   if (withTotal.length === 0) return [];
 
-  const dates = withTotal.map((r) => new Date(r.submitted_at).getTime());
+  const dates = withTotal.map((r) => resultEventInstant(r));
   const totals = withTotal.map((r) => r.total_kg as number);
   const minT = Math.min(...totals);
   const maxT = Math.max(...totals);
@@ -170,16 +173,16 @@ export function buildChartPoints(
   const innerH = height - pad * 2;
 
   return withTotal.map((result, i) => {
-    const date = new Date(result.submitted_at);
+    const dateMs = resultEventInstant(result);
     const totalKg = result.total_kg as number;
     const x =
       withTotal.length === 1
         ? width / 2
-        : pad + ((date.getTime() - minD) / spanD) * innerW;
+        : pad + ((dateMs - minD) / spanD) * innerW;
     const y = pad + (1 - (totalKg - minT) / spanT) * innerH;
     return {
       result,
-      date,
+      date: new Date(dateMs),
       totalKg,
       sinclair: computeResultSinclair(result, profile),
       x: Number.isFinite(x) ? x : pad + (i / Math.max(withTotal.length - 1, 1)) * innerW,

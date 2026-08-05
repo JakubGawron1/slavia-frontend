@@ -21,6 +21,11 @@ export interface CompetitionResult {
   category?: string | null;
   /** @nullable */
   clean_jerk_kg?: number | null;
+  /**
+     * Data zawodów / treningu (YYYY-MM-DD)
+     * @nullable
+     */
+  event_date?: string | null;
   event_name: string;
   id: string;
   /** "competition" | "training" */

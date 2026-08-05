@@ -83,10 +83,11 @@ export function KlubShell({ children }: { children: ReactNode }) {
                   {viewAs.displayName}
                 </span>{" "}
                 <span className="text-paper/55">({viewAs.email})</span>
+                <span className="ml-2 text-paper/45">· tylko odczyt</span>
               </p>
               <button
                 type="button"
-                onClick={clearViewAs}
+                onClick={() => void clearViewAs()}
                 className="panel-control border border-paper/30 px-3 py-1 font-display text-[11px] tracking-[0.12em] uppercase transition-colors hover:border-paper hover:bg-paper/10"
               >
                 Zakończ podgląd
@@ -94,10 +95,10 @@ export function KlubShell({ children }: { children: ReactNode }) {
             </div>
           ) : null}
 
-          <header className="flex shrink-0 items-center justify-between gap-3 border-b border-paper/10 px-4 py-3 lg:px-6">
+          <header className="flex shrink-0 flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-paper/10 px-3 py-3 sm:px-4 lg:px-6">
             <button
               type="button"
-              className="panel-control border border-paper/20 px-3 py-1.5 font-display text-[11px] tracking-[0.12em] uppercase lg:hidden"
+              className="panel-control shrink-0 border border-paper/20 px-3 py-1.5 font-display text-[11px] tracking-[0.12em] uppercase lg:hidden"
               onClick={() => setMobileNavOpen(true)}
             >
               Menu
@@ -108,26 +109,27 @@ export function KlubShell({ children }: { children: ReactNode }) {
                 <span className="ml-2 text-paper/35">· eksperymentalny</span>
               ) : null}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="ml-auto flex min-w-0 max-w-full flex-wrap items-center justify-end gap-1.5 sm:gap-2">
               <NotificationBell />
               {user.roles.includes("superadmin") ? (
                 <Link
                   href="/panel"
-                  className="panel-control border border-brand/40 bg-brand/10 px-3 py-1.5 font-display text-[11px] tracking-[0.1em] text-paper uppercase transition-colors hover:border-brand hover:bg-brand/20"
+                  className="panel-control border border-brand/40 bg-brand/10 px-2.5 py-1.5 font-display text-[10px] tracking-[0.1em] text-paper uppercase transition-colors hover:border-brand hover:bg-brand/20 sm:px-3 sm:text-[11px]"
                 >
-                  Panel zawodnika
+                  <span className="sm:hidden">Zawodnik</span>
+                  <span className="hidden sm:inline">Panel zawodnika</span>
                 </Link>
               ) : null}
               <Link
                 href="/"
-                className="panel-control border border-paper/15 px-3 py-1.5 font-display text-[11px] tracking-[0.1em] text-paper/70 uppercase transition-colors hover:border-paper/40 hover:text-paper"
+                className="panel-control border border-paper/15 px-2.5 py-1.5 font-display text-[10px] tracking-[0.1em] text-paper/70 uppercase transition-colors hover:border-paper/40 hover:text-paper sm:px-3 sm:text-[11px]"
               >
                 Witryna
               </Link>
               <button
                 type="button"
                 onClick={logout}
-                className="panel-control border border-paper/15 px-3 py-1.5 font-display text-[11px] tracking-[0.1em] text-paper/70 uppercase transition-colors hover:border-brand hover:text-paper"
+                className="panel-control border border-paper/15 px-2.5 py-1.5 font-display text-[10px] tracking-[0.1em] text-paper/70 uppercase transition-colors hover:border-brand hover:text-paper sm:px-3 sm:text-[11px]"
               >
                 Wyloguj
               </button>

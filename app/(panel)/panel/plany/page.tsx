@@ -8,9 +8,12 @@ import type {
 } from "@/lib/api/generated/models";
 import { klubFetch } from "@/lib/klub-api";
 import { useToast } from "@/components/toast/ToastProvider";
+import { usePanel } from "@/components/panel/PanelProvider";
 
 export default function AthletePlansPage() {
   const toast = useToast();
+  const { viewAs, user } = usePanel();
+  const scopeKey = viewAs?.userId ?? user?.id ?? "self";
   const [plans, setPlans] = useState<TrainingPlan[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [progress, setProgress] = useState<Record<string, PlanProgressEntry>>({});
@@ -21,16 +24,16 @@ export default function AthletePlansPage() {
     try {
       const list = await klubFetch<TrainingPlan[]>("/api/plans");
       setPlans(list);
-      if (list[0] && !activeId) setActiveId(list[0].id);
+      setActiveId(list[0]?.id ?? null);
+      setProgress({});
     } catch (err) {
       setError(err instanceof Error ? err.message : "Błąd planów");
     }
-  }, [activeId]);
+  }, []);
 
   useEffect(() => {
     void load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [load, scopeKey]);
 
   useEffect(() => {
     if (!activeId) return;
