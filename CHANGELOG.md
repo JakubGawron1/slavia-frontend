@@ -12,6 +12,26 @@ Format sekcji:
 
 Opcjonalnie po dacie: `!breaking` (breaking API).
 
+## [1.1.0.5+5] - 2026-08-07
+
+### Fix: agenda kadry — menu kontekstowe
+
+- Klik w wydarzenie w agendzie kalendarza kadry otwiera menu (Edytuj / Szczegóły / Usuń), jak w siatce miesiąca.
+
+## [1.1.0.5+4] - 2026-08-07
+
+### UX: agenda — wszystkie dni, plus i szczegóły
+
+- Agenda pokazuje każdy dzień miesiąca (także bez wydarzeń).
+- Kalendarz kadry: „+” przy dacie dodaje wydarzenie; klik w wydarzenie w agendzie otwiera menu (jak w siatce).
+- Publiczny `/kalendarz`: klik w wydarzenie (agenda/siatka) → modal ze szczegółami.
+
+## [1.1.0.5+3] - 2026-08-07
+
+### UX: czytelna lista obecności w panelu zawodnika
+
+- `/panel/obecnosc`: zamiast surowego ISO — polska data, godzina zapisu i badge statusu (Obecny / Nieobecny).
+
 ## [1.1.0.5+2] - 2026-08-05
 
 ### UX: sortowanie i filtr zawodnika na weryfikacji

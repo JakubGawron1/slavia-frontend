@@ -3,6 +3,24 @@ import type { UserChangelogEntry } from "@/lib/user-changelog";
 
 export const GENERATED_USER_CHANGELOG: UserChangelogEntry[] = [
   {
+    "version": "1.1.0.5+4",
+    "date": "2026-08-07",
+    "title": "Agenda kalendarza",
+    "notes": [
+      "W widoku listy widać wszystkie dni miesiąca.",
+      "W kalendarzu kadry przy dacie jest plus do dodania wydarzenia, a kliknięcie wydarzenia otwiera menu (edycja, szczegóły, usuwanie).",
+      "W publicznym kalendarzu kliknięcie wydarzenia pokazuje szczegóły."
+    ]
+  },
+  {
+    "version": "1.1.0.5+3",
+    "date": "2026-08-07",
+    "title": "Czytelniejsza lista obecności",
+    "notes": [
+      "Na stronie Obecność widać teraz zwykłą datę i godzinę oraz czy byłeś obecny, czy nie — bez technicznego znacznika czasu."
+    ]
+  },
+  {
     "version": "1.0.0.3+20",
     "date": "2026-08-05",
     "title": "Data zawodów i treningu",

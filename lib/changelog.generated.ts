@@ -3,6 +3,35 @@ import type { ChangelogEntry } from "@/lib/changelog";
 
 export const GENERATED_CHANGELOG: ChangelogEntry[] = [
   {
+    "version": "1.1.0.5+5",
+    "date": "2026-08-07",
+    "category": "frontend",
+    "title": "Fix: agenda kadry — menu kontekstowe",
+    "notes": [
+      "Klik w wydarzenie w agendzie kalendarza kadry otwiera menu (Edytuj / Szczegóły / Usuń), jak w siatce miesiąca."
+    ]
+  },
+  {
+    "version": "1.1.0.5+4",
+    "date": "2026-08-07",
+    "category": "frontend",
+    "title": "UX: agenda — wszystkie dni, plus i szczegóły",
+    "notes": [
+      "Agenda pokazuje każdy dzień miesiąca (także bez wydarzeń).",
+      "Kalendarz kadry: „+” przy dacie dodaje wydarzenie; klik w wydarzenie w agendzie otwiera menu (jak w siatce).",
+      "Publiczny `/kalendarz`: klik w wydarzenie (agenda/siatka) → modal ze szczegółami."
+    ]
+  },
+  {
+    "version": "1.1.0.5+3",
+    "date": "2026-08-07",
+    "category": "frontend",
+    "title": "UX: czytelna lista obecności w panelu zawodnika",
+    "notes": [
+      "`/panel/obecnosc`: zamiast surowego ISO — polska data, godzina zapisu i badge statusu (Obecny / Nieobecny)."
+    ]
+  },
+  {
     "version": "1.0.0.3+20",
     "date": "2026-08-05",
     "category": "backend",

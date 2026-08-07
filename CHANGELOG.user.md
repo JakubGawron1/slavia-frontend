@@ -11,6 +11,20 @@ Format:
 - zdanie zrozumiałe dla zwykłego użytkownika
 ```
 
+## [1.1.0.5+4] - 2026-08-07
+
+### Agenda kalendarza
+
+- W widoku listy widać wszystkie dni miesiąca.
+- W kalendarzu kadry przy dacie jest plus do dodania wydarzenia, a kliknięcie wydarzenia otwiera menu (edycja, szczegóły, usuwanie).
+- W publicznym kalendarzu kliknięcie wydarzenia pokazuje szczegóły.
+
+## [1.1.0.5+3] - 2026-08-07
+
+### Czytelniejsza lista obecności
+
+- Na stronie Obecność widać teraz zwykłą datę i godzinę oraz czy byłeś obecny, czy nie — bez technicznego znacznika czasu.
+
 ## [1.0.0.3+24] - 2026-08-05
 
 ### Poprawka już zaakceptowanego wyniku

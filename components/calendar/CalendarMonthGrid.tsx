@@ -10,7 +10,6 @@ import {
   getWeekdayLabels,
   isMultiDay,
   shiftMonth,
-  toDateKey,
 } from "@/lib/calendar";
 import {
   ATTENDANCE_COUNTS_CHIP,
@@ -50,8 +49,12 @@ export type CalendarGridProps = {
   onHideCancelledChange?: (v: boolean) => void;
   extraFilters?: ReactNode;
   renderEventDetails?: (event: ClubEvent) => ReactNode;
-  onSelectEvent?: (event: ClubEvent, anchor?: DOMRect) => void;
-  /** Klik w dzień (tło komórki) — np. dodanie wydarzenia */
+  onSelectEvent?: (
+    event: ClubEvent,
+    anchor?: DOMRect,
+    source?: "calendar" | "agenda" | "aside",
+  ) => void;
+  /** Klik w dzień (tło komórki) / plus w agendzie — np. dodanie wydarzenia */
   onSelectDay?: (dateKey: string) => void;
   size?: "default" | "medium" | "large";
   layout?: "default" | "wide";
@@ -230,23 +233,17 @@ export function CalendarMonthGrid({
 
   const eventsById = new Map(filtered.map((e) => [e.id, e]));
 
-  const monthStartKey = `${year}-${String(monthIndex + 1).padStart(2, "0")}-01`;
-  const monthEndKey = toDateKey(new Date(year, monthIndex + 1, 0));
-  const agendaByDay = (() => {
-    const map = new Map<string, ClubEvent[]>();
-    for (const event of filtered) {
-      if (eventEndKey(event) < monthStartKey || event.date > monthEndKey) {
-        continue;
-      }
-      const groupKey =
-        event.date < monthStartKey ? monthStartKey : event.date;
-      const list = map.get(groupKey) ?? [];
-      if (!list.some((x) => x.id === event.id)) {
-        list.push(event);
-        map.set(groupKey, list);
-      }
+  const agendaDays = (() => {
+    const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+    const days: { key: string; events: ClubEvent[] }[] = [];
+    for (let day = 1; day <= daysInMonth; day++) {
+      const key = `${year}-${String(monthIndex + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+      const dayEvents = (eventsByDate.get(key) ?? []).filter(
+        (e, i, arr) => arr.findIndex((x) => x.id === e.id) === i,
+      );
+      days.push({ key, events: dayEvents });
     }
-    return [...map.entries()].sort(([a], [b]) => a.localeCompare(b));
+    return days;
   })();
 
   const showAside = !hideAside && showCalendar;
@@ -364,26 +361,13 @@ export function CalendarMonthGrid({
           <div
             className={`min-h-0 flex-1 overflow-y-auto border-b ${t.rootBorder}`}
           >
-            {agendaByDay.length === 0 ? (
-              <p className={`px-4 py-8 text-sm sm:px-5 ${t.muted}`}>
-                Brak wydarzeń w tym miesiącu.
-                {onSelectDay ? (
-                  <button
-                    type="button"
-                    className="mt-3 block font-display text-xs tracking-wide text-brand uppercase"
-                    onClick={() => onSelectDay(selectedKey)}
+            <ul>
+              {agendaDays.map(({ key: dayKey, events: dayEvents }) => (
+                <li key={dayKey} className={`border-b ${t.rootBorder}`}>
+                  <div
+                    className={`flex flex-wrap items-center justify-between gap-2 px-4 py-3 sm:px-5 ${t.headerBg}`}
                   >
-                    + Dodaj wydarzenie
-                  </button>
-                ) : null}
-              </p>
-            ) : (
-              <ul>
-                {agendaByDay.map(([dayKey, dayEvents]) => (
-                  <li key={dayKey} className={`border-b ${t.rootBorder}`}>
-                    <div
-                      className={`flex flex-wrap items-center justify-between gap-2 px-4 py-3 sm:px-5 ${t.headerBg}`}
-                    >
+                    <div className="flex min-w-0 flex-wrap items-center gap-2">
                       <h3
                         className={`font-display text-sm tracking-wide uppercase sm:text-base ${t.title}`}
                       >
@@ -395,6 +379,26 @@ export function CalendarMonthGrid({
                         </span>
                       ) : null}
                     </div>
+                    {onSelectDay ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedKey(dayKey);
+                          onSelectDay(dayKey);
+                        }}
+                        className={`inline-flex h-8 w-8 shrink-0 items-center justify-center border font-display text-lg leading-none transition-colors hover:border-brand hover:text-brand ${t.chipIdle}`}
+                        aria-label={`Dodaj wydarzenie ${formatPolishDate(dayKey)}`}
+                        title="Dodaj wydarzenie"
+                      >
+                        +
+                      </button>
+                    ) : null}
+                  </div>
+                  {dayEvents.length === 0 ? (
+                    <p className={`px-4 py-3 text-sm sm:px-5 ${t.muted}`}>
+                      Brak wydarzeń
+                    </p>
+                  ) : (
                     <ul
                       className={`divide-y ${
                         tone === "panel" ? "divide-paper/10" : "divide-mist"
@@ -413,6 +417,7 @@ export function CalendarMonthGrid({
                                   (
                                     e.currentTarget as HTMLElement
                                   ).getBoundingClientRect(),
+                                  "agenda",
                                 );
                               }}
                             >
@@ -431,10 +436,10 @@ export function CalendarMonthGrid({
                         </li>
                       ))}
                     </ul>
-                  </li>
-                ))}
-              </ul>
-            )}
+                  )}
+                </li>
+              ))}
+            </ul>
           </div>
         ) : null}
 
@@ -559,7 +564,7 @@ export function CalendarMonthGrid({
                             const rect = (
                               e.currentTarget as HTMLElement
                             ).getBoundingClientRect();
-                            onSelectEvent?.(event, rect);
+                            onSelectEvent?.(event, rect, "calendar");
                           }}
                           className={`pointer-events-auto mx-0.5 overflow-hidden px-2 text-left font-display leading-snug tracking-wide uppercase ${barTextClass} ${
                             event.status === "cancelled"
@@ -652,6 +657,7 @@ export function CalendarMonthGrid({
                           onSelectEvent(
                             event,
                             (e.currentTarget as HTMLElement).getBoundingClientRect(),
+                            "aside",
                           )
                         }
                       >
@@ -705,6 +711,7 @@ export function CalendarMonthGrid({
                         onSelectEvent?.(
                           event,
                           (e.currentTarget as HTMLElement).getBoundingClientRect(),
+                          "aside",
                         );
                       }}
                     >

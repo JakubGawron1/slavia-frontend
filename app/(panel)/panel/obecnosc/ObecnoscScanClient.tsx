@@ -4,6 +4,10 @@ import { FormEvent, useCallback, useEffect, useId, useRef, useState } from "reac
 import { useSearchParams } from "next/navigation";
 import { Html5Qrcode } from "html5-qrcode";
 import type { AttendanceRecord } from "@/lib/api/generated/models";
+import {
+  attendanceRecordStyle,
+  formatAttendanceCheckedAt,
+} from "@/lib/attendance-ui";
 import { klubFetch } from "@/lib/klub-api";
 import { useToast } from "@/components/toast/ToastProvider";
 import { usePanel } from "@/components/panel/PanelProvider";
@@ -193,11 +197,31 @@ export default function ObecnoscScanClient() {
           Twoje obecności (okno roku)
         </h2>
         <ul className="mt-3 divide-y divide-paper/10 border border-paper/10">
-          {mine.map((r) => (
-            <li key={r.id} className="px-3 py-2 text-sm text-paper/70">
-              {r.checked_at}
-            </li>
-          ))}
+          {mine.map((r) => {
+            const style = attendanceRecordStyle(r.status);
+            const { date, time } = formatAttendanceCheckedAt(r.checked_at);
+            const showTime = r.status !== "absent" && Boolean(time);
+            return (
+              <li
+                key={r.id}
+                className="flex items-center justify-between gap-3 px-3 py-3"
+              >
+                <div className="min-w-0">
+                  <p className="text-sm text-paper/85">{date}</p>
+                  {showTime ? (
+                    <p className="mt-0.5 text-xs text-paper/45">
+                      Zapis o {time}
+                    </p>
+                  ) : null}
+                </div>
+                <span
+                  className={`shrink-0 px-2 py-0.5 font-display text-[0.65rem] tracking-[0.12em] uppercase ${style.badge}`}
+                >
+                  {style.label}
+                </span>
+              </li>
+            );
+          })}
           {mine.length === 0 ? (
             <li className="px-3 py-4 text-paper/45">Brak zapisów.</li>
           ) : null}

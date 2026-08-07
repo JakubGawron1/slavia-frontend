@@ -26,6 +26,65 @@ export const ATTENDANCE_STYLES: Record<
 export const ATTENDANCE_NONE_BADGE = "bg-paper/15 text-paper/60";
 export const ATTENDANCE_NONE_LABEL = "Brak wpisu";
 
+/** Etykiety statusów rekordu API (obecność QR / auto). */
+export const ATTENDANCE_RECORD_STYLES: Record<
+  string,
+  { badge: string; label: string }
+> = {
+  present: ATTENDANCE_STYLES.present,
+  absent: ATTENDANCE_STYLES.absent,
+  pending_unauthorized: {
+    badge: "bg-[#8a6a2f] text-paper",
+    label: "Oczekuje",
+  },
+  rejected: {
+    badge: ATTENDANCE_NONE_BADGE,
+    label: "Odrzucone",
+  },
+};
+
+export function attendanceRecordStyle(status: string | null | undefined): {
+  badge: string;
+  label: string;
+} {
+  const key = status || "present";
+  return (
+    ATTENDANCE_RECORD_STYLES[key] ?? {
+      badge: ATTENDANCE_NONE_BADGE,
+      label: key,
+    }
+  );
+}
+
+/** Czytelna data + godzina check-inu (lokalna strefa). */
+export function formatAttendanceCheckedAt(iso: string): {
+  date: string;
+  time: string;
+} {
+  try {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) {
+      return { date: iso, time: "" };
+    }
+    let weekday = d.toLocaleDateString("pl-PL", { weekday: "long" });
+    if (weekday) {
+      weekday = weekday.charAt(0).toUpperCase() + weekday.slice(1);
+    }
+    const rest = d.toLocaleDateString("pl-PL", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+    const time = d.toLocaleTimeString("pl-PL", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    return { date: `${weekday}, ${rest}`, time };
+  } catch {
+    return { date: iso, time: "" };
+  }
+}
+
 /** Frekwencja w siatce kadry: obecni / oczekiwani. */
 export type AttendanceCountsTone = "full" | "partial" | "zero" | "empty";
 
