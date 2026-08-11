@@ -3,12 +3,14 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 1.0.0.2+5
+ * OpenAPI spec version: 1.1.0.17+18
  */
 import type { FlagKind } from './flagKind';
 import type { FlagRolloutStatus } from './flagRolloutStatus';
 
 export interface FeatureFlag {
+  /** Czy klient (witryna / panele) może odczytać stan przez `GET /api/flags/public`. */
+  client_visible: boolean;
   /** Opis dla DevTools — katalog flag na backendzie. */
   description: string;
   enabled: boolean;

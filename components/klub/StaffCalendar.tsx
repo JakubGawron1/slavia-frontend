@@ -19,8 +19,22 @@ import {
   type TrainingScheduleDefaults,
   type WithdrawalStatus,
 } from "@/lib/events";
-import { klubFetch } from "@/lib/klub-api";
-import type { AthleteProfile } from "@/lib/api/generated/models";
+import {
+  acceptWithdrawal as acceptWithdrawalApi,
+  cancelEvent,
+  clearWithdrawal as clearWithdrawalApi,
+  createEvent,
+  deleteEvent,
+  getSchedule,
+  listAttendance,
+  listEvents,
+  listProfiles,
+  rejectWithdrawal as rejectWithdrawalApi,
+  restoreEvent as restoreEventApi,
+  updateEvent,
+  updateSchedule,
+} from "@/lib/api/generated/default/default";
+import type { AthleteProfile, EventBody } from "@/lib/api/generated/models";
 
 type AttendanceRecordLocal = {
   id: string;
@@ -104,19 +118,19 @@ export function StaffCalendar() {
   const load = useCallback(async () => {
     setError(null);
     try {
-      const [ev, pr, sch, att] = await Promise.all([
-        klubFetch<CalendarEventFull[]>("/api/events"),
-        klubFetch<AthleteProfile[]>("/api/profiles").catch(() => [] as AthleteProfile[]),
-        klubFetch<TrainingScheduleDefaults>("/api/events/schedule"),
-        klubFetch<AttendanceRecordLocal[]>("/api/attendance").catch(
-          () => [] as AttendanceRecordLocal[],
-        ),
+      const [evRes, prRes, schRes, attRes] = await Promise.all([
+        listEvents(),
+        listProfiles().catch(() => null),
+        getSchedule(),
+        listAttendance().catch(() => null),
       ]);
-      setEvents(ev);
+      setEvents((evRes.data as CalendarEventFull[]) ?? []);
       // Profile zawodników (także bez konta w systemie — user_id "manual")
-      setProfiles(pr);
-      setSchedule(sch);
-      setAttendance(att);
+      setProfiles((prRes?.data as AthleteProfile[] | undefined) ?? []);
+      setSchedule(schRes.data as TrainingScheduleDefaults);
+      setAttendance(
+        (attRes?.data as AttendanceRecordLocal[] | undefined) ?? [],
+      );
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Błąd kalendarza";
       setError(msg);
@@ -276,7 +290,7 @@ export function StaffCalendar() {
       form.end_date !== form.date
         ? form.end_date
         : null;
-    const body = {
+    const body: EventBody = {
       title: form.title,
       event_type: form.event_type,
       date: form.date,
@@ -289,10 +303,10 @@ export function StaffCalendar() {
     };
     try {
       if (formMode === "create") {
-        await klubFetch("/api/events", { method: "POST", body });
+        await createEvent(body);
         toast.success("Dodano wydarzenie", form.title);
       } else {
-        await klubFetch(`/api/events/${form.id}`, { method: "PATCH", body });
+        await updateEvent(form.id, body);
         toast.success("Zapisano zmiany", form.title);
       }
       setForm(null);
@@ -315,7 +329,7 @@ export function StaffCalendar() {
     setDialog(null);
     setDetail(null);
     try {
-      await klubFetch(`/api/events/${ev.id}`, { method: "DELETE" });
+      await deleteEvent(ev.id);
       toast.success("Usunięto wydarzenie", ev.title);
       await load();
     } catch (err) {
@@ -334,10 +348,7 @@ export function StaffCalendar() {
     const { event: ev, note } = dialog;
     setDialog(null);
     try {
-      await klubFetch(`/api/events/${ev.id}/cancel`, {
-        method: "POST",
-        body: { cancellation_note: note.trim() || null },
-      });
+      await cancelEvent(ev.id, { cancellation_note: note.trim() || null });
       toast.success("Odwołano wydarzenie", ev.title);
       await load();
     } catch (err) {
@@ -349,10 +360,7 @@ export function StaffCalendar() {
 
   async function restoreEvent(ev: CalendarEventFull, force = false) {
     try {
-      await klubFetch(`/api/events/${ev.id}/restore`, {
-        method: "POST",
-        body: { force },
-      });
+      await restoreEventApi(ev.id, { force });
       setDialog(null);
       toast.success(
         force ? "Przywrócono (wymuszone)" : "Przywrócono wydarzenie",
@@ -376,9 +384,7 @@ export function StaffCalendar() {
 
   async function acceptWithdrawal(ev: CalendarEventFull, athleteId: string) {
     try {
-      await klubFetch(`/api/events/${ev.id}/withdrawals/${athleteId}/accept`, {
-        method: "POST",
-      });
+      await acceptWithdrawalApi(ev.id, athleteId);
       toast.success("Zaakceptowano rezygnację");
       await load();
     } catch (err) {
@@ -391,9 +397,7 @@ export function StaffCalendar() {
 
   async function rejectWithdrawal(ev: CalendarEventFull, athleteId: string) {
     try {
-      await klubFetch(`/api/events/${ev.id}/withdrawals/${athleteId}/reject`, {
-        method: "POST",
-      });
+      await rejectWithdrawalApi(ev.id, athleteId);
       toast.success("Odrzucono rezygnację");
       await load();
     } catch (err) {
@@ -406,9 +410,7 @@ export function StaffCalendar() {
 
   async function clearWithdrawal(ev: CalendarEventFull, athleteId: string) {
     try {
-      await klubFetch(`/api/events/${ev.id}/withdrawals/${athleteId}/clear`, {
-        method: "POST",
-      });
+      await clearWithdrawalApi(ev.id, athleteId);
       toast.success("Przywrócono na trening");
       await load();
     } catch (err) {
@@ -429,11 +431,8 @@ export function StaffCalendar() {
     if (!schedule || dialog?.kind !== "schedule") return;
     setDialog(null);
     try {
-      const updated = await klubFetch<TrainingScheduleDefaults>(
-        "/api/events/schedule",
-        { method: "PATCH", body: schedule },
-      );
-      setSchedule(updated);
+      const updated = await updateSchedule(schedule);
+      setSchedule(updated.data as TrainingScheduleDefaults);
       toast.success("Zapisano terminarz treningów");
       await load();
     } catch (err) {

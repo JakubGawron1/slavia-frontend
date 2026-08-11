@@ -22,7 +22,7 @@ import {
   syncSessionCookie,
   type AuthUser,
 } from "@/lib/auth";
-import { klubFetch } from "@/lib/klub-api";
+import { previewStop } from "@/lib/api/generated/default/default";
 import { canAccessAthletePanel } from "@/lib/panel-nav";
 import {
   clearViewAsStorage,
@@ -63,11 +63,7 @@ export function PanelProvider({ children }: { children: ReactNode }) {
 
   const clearViewAs = useCallback(async () => {
     try {
-      await klubFetch("/api/admin/preview/stop", {
-        method: "POST",
-        body: {},
-        viewAsUserId: null,
-      });
+      await previewStop({ viewAsUserId: null });
     } catch {
       /* ignore */
     }

@@ -6,7 +6,12 @@ import type {
   CompetitionResult,
   ResultStatus,
 } from "@/lib/api/generated/models";
-import { klubFetch } from "@/lib/klub-api";
+import {
+  createResult,
+  listProfiles,
+  listResults,
+  updateResult,
+} from "@/lib/api/generated/default/default";
 import { useKlub } from "@/components/klub/KlubProvider";
 import { useToast } from "@/components/toast/ToastProvider";
 import { Modal } from "@/components/ui/Modal";
@@ -83,12 +88,12 @@ export default function WeryfikacjaPage() {
     setLoading(true);
     setError(null);
     try {
-      const [data, profileList] = await Promise.all([
-        klubFetch<CompetitionResult[]>("/api/results"),
-        klubFetch<AthleteProfile[]>("/api/profiles"),
+      const [dataRes, profileRes] = await Promise.all([
+        listResults(),
+        listProfiles(),
       ]);
-      setResults(data);
-      setProfiles(profileList);
+      setResults((dataRes.data as CompetitionResult[]) ?? []);
+      setProfiles((profileRes.data as AthleteProfile[]) ?? []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Błąd ładowania");
     } finally {
@@ -192,10 +197,7 @@ export default function WeryfikacjaPage() {
         body.event_name = editEventName.trim();
         body.bodyweight_kg = editBwNum;
       }
-      await klubFetch(`/api/results/${editing.id}`, {
-        method: "PATCH",
-        body,
-      });
+      await updateResult(editing.id, body);
       toast.success(
         "Zapisano zmiany",
         editPreviewCategory ?? editing.athlete_name,
@@ -214,12 +216,9 @@ export default function WeryfikacjaPage() {
 
   async function review(id: string, status: ResultStatus) {
     try {
-      await klubFetch(`/api/results/${id}`, {
-        method: "PATCH",
-        body: {
-          status,
-          reviewer_note: notes[id] || null,
-        },
+      await updateResult(id, {
+        status,
+        reviewer_note: notes[id] || null,
       });
       toast.success(
         status === "accepted"
@@ -257,24 +256,21 @@ export default function WeryfikacjaPage() {
     }
     setSaving(true);
     try {
-      await klubFetch("/api/results", {
-        method: "POST",
-        body: {
-          event_name: eventName.trim(),
-          event_date: eventDate,
-          kind: "competition",
-          athlete_name: selectedProfile.display_name,
-          profile_id: selectedProfile.id,
-          user_id:
-            selectedProfile.user_id && selectedProfile.user_id !== "manual"
-              ? selectedProfile.user_id
-              : null,
-          snatch_kg: snatch ? Number(snatch) : null,
-          clean_jerk_kg: cj ? Number(cj) : null,
-          bodyweight_kg: bwNum,
-          venue: venue.trim() || null,
-          auto_accept: true,
-        },
+      await createResult({
+        event_name: eventName.trim(),
+        event_date: eventDate,
+        kind: "competition",
+        athlete_name: selectedProfile.display_name,
+        profile_id: selectedProfile.id,
+        user_id:
+          selectedProfile.user_id && selectedProfile.user_id !== "manual"
+            ? selectedProfile.user_id
+            : null,
+        snatch_kg: snatch ? Number(snatch) : null,
+        clean_jerk_kg: cj ? Number(cj) : null,
+        bodyweight_kg: bwNum,
+        venue: venue.trim() || null,
+        auto_accept: true,
       });
       toast.success(
         "Dodano wynik",

@@ -1,7 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { klubFetch } from "@/lib/klub-api";
+import {
+  dbDeleteRow,
+  dbListRows,
+  dbListTables,
+  dbUpsertRow,
+} from "@/lib/api/generated/default/default";
+import type { UpsertRowBodyRow } from "@/lib/api/generated/models";
 import { useToast } from "@/components/toast/ToastProvider";
 import { Modal } from "@/components/ui/Modal";
 
@@ -17,16 +23,14 @@ export default function BazaDanychPage() {
   const [deleting, setDeleting] = useState(false);
 
   const loadTables = useCallback(async () => {
-    const data = await klubFetch<string[]>("/api/admin/db/tables");
+    const data = (await dbListTables()).data as string[];
     setTables(data);
     if (!table && data[0]) setTable(data[0]);
   }, [table]);
 
   const loadRows = useCallback(async (name: string) => {
     if (!name) return;
-    const data = await klubFetch<Record<string, unknown>[]>(
-      `/api/admin/db/${name}`,
-    );
+    const data = (await dbListRows(name)).data as Record<string, unknown>[];
     setRows(data);
   }, []);
 
@@ -56,11 +60,8 @@ export default function BazaDanychPage() {
   async function saveRow() {
     try {
       setMessage(null);
-      const row = JSON.parse(editJson) as unknown;
-      await klubFetch(`/api/admin/db/${table}`, {
-        method: "POST",
-        body: { row },
-      });
+      const row = JSON.parse(editJson) as UpsertRowBodyRow;
+      await dbUpsertRow(table, { row });
       setMessage("Zapisano wiersz.");
       toast.success("Zapisano wiersz", table);
       setEditJson("");
@@ -76,9 +77,7 @@ export default function BazaDanychPage() {
     if (!deleteId) return;
     setDeleting(true);
     try {
-      await klubFetch(`/api/admin/db/${table}/${deleteId}`, {
-        method: "DELETE",
-      });
+      await dbDeleteRow(table, deleteId);
       toast.success("Usunięto rekord", deleteId);
       setDeleteId(null);
       await loadRows(table);

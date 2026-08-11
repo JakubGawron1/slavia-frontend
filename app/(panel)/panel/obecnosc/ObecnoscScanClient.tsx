@@ -5,10 +5,13 @@ import { useSearchParams } from "next/navigation";
 import { Html5Qrcode } from "html5-qrcode";
 import type { AttendanceRecord } from "@/lib/api/generated/models";
 import {
+  checkIn as checkInApi,
+  listAttendance,
+} from "@/lib/api/generated/default/default";
+import {
   attendanceRecordStyle,
   formatAttendanceCheckedAt,
 } from "@/lib/attendance-ui";
-import { klubFetch } from "@/lib/klub-api";
 import { useToast } from "@/components/toast/ToastProvider";
 import { usePanel } from "@/components/panel/PanelProvider";
 
@@ -37,7 +40,8 @@ export default function ObecnoscScanClient() {
 
   const load = useCallback(async () => {
     try {
-      setMine(await klubFetch<AttendanceRecord[]>("/api/attendance"));
+      const res = await listAttendance();
+      setMine((res.data as AttendanceRecord[]) ?? []);
     } catch {
       /* ignore */
     }
@@ -61,10 +65,7 @@ export default function ObecnoscScanClient() {
     setError(null);
     setMessage(null);
     try {
-      await klubFetch("/api/attendance", {
-        method: "POST",
-        body: { token: token.trim() },
-      });
+      await checkInApi({ token: token.trim() });
       setMessage("Obecność zapisana.");
       toast.success("Obecność zapisana");
       await load();

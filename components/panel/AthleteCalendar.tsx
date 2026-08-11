@@ -14,7 +14,10 @@ import {
   type AthleteCalendarEvent,
   type ClubEvent,
 } from "@/lib/events";
-import { klubFetch } from "@/lib/klub-api";
+import {
+  listMyEvents,
+  withdrawFromEvent,
+} from "@/lib/api/generated/default/default";
 import { usePanel } from "@/components/panel/PanelProvider";
 
 function eventsRangeAroundToday(): { from: string; to: string } {
@@ -42,10 +45,8 @@ export function AthleteCalendar() {
     setLoading(true);
     try {
       const { from, to } = eventsRangeAroundToday();
-      const data = await klubFetch<AthleteCalendarEvent[]>(
-        `/api/events/mine?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`,
-        { auth: true },
-      );
+      const res = await listMyEvents({ from, to });
+      const data = res.data as AthleteCalendarEvent[];
       setEvents(Array.isArray(data) ? data : []);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Błąd kalendarza";
@@ -103,10 +104,7 @@ export function AthleteCalendar() {
     e.preventDefault();
     if (!selected || !reason.trim()) return;
     try {
-      await klubFetch(`/api/events/${selected.id}/withdraw`, {
-        method: "POST",
-        body: { reason: reason.trim() },
-      });
+      await withdrawFromEvent(selected.id, { reason: reason.trim() });
       setReason("");
       toast.success(
         selected.event_type === "trening"

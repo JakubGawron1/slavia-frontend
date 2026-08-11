@@ -1,5 +1,5 @@
 import type { LoginResponse, PublicUser, Role } from "@/lib/api/generated/models";
-import { readViewAsUserId } from "@/lib/view-as";
+import { me } from "@/lib/api/generated/auth/auth";
 
 export type { LoginResponse, Role };
 
@@ -126,6 +126,7 @@ export type FetchMeOptions = {
   viewAsUserId?: string | null;
 };
 
+/** Bootstrap sesji — Orval `GET /api/auth/me`. */
 export async function fetchMe(
   token?: string,
   options: FetchMeOptions = {},
@@ -135,26 +136,9 @@ export async function fetchMe(
     throw new Error("Brak sesji.");
   }
 
-  const headers: Record<string, string> = {
-    Accept: "application/json",
-    Authorization: `Bearer ${authToken}`,
-  };
-
-  const resolvedViewAs =
-    options.viewAsUserId === undefined
-      ? readViewAsUserId()
-      : options.viewAsUserId;
-  if (resolvedViewAs) {
-    headers["X-View-As-User"] = resolvedViewAs;
-  }
-
-  const response = await fetch(`${getApiBaseUrl()}/api/auth/me`, {
-    headers,
+  const res = await me({
+    authToken,
+    viewAsUserId: options.viewAsUserId,
   });
-
-  if (!response.ok) {
-    throw new Error(await parseError(response));
-  }
-
-  return (await response.json()) as AuthUser;
+  return res.data as AuthUser;
 }

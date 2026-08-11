@@ -3,7 +3,7 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 1.0.0.2+5
+ * OpenAPI spec version: 1.1.0.17+18
  */
 import {
   useMutation,
@@ -4914,6 +4914,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   status: 200
 }
 
+export type updateResultResponse400 = {
+  data: ErrorBody
+  status: 400
+}
+
 export type updateResultResponse401 = {
   data: ErrorBody
   status: 401
@@ -4932,7 +4937,7 @@ export type updateResultResponse404 = {
 export type updateResultResponseSuccess = (updateResultResponse200) & {
   headers: Headers;
 };
-export type updateResultResponseError = (updateResultResponse401 | updateResultResponse403 | updateResultResponse404) & {
+export type updateResultResponseError = (updateResultResponse400 | updateResultResponse401 | updateResultResponse403 | updateResultResponse404) & {
   headers: Headers;
 };
 

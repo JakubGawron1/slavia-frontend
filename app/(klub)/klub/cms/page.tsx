@@ -6,7 +6,12 @@ import type {
   CmsPage,
   CmsStatus,
 } from "@/lib/api/generated/models";
-import { klubFetch } from "@/lib/klub-api";
+import {
+  createCmsPage,
+  deleteCmsPage,
+  listCmsPages,
+  updateCmsPage,
+} from "@/lib/api/generated/default/default";
 import { useToast } from "@/components/toast/ToastProvider";
 
 function newBlock(type = "paragraph"): CmsBlock {
@@ -28,7 +33,7 @@ export default function CmsAdminPage() {
     setLoading(true);
     setError(null);
     try {
-      setPages(await klubFetch<CmsPage[]>("/api/cms/pages"));
+      setPages((await listCmsPages()).data as CmsPage[]);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Błąd CMS");
     } finally {
@@ -63,13 +68,10 @@ export default function CmsAdminPage() {
         blocks: editing.blocks,
       };
       if (editing.id) {
-        await klubFetch(`/api/cms/pages/${editing.id}`, {
-          method: "PATCH",
-          body,
-        });
+        await updateCmsPage(editing.id, body);
         toast.success("Zapisano stronę", editing.title);
       } else {
-        await klubFetch("/api/cms/pages", { method: "POST", body });
+        await createCmsPage(body);
         toast.success("Dodano stronę", editing.title);
       }
       setEditing(null);
@@ -84,7 +86,7 @@ export default function CmsAdminPage() {
   async function remove(id: string) {
     if (!confirm("Usunąć stronę CMS?")) return;
     try {
-      await klubFetch(`/api/cms/pages/${id}`, { method: "DELETE" });
+      await deleteCmsPage(id);
       toast.success("Usunięto stronę");
       await load();
     } catch (err) {

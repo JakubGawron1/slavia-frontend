@@ -2,7 +2,16 @@
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import type { AthleteProfile, PublicUser } from "@/lib/api/generated/models";
-import { klubFetch } from "@/lib/klub-api";
+import {
+  createProfile,
+  createUser as createUserApi,
+  deleteProfile,
+  deleteUser,
+  listProfiles,
+  listUsers,
+  updateProfile,
+  updateUser,
+} from "@/lib/api/generated/default/default";
 import { ROLE_LABELS } from "@/lib/klub-nav";
 import type { Role } from "@/lib/auth";
 import { useKlub } from "@/components/klub/KlubProvider";
@@ -88,12 +97,9 @@ export default function KontaPage() {
     setLoading(true);
     setError(null);
     try {
-      const [u, p] = await Promise.all([
-        klubFetch<PublicUser[]>("/api/users"),
-        klubFetch<AthleteProfile[]>("/api/profiles"),
-      ]);
-      setUsers(u);
-      setProfiles(p);
+      const [uRes, pRes] = await Promise.all([listUsers(), listProfiles()]);
+      setUsers((uRes.data as PublicUser[]) ?? []);
+      setProfiles((pRes.data as AthleteProfile[]) ?? []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Błąd ładowania");
     } finally {
@@ -199,15 +205,12 @@ export default function KontaPage() {
     e.preventDefault();
     setError(null);
     try {
-      await klubFetch("/api/users", {
-        method: "POST",
-        body: {
-          email: createUserForm.email,
-          password: createUserForm.password,
-          display_name: createUserForm.name,
-          roles: createUserForm.roles,
-          photo_url: createUserForm.photoUrl.trim() || null,
-        },
+      await createUserApi({
+        email: createUserForm.email,
+        password: createUserForm.password,
+        display_name: createUserForm.name,
+        roles: createUserForm.roles,
+        photo_url: createUserForm.photoUrl.trim() || null,
       });
       toast.success(
         "Utworzono konto",
@@ -227,7 +230,7 @@ export default function KontaPage() {
     if (!editingUserId) return;
     setError(null);
     try {
-      const body: Record<string, unknown> = {
+      const body: Parameters<typeof updateUser>[1] = {
         display_name: editName.trim(),
         email: editEmail.trim(),
         roles: editRoles,
@@ -236,10 +239,7 @@ export default function KontaPage() {
       if (editPassword.trim()) {
         body.password = editPassword;
       }
-      await klubFetch(`/api/users/${editingUserId}`, {
-        method: "PATCH",
-        body,
-      });
+      await updateUser(editingUserId, body);
       toast.success("Zapisano konto", editName.trim() || editEmail.trim());
       closeUserModal();
       await load();
@@ -252,10 +252,7 @@ export default function KontaPage() {
 
   async function toggleBan(u: PublicUser) {
     try {
-      await klubFetch(`/api/users/${u.id}`, {
-        method: "PATCH",
-        body: { is_active: !u.is_active },
-      });
+      await updateUser(u.id, { is_active: !u.is_active });
       toast.success(
         u.is_active ? "Zablokowano konto" : "Odblokowano konto",
         u.display_name,
@@ -271,7 +268,7 @@ export default function KontaPage() {
   async function removeUser(id: string) {
     if (!confirm("Na pewno usunąć konto?")) return;
     try {
-      await klubFetch(`/api/users/${id}`, { method: "DELETE" });
+      await deleteUser(id);
       toast.success("Usunięto konto");
       if (editingUserId === id) closeUserModal();
       await load();
@@ -302,16 +299,15 @@ export default function KontaPage() {
           toast.error("Profil", "Podaj e-mail i hasło dla nowego konta.");
           return;
         }
-        const created = await klubFetch<PublicUser>("/api/users", {
-          method: "POST",
-          body: {
+        const created = (
+          await createUserApi({
             email: profileForm.accountEmail.trim(),
             password: profileForm.accountPassword,
             display_name: profileForm.name,
             roles: ["zawodnik"],
             photo_url: profileForm.photoUrl.trim() || null,
-          },
-        });
+          })
+        ).data as PublicUser;
         userId = created.id;
       }
 
@@ -327,16 +323,10 @@ export default function KontaPage() {
       };
 
       if (editingProfileId) {
-        await klubFetch(`/api/profiles/${editingProfileId}`, {
-          method: "PATCH",
-          body,
-        });
+        await updateProfile(editingProfileId, body);
         toast.success("Zapisano profil", profileForm.name);
       } else {
-        await klubFetch("/api/profiles", {
-          method: "POST",
-          body,
-        });
+        await createProfile(body);
         toast.success("Dodano profil", profileForm.name);
       }
 
@@ -352,7 +342,7 @@ export default function KontaPage() {
   async function removeProfile(id: string) {
     if (!confirm("Usunąć profil zawodnika?")) return;
     try {
-      await klubFetch(`/api/profiles/${id}`, { method: "DELETE" });
+      await deleteProfile(id);
       toast.success("Usunięto profil");
       if (editingProfileId === id) closeProfileModal();
       await load();

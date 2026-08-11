@@ -1,12 +1,22 @@
 /**
  * Orval custom fetch — zwraca { data, status, headers } jak oczekuje generator.
  */
+export type CustomFetchOptions = RequestInit & {
+  data?: unknown;
+  params?: Record<string, unknown>;
+  /**
+   * `undefined` — z localStorage (aktywny podgląd).
+   * `null` — wymuś brak `X-View-As-User` (np. /me actora, preview stop).
+   * string — konkretny target.
+   */
+  viewAsUserId?: string | null;
+  /** Nadpisanie Bearer (np. świeży token przed zapisem do localStorage). */
+  authToken?: string | null;
+};
+
 export const customFetch = async <T>(
   url: string,
-  options: RequestInit & {
-    data?: unknown;
-    params?: Record<string, unknown>;
-  },
+  options: CustomFetchOptions = {},
 ): Promise<T> => {
   const { getApiBaseUrl, getStoredToken } = await import("@/lib/auth");
 
@@ -30,13 +40,16 @@ export const customFetch = async <T>(
   };
 
   if (!isPublic) {
-    const token = getStoredToken();
+    const token = options.authToken ?? getStoredToken();
     if (!token) throw new Error("Brak sesji.");
     headers.Authorization = `Bearer ${token}`;
     const { readViewAsUserId } = await import("@/lib/view-as");
-    const viewAsUserId = readViewAsUserId();
-    if (viewAsUserId) {
-      headers["X-View-As-User"] = viewAsUserId;
+    const resolvedViewAs =
+      options.viewAsUserId === undefined
+        ? readViewAsUserId()
+        : options.viewAsUserId;
+    if (resolvedViewAs) {
+      headers["X-View-As-User"] = resolvedViewAs;
     }
   }
 

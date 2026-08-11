@@ -72,6 +72,7 @@ function FlagRow({
         </p>
         <p className="font-mono text-[11px] text-paper/35">
           {flag.key}
+          {flag.client_visible ? " · client" : " · server"}
           {flag.updated_at
             ? ` · aktualizacja ${new Date(flag.updated_at).toLocaleString("pl-PL")}`
             : null}
@@ -243,8 +244,16 @@ export default function DevToolsPage() {
         <div className="space-y-8">
           <div className="border border-paper/10 bg-paper/[0.03] px-4 py-3 text-sm text-paper/60">
             <p>
-              Katalog flag pochodzi z backendu. Przełącznik zmienia stan w DB —
-              badge pokazuje, czy funkcja jest już podpięta w kodzie.
+              FE pyta backend o katalog flag (`GET /api/admin/flags`). Backend
+              zwraca experimental + stable — UI buduje się z tej listy.
+              Przełącznik zapisuje stan w DB (
+              <span className="font-mono text-paper/80">
+                PATCH /api/admin/flags/&#123;key&#125;
+              </span>
+              ). Flagi z{" "}
+              <span className="font-mono text-paper/80">client_visible</span>{" "}
+              trafiają też do witryny/paneli przez{" "}
+              <span className="font-mono text-paper/80">/api/flags/public</span>.
             </p>
             <dl className="mt-3 grid gap-2 sm:grid-cols-2">
               {rolloutStatuses.map((status) => (

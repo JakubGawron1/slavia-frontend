@@ -28,7 +28,7 @@ import {
   defaultActiveRole,
   STAFF_ROLES,
 } from "@/lib/klub-nav";
-import { klubFetch } from "@/lib/klub-api";
+import { previewStop } from "@/lib/api/generated/default/default";
 import {
   clearViewAsStorage,
   readViewAs,
@@ -237,11 +237,7 @@ export function KlubProvider({ children }: { children: ReactNode }) {
 
   const clearViewAs = useCallback(async () => {
     try {
-      await klubFetch("/api/admin/preview/stop", {
-        method: "POST",
-        body: {},
-        viewAsUserId: null,
-      });
+      await previewStop({ viewAsUserId: null });
     } catch {
       /* ignore — i tak czyścimy lokalnie */
     }

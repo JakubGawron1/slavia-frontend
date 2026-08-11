@@ -3,6 +3,17 @@ import type { ChangelogEntry } from "@/lib/changelog";
 
 export const GENERATED_CHANGELOG: ChangelogEntry[] = [
   {
+    "version": "1.1.0.18+19",
+    "date": "2026-08-11",
+    "category": "backend",
+    "title": "Feature: `client_visible` w katalogu flag",
+    "notes": [
+      "`FeatureFlag.client_visible` — źródło prawdy w katalogu BE (`sync_flag_catalog`).",
+      "`GET /api/flags/public` filtruje po `client_visible` (bez hardkodowanej listy kluczy).",
+      "DevTools nadal listuje wszystkie flagi (stable + experimental) i przełącza przez `PATCH /api/admin/flags/{key}`."
+    ]
+  },
+  {
     "version": "1.1.0.16+17",
     "date": "2026-08-11",
     "category": "backend",
@@ -12,6 +23,26 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
       "Profil `dev`: `debug = \"line-tables-only\"`, `opt-level = 1` dla zależności.",
       "`.cargo/config.toml`: incremental + `/DEBUG:FASTLINK` (Windows MSVC).",
       "Dockerfile (HF): mold + BuildKit cache mounts (`registry` / `git` / `target`)."
+    ]
+  },
+  {
+    "version": "1.1.0.18+19",
+    "date": "2026-08-11",
+    "category": "frontend",
+    "title": "Refactor: `fetchMe` → Orval `me()`; flagi `client_visible`",
+    "notes": [
+      "Bootstrap sesji (`lib/auth.ts` `fetchMe`) woła Orval `me()` przez `customFetch` (`authToken` + `viewAsUserId`).",
+      "DevTools: UI flag budowany z `GET /api/admin/flags`; opis flow w zakładce Flagi; oznaczenie client/server."
+    ]
+  },
+  {
+    "version": "1.1.0.17+18",
+    "date": "2026-08-11",
+    "category": "frontend",
+    "title": "Refactor: pełna migracja FE na Orval",
+    "notes": [
+      "Usunięto legacy `klubFetch` (`lib/klub-api.ts`); wszystkie call site’y używają klienta Orval + `customFetch`.",
+      "Mutator Orval: opcjonalne `viewAsUserId` (`null` = bez `X-View-As-User` dla actora / preview stop)."
     ]
   },
   {

@@ -3,7 +3,15 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import type { PublicUser } from "@/lib/api/generated/models";
-import { klubFetch } from "@/lib/klub-api";
+import {
+  approveAttendance,
+  getSession,
+  listAttendance,
+  listEvents,
+  listUsers,
+  refreshSession,
+  rejectAttendance,
+} from "@/lib/api/generated/default/default";
 import { QrCodeImage } from "@/components/QrCodeImage";
 import { useToast } from "@/components/toast/ToastProvider";
 import type { CalendarEventFull } from "@/lib/events";
@@ -51,20 +59,20 @@ export default function StaffObecnoscInner() {
   const load = useCallback(async () => {
     setError(null);
     try {
-      const params = selectedEventId
-        ? `?event_id=${encodeURIComponent(selectedEventId)}`
-        : "";
-      const [r, unauthorized, u, events, s] = await Promise.all([
-        klubFetch<AttendanceRecordLocal[]>(`/api/attendance${params}`),
-        klubFetch<AttendanceRecordLocal[]>(
-          "/api/attendance?status=pending_unauthorized",
+      const [rRes, unauthorizedRes, uRes, eventsRes, sRes] = await Promise.all([
+        listAttendance(
+          selectedEventId ? { event_id: selectedEventId } : undefined,
         ),
-        klubFetch<PublicUser[]>("/api/users").catch(() => [] as PublicUser[]),
-        klubFetch<CalendarEventFull[]>("/api/events").catch(
-          () => [] as CalendarEventFull[],
-        ),
-        klubFetch<AttendanceSessionLocal>("/api/attendance/session"),
+        listAttendance({ status: "pending_unauthorized" }),
+        listUsers().catch(() => null),
+        listEvents().catch(() => null),
+        getSession(),
       ]);
+      const r = (rRes.data as AttendanceRecordLocal[]) ?? [];
+      const unauthorized =
+        (unauthorizedRes.data as AttendanceRecordLocal[]) ?? [];
+      const u = (uRes?.data as PublicUser[] | undefined) ?? [];
+      const events = (eventsRes?.data as CalendarEventFull[] | undefined) ?? [];
       setRecords(r.filter((x) => x.status !== "pending_unauthorized"));
       setPending(unauthorized);
       setUsers(u.filter((x) => x.roles.includes("zawodnik") && x.is_active));
@@ -73,7 +81,7 @@ export default function StaffObecnoscInner() {
           (e) => e.event_type === "trening" && e.status === "scheduled",
         ),
       );
-      setSession(s);
+      setSession(sRes.data as AttendanceSessionLocal);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Błąd obecności");
     }
@@ -89,14 +97,8 @@ export default function StaffObecnoscInner() {
 
   async function refreshQr() {
     try {
-      const s = await klubFetch<AttendanceSessionLocal>(
-        "/api/attendance/session",
-        {
-          method: "POST",
-          body: {},
-        },
-      );
-      setSession(s);
+      const s = await refreshSession({});
+      setSession(s.data as AttendanceSessionLocal);
       toast.success("Odświeżono kod QR", "Poprzedni token przestał działać.");
     } catch (err) {
       const msg =
@@ -114,10 +116,7 @@ export default function StaffObecnoscInner() {
       return;
     }
     try {
-      await klubFetch(`/api/attendance/${record.id}/approve`, {
-        method: "POST",
-        body: { event_id: eventId },
-      });
+      await approveAttendance(record.id, { event_id: eventId });
       toast.success("Zaakceptowano obecność", record.display_name);
       await load();
     } catch (err) {
@@ -130,9 +129,7 @@ export default function StaffObecnoscInner() {
 
   async function rejectPending(record: AttendanceRecordLocal) {
     try {
-      await klubFetch(`/api/attendance/${record.id}/reject`, {
-        method: "POST",
-      });
+      await rejectAttendance(record.id);
       toast.success("Odrzucono skan", record.display_name);
       await load();
     } catch (err) {

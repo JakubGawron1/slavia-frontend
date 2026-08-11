@@ -6,7 +6,7 @@
     "license": {
       "name": ""
     },
-    "version": "1.0.0.2+6"
+    "version": "1.1.0.17+18"
   },
   "paths": {
     "/api/admin/db/tables": {
@@ -3958,11 +3958,21 @@
         },
         "responses": {
           "200": {
-            "description": "Zweryfikowano wynik",
+            "description": "Zaktualizowano / zweryfikowano wynik",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CompetitionResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Nieprawidłowe dane",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
                 }
               }
             }
@@ -4945,6 +4955,13 @@
             ],
             "format": "double"
           },
+          "event_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Data zawodów / treningu (YYYY-MM-DD)"
+          },
           "event_name": {
             "type": "string"
           },
@@ -5119,7 +5136,8 @@
             "type": [
               "string",
               "null"
-            ]
+            ],
+            "description": "Ignorowane dla zawodów — kategoria wyliczana z profilu (wiek + płeć) i masy ciała."
           },
           "clean_jerk_kg": {
             "type": [
@@ -5127,6 +5145,13 @@
               "null"
             ],
             "format": "double"
+          },
+          "event_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Data zawodów / treningu (YYYY-MM-DD)"
           },
           "event_name": {
             "type": "string"
@@ -5136,6 +5161,13 @@
               "string",
               "null"
             ]
+          },
+          "profile_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Profil zawodnika (staff) — do wyliczenia kategorii gdy brak user_id"
           },
           "snatch_kg": {
             "type": [
@@ -5352,9 +5384,14 @@
           "kind",
           "description",
           "rollout_status",
+          "client_visible",
           "updated_at"
         ],
         "properties": {
+          "client_visible": {
+            "type": "boolean",
+            "description": "Czy klient (witryna / panele) może odczytać stan przez `GET /api/flags/public`."
+          },
           "description": {
             "type": "string",
             "description": "Opis dla DevTools — katalog flag na backendzie."
@@ -6314,18 +6351,63 @@
       },
       "UpdateResultBody": {
         "type": "object",
-        "required": [
-          "status"
-        ],
         "properties": {
+          "bodyweight_kg": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
+          "clean_jerk_kg": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
+          "event_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "YYYY-MM-DD"
+          },
+          "event_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "reviewer_note": {
             "type": [
               "string",
               "null"
             ]
           },
+          "snatch_kg": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
           "status": {
-            "$ref": "#/components/schemas/ResultStatus"
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ResultStatus",
+                "description": "Gdy brak — status bez zmian (sama edycja pól)."
+              }
+            ]
+          },
+          "venue": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },

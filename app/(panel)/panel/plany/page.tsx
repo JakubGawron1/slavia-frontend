@@ -6,7 +6,11 @@ import type {
   TrainingPlan,
   TrainingPlanProgress,
 } from "@/lib/api/generated/models";
-import { klubFetch } from "@/lib/klub-api";
+import {
+  getMyProgress,
+  listPlans,
+  saveProgress,
+} from "@/lib/api/generated/default/default";
 import { useToast } from "@/components/toast/ToastProvider";
 import { usePanel } from "@/components/panel/PanelProvider";
 
@@ -22,7 +26,8 @@ export default function AthletePlansPage() {
 
   const load = useCallback(async () => {
     try {
-      const list = await klubFetch<TrainingPlan[]>("/api/plans");
+      const res = await listPlans();
+      const list = (res.data as TrainingPlan[]) ?? [];
       setPlans(list);
       setActiveId(list[0]?.id ?? null);
       setProgress({});
@@ -39,9 +44,8 @@ export default function AthletePlansPage() {
     if (!activeId) return;
     void (async () => {
       try {
-        const p = await klubFetch<TrainingPlanProgress>(
-          `/api/plans/${activeId}/progress`,
-        );
+        const pRes = await getMyProgress(activeId);
+        const p = pRes.data as TrainingPlanProgress;
         const map: Record<string, PlanProgressEntry> = {};
         for (const e of p.entries) map[e.exercise_id] = e;
         setProgress(map);
@@ -105,10 +109,7 @@ export default function AthletePlansPage() {
     if (!activeId) return;
     setError(null);
     try {
-      await klubFetch(`/api/plans/${activeId}/progress`, {
-        method: "PUT",
-        body: { entries: Object.values(progress) },
-      });
+      await saveProgress(activeId, { entries: Object.values(progress) });
       setSaved(true);
       toast.success("Zapisano postęp treningu");
     } catch (err) {

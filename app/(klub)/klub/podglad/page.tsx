@@ -3,7 +3,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { PublicUser } from "@/lib/api/generated/models";
-import { klubFetch } from "@/lib/klub-api";
+import {
+  listUsers,
+  previewStart,
+} from "@/lib/api/generated/default/default";
 import { ROLE_LABELS } from "@/lib/klub-nav";
 import type { Role } from "@/lib/auth";
 import { useKlub } from "@/components/klub/KlubProvider";
@@ -31,7 +34,9 @@ export default function PodgladPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      setUsers(await klubFetch<PublicUser[]>("/api/users", { viewAsUserId: null }));
+      setUsers(
+        ((await listUsers({ viewAsUserId: null })).data as PublicUser[]) ?? [],
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Błąd listy kont");
     } finally {
@@ -59,11 +64,12 @@ export default function PodgladPage() {
     setStartingId(`${u.id}:${roleHint ?? ""}`);
     setError(null);
     try {
-      const target = await klubFetch<PublicUser>("/api/admin/preview/start", {
-        method: "POST",
-        body: { user_id: u.id },
-        viewAsUserId: null,
-      });
+      const target = (
+        await previewStart(
+          { user_id: u.id },
+          { viewAsUserId: null },
+        )
+      ).data as PublicUser;
       setViewAs({
         userId: target.id,
         displayName: target.display_name,

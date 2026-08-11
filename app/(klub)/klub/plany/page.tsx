@@ -6,7 +6,13 @@ import type {
   PublicUser,
   TrainingPlan,
 } from "@/lib/api/generated/models";
-import { klubFetch } from "@/lib/klub-api";
+import {
+  createPlan,
+  deletePlan,
+  listPlans,
+  listUsers,
+  updatePlan,
+} from "@/lib/api/generated/default/default";
 import { useToast } from "@/components/toast/ToastProvider";
 
 function emptyEx(): PlanExercise {
@@ -29,11 +35,12 @@ export default function StaffPlansPage() {
 
   const load = useCallback(async () => {
     try {
-      const [p, u] = await Promise.all([
-        klubFetch<TrainingPlan[]>("/api/plans"),
-        klubFetch<PublicUser[]>("/api/users").catch(() => [] as PublicUser[]),
+      const [pRes, uRes] = await Promise.all([
+        listPlans(),
+        listUsers().catch(() => null),
       ]);
-      setPlans(p);
+      setPlans((pRes.data as TrainingPlan[]) ?? []);
+      const u = (uRes?.data as PublicUser[] | undefined) ?? [];
       setUsers(u.filter((x) => x.roles.includes("zawodnik")));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Błąd planów");
@@ -71,10 +78,10 @@ export default function StaffPlansPage() {
         assigned_user_ids: editing.assigned_user_ids,
       };
       if (editing.id) {
-        await klubFetch(`/api/plans/${editing.id}`, { method: "PATCH", body });
+        await updatePlan(editing.id, body);
         toast.success("Zapisano plan", editing.title);
       } else {
-        await klubFetch("/api/plans", { method: "POST", body });
+        await createPlan(body);
         toast.success("Dodano plan", editing.title);
       }
       setEditing(null);
@@ -89,7 +96,7 @@ export default function StaffPlansPage() {
   async function remove(id: string) {
     if (!confirm("Usunąć plan?")) return;
     try {
-      await klubFetch(`/api/plans/${id}`, { method: "DELETE" });
+      await deletePlan(id);
       toast.success("Usunięto plan");
       await load();
     } catch (err) {

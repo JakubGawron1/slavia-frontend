@@ -3,7 +3,7 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 1.0.0.2+5
+ * OpenAPI spec version: 1.1.0.17+18
  */
 
 export interface CreateResultBody {
@@ -16,7 +16,10 @@ export interface CreateResultBody {
   auto_accept?: boolean | null;
   /** @nullable */
   bodyweight_kg?: number | null;
-  /** @nullable */
+  /**
+     * Ignorowane dla zawodów — kategoria wyliczana z profilu (wiek + płeć) i masy ciała.
+     * @nullable
+     */
   category?: string | null;
   /** @nullable */
   clean_jerk_kg?: number | null;

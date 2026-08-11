@@ -6,7 +6,12 @@ import type {
   CompetitionResult,
   ResultStatus,
 } from "@/lib/api/generated/models";
-import { klubFetch } from "@/lib/klub-api";
+import {
+  createResult,
+  listResults,
+  updateResult,
+} from "@/lib/api/generated/default/default";
+import { listPublicProfiles } from "@/lib/api/generated/public/public";
 import { useToast } from "@/components/toast/ToastProvider";
 import { usePanel } from "@/components/panel/PanelProvider";
 import { Modal } from "@/components/ui/Modal";
@@ -67,13 +72,13 @@ export default function WynikiPage() {
 
   const load = useCallback(async () => {
     try {
-      const [mine, profiles] = await Promise.all([
-        klubFetch<CompetitionResult[]>("/api/results?mine=true"),
-        klubFetch<AthleteProfile[]>("/api/public/profiles").catch(
-          () => [] as AthleteProfile[],
-        ),
+      const [mineRes, profilesRes] = await Promise.all([
+        listResults({ mine: true }),
+        listPublicProfiles().catch(() => null),
       ]);
-      setResults(mine);
+      setResults((mineRes.data as CompetitionResult[]) ?? []);
+      const profiles =
+        (profilesRes?.data as AthleteProfile[] | undefined) ?? [];
       const uid = viewAs?.userId ?? user?.id;
       setProfile(uid ? profiles.find((p) => p.user_id === uid) ?? null : null);
     } catch (err) {
@@ -177,10 +182,7 @@ export default function WynikiPage() {
         body.event_name = editEventName.trim();
         body.bodyweight_kg = editBwNum;
       }
-      await klubFetch(`/api/results/${editing.id}`, {
-        method: "PATCH",
-        body,
-      });
+      await updateResult(editing.id, body);
       toast.success(
         editing.status === "accepted"
           ? "Wysłano do ponownej weryfikacji"
@@ -225,19 +227,15 @@ export default function WynikiPage() {
       }
     }
     try {
-      await klubFetch("/api/results", {
-        method: "POST",
-        body: {
-          event_name: resolvedName,
-          event_date: eventDate,
-          kind,
-          snatch_kg: snatch ? Number(snatch) : null,
-          clean_jerk_kg: cj ? Number(cj) : null,
-          bodyweight_kg:
-            kind === "competition" ? bwNum : null,
-          venue: venue.trim() || null,
-          category: null,
-        },
+      await createResult({
+        event_name: resolvedName,
+        event_date: eventDate,
+        kind,
+        snatch_kg: snatch ? Number(snatch) : null,
+        clean_jerk_kg: cj ? Number(cj) : null,
+        bodyweight_kg: kind === "competition" ? bwNum : null,
+        venue: venue.trim() || null,
+        category: null,
       });
       setEventName("");
       setEventDate(todayIsoDate());

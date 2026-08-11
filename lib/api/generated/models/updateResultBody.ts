@@ -3,7 +3,7 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 1.0.0.2+5
+ * OpenAPI spec version: 1.1.0.17+18
  */
 import type { ResultStatus } from './resultStatus';
 
@@ -23,11 +23,7 @@ export interface UpdateResultBody {
   reviewer_note?: string | null;
   /** @nullable */
   snatch_kg?: number | null;
-  /**
-     * Gdy brak — status bez zmian (sama edycja pól).
-     * @nullable
-     */
-  status?: ResultStatus;
+  status?: null | ResultStatus;
   /** @nullable */
   venue?: string | null;
 }

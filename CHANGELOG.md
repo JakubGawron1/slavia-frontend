@@ -12,6 +12,16 @@ Format sekcji:
 
 Opcjonalnie po dacie: `!breaking` (breaking API).
 
+## [1.1.0.18+19] - 2026-08-11
+### Refactor: `fetchMe` → Orval `me()`; flagi `client_visible`
+- Bootstrap sesji (`lib/auth.ts` `fetchMe`) woła Orval `me()` przez `customFetch` (`authToken` + `viewAsUserId`).
+- DevTools: UI flag budowany z `GET /api/admin/flags`; opis flow w zakładce Flagi; oznaczenie client/server.
+
+## [1.1.0.17+18] - 2026-08-11
+### Refactor: pełna migracja FE na Orval
+- Usunięto legacy `klubFetch` (`lib/klub-api.ts`); wszystkie call site’y używają klienta Orval + `customFetch`.
+- Mutator Orval: opcjonalne `viewAsUserId` (`null` = bez `X-View-As-User` dla actora / preview stop).
+
 ## [1.1.0.5+5] - 2026-08-07
 
 ### Fix: agenda kadry — menu kontekstowe
