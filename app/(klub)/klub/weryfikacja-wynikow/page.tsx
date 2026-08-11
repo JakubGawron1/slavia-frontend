@@ -1,364 +1,14 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
-import type {
-  AthleteProfile,
-  CompetitionResult,
-  ResultStatus,
-} from "@/lib/api/generated/models";
-import {
-  createResult,
-  listProfiles,
-  listResults,
-  updateResult,
-} from "@/lib/api/generated/default/default";
-import { useKlub } from "@/components/klub/KlubProvider";
-import { useToast } from "@/components/toast/ToastProvider";
-import { Modal } from "@/components/ui/Modal";
-import { formatResultDate, resultEventInstant } from "@/lib/athletes";
-import { resolveWeightCategory } from "@/lib/weightlifting-categories";
-
-const STATUS_LABEL: Record<ResultStatus, string> = {
-  pending: "Oczekuje",
-  accepted: "Zaakceptowany",
-  rejected: "Odrzucony",
-  needs_edit: "Do edycji",
-};
-
-const inputClass =
-  "border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand";
-
-function todayIsoDate() {
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
-
-function isCompetitionResult(r: CompetitionResult) {
-  return r.kind !== "training";
-}
-
-function canStaffEdit(status: ResultStatus) {
-  return status === "pending" || status === "needs_edit" || status === "accepted";
-}
-
-function findProfileForResult(
-  profiles: AthleteProfile[],
-  r: CompetitionResult,
-): AthleteProfile | null {
-  if (r.user_id) {
-    const byUser = profiles.find((p) => p.user_id === r.user_id);
-    if (byUser) return byUser;
-  }
-  return profiles.find((p) => p.display_name === r.athlete_name) ?? null;
-}
+import { AthleteFilterSelect } from "@/components/results/AthleteFilterSelect";
+import { OtherResultsList } from "@/components/klub/weryfikacja-wynikow/OtherResultsList";
+import { PendingResultsList } from "@/components/klub/weryfikacja-wynikow/PendingResultsList";
+import { StaffResultForm } from "@/components/klub/weryfikacja-wynikow/StaffResultForm";
+import { useWeryfikacjaWynikow } from "@/components/klub/weryfikacja-wynikow/useWeryfikacjaWynikow";
+import { WeryfikacjaEditModal } from "@/components/klub/weryfikacja-wynikow/WeryfikacjaEditModal";
 
 export default function WeryfikacjaPage() {
-  const toast = useToast();
-  const { viewAs } = useKlub();
-  const [results, setResults] = useState<CompetitionResult[]>([]);
-  const [profiles, setProfiles] = useState<AthleteProfile[]>([]);
-  const [notes, setNotes] = useState<Record<string, string>>({});
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-
-  const [profileId, setProfileId] = useState("");
-  const [eventName, setEventName] = useState("");
-  const [eventDate, setEventDate] = useState(todayIsoDate);
-  const [snatch, setSnatch] = useState("");
-  const [cj, setCj] = useState("");
-  const [bodyweight, setBodyweight] = useState("");
-  const [venue, setVenue] = useState("");
-
-  const [editing, setEditing] = useState<CompetitionResult | null>(null);
-  const [editEventName, setEditEventName] = useState("");
-  const [editEventDate, setEditEventDate] = useState("");
-  const [editSnatch, setEditSnatch] = useState("");
-  const [editCj, setEditCj] = useState("");
-  const [editBodyweight, setEditBodyweight] = useState("");
-  const [editVenue, setEditVenue] = useState("");
-  const [editSaving, setEditSaving] = useState(false);
-  /** Filtr listy: "" = wszyscy; inaczej user_id lub `__name__:Nazwa` dla manual. */
-  const [filterAthlete, setFilterAthlete] = useState("");
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const [dataRes, profileRes] = await Promise.all([
-        listResults(),
-        listProfiles(),
-      ]);
-      setResults((dataRes.data as CompetitionResult[]) ?? []);
-      setProfiles((profileRes.data as AthleteProfile[]) ?? []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Błąd ładowania");
-    } finally {
-      setLoading(false);
-    }
-  }, [viewAs]);
-
-  useEffect(() => {
-    void load();
-  }, [load]);
-
-  const selectedProfile = useMemo(
-    () => profiles.find((p) => p.id === profileId) ?? null,
-    [profiles, profileId],
-  );
-
-  useEffect(() => {
-    if (!selectedProfile) return;
-    if (selectedProfile.bodyweight_kg != null) {
-      setBodyweight(String(selectedProfile.bodyweight_kg));
-    }
-  }, [selectedProfile]);
-
-  const bwNum = bodyweight ? Number(bodyweight) : NaN;
-  const previewCategory = useMemo(() => {
-    if (!selectedProfile || !Number.isFinite(bwNum) || bwNum <= 0) return null;
-    return resolveWeightCategory({
-      birthDate: selectedProfile.birth_date,
-      sex: selectedProfile.sex,
-      bodyweightKg: bwNum,
-    });
-  }, [selectedProfile, bwNum]);
-
-  const editingProfile = useMemo(
-    () => (editing ? findProfileForResult(profiles, editing) : null),
-    [editing, profiles],
-  );
-
-  const editBwNum = editBodyweight ? Number(editBodyweight) : NaN;
-  const editPreviewCategory = useMemo(() => {
-    if (!editingProfile || !Number.isFinite(editBwNum) || editBwNum <= 0) {
-      return null;
-    }
-    return resolveWeightCategory({
-      birthDate: editingProfile.birth_date,
-      sex: editingProfile.sex,
-      bodyweightKg: editBwNum,
-    });
-  }, [editingProfile, editBwNum]);
-
-  function openEdit(r: CompetitionResult) {
-    setEditing(r);
-    setEditEventName(isCompetitionResult(r) ? r.event_name : "");
-    setEditEventDate(r.event_date ?? todayIsoDate());
-    setEditSnatch(r.snatch_kg != null ? String(r.snatch_kg) : "");
-    setEditCj(r.clean_jerk_kg != null ? String(r.clean_jerk_kg) : "");
-    setEditBodyweight(
-      r.bodyweight_kg != null ? String(r.bodyweight_kg) : "",
-    );
-    setEditVenue(r.venue ?? "");
-  }
-
-  function closeEdit() {
-    setEditing(null);
-  }
-
-  async function saveEdit(e: FormEvent) {
-    e.preventDefault();
-    if (!editing) return;
-    setError(null);
-    const isComp = isCompetitionResult(editing);
-    if (!editEventDate.trim()) {
-      const msg = "Podaj datę.";
-      setError(msg);
-      toast.error("Edycja wyniku", msg);
-      return;
-    }
-    if (isComp) {
-      if (!editEventName.trim()) {
-        const msg = "Podaj nazwę zawodów.";
-        setError(msg);
-        toast.error("Edycja wyniku", msg);
-        return;
-      }
-      if (!Number.isFinite(editBwNum) || editBwNum <= 0) {
-        const msg = "Podaj masę ciała (kg).";
-        setError(msg);
-        toast.error("Edycja wyniku", msg);
-        return;
-      }
-    }
-    setEditSaving(true);
-    try {
-      const body: Record<string, unknown> = {
-        event_date: editEventDate,
-        snatch_kg: editSnatch ? Number(editSnatch) : null,
-        clean_jerk_kg: editCj ? Number(editCj) : null,
-        venue: editVenue.trim() || null,
-      };
-      if (isComp) {
-        body.event_name = editEventName.trim();
-        body.bodyweight_kg = editBwNum;
-      }
-      await updateResult(editing.id, body);
-      toast.success(
-        "Zapisano zmiany",
-        editPreviewCategory ?? editing.athlete_name,
-      );
-      closeEdit();
-      await load();
-    } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : "Nie udało się zapisać wyniku";
-      setError(msg);
-      toast.error("Edycja wyniku", msg);
-    } finally {
-      setEditSaving(false);
-    }
-  }
-
-  async function review(id: string, status: ResultStatus) {
-    try {
-      await updateResult(id, {
-        status,
-        reviewer_note: notes[id] || null,
-      });
-      toast.success(
-        status === "accepted"
-          ? "Zaakceptowano wynik"
-          : status === "rejected"
-            ? "Odrzucono wynik"
-            : "Zaktualizowano wynik",
-        STATUS_LABEL[status],
-      );
-      await load();
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Błąd weryfikacji";
-      setError(msg);
-      toast.error("Weryfikacja", msg);
-    }
-  }
-
-  async function createStaffResult(e: FormEvent) {
-    e.preventDefault();
-    setError(null);
-    if (!selectedProfile) {
-      setError("Wybierz profil zawodnika.");
-      toast.error("Wynik", "Wybierz profil zawodnika.");
-      return;
-    }
-    if (!Number.isFinite(bwNum) || bwNum <= 0) {
-      setError("Podaj masę ciała (kg).");
-      toast.error("Wynik", "Podaj masę ciała (kg).");
-      return;
-    }
-    if (!eventDate.trim()) {
-      setError("Podaj datę zawodów.");
-      toast.error("Wynik", "Podaj datę zawodów.");
-      return;
-    }
-    setSaving(true);
-    try {
-      await createResult({
-        event_name: eventName.trim(),
-        event_date: eventDate,
-        kind: "competition",
-        athlete_name: selectedProfile.display_name,
-        profile_id: selectedProfile.id,
-        user_id:
-          selectedProfile.user_id && selectedProfile.user_id !== "manual"
-            ? selectedProfile.user_id
-            : null,
-        snatch_kg: snatch ? Number(snatch) : null,
-        clean_jerk_kg: cj ? Number(cj) : null,
-        bodyweight_kg: bwNum,
-        venue: venue.trim() || null,
-        auto_accept: true,
-      });
-      toast.success(
-        "Dodano wynik",
-        previewCategory
-          ? `${selectedProfile.display_name} · ${previewCategory}`
-          : selectedProfile.display_name,
-      );
-      setProfileId("");
-      setEventName("");
-      setEventDate(todayIsoDate());
-      setSnatch("");
-      setCj("");
-      setBodyweight("");
-      setVenue("");
-      await load();
-    } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : "Nie udało się dodać wyniku";
-      setError(msg);
-      toast.error("Dodawanie wyniku", msg);
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  const athleteFilterOptions = useMemo(() => {
-    const byKey = new Map<string, string>();
-    for (const p of profiles) {
-      if (p.user_id && p.user_id !== "manual") {
-        byKey.set(p.user_id, p.display_name);
-      } else {
-        byKey.set(`__name__:${p.display_name}`, p.display_name);
-      }
-    }
-    for (const r of results) {
-      if (r.user_id) {
-        if (!byKey.has(r.user_id)) byKey.set(r.user_id, r.athlete_name);
-      } else {
-        const key = `__name__:${r.athlete_name}`;
-        if (!byKey.has(key)) byKey.set(key, r.athlete_name);
-      }
-    }
-    return [...byKey.entries()]
-      .map(([value, label]) => ({ value, label }))
-      .sort((a, b) => a.label.localeCompare(b.label, "pl"));
-  }, [profiles, results]);
-
-  const matchesAthleteFilter = useCallback(
-    (r: CompetitionResult) => {
-      if (!filterAthlete) return true;
-      if (filterAthlete.startsWith("__name__:")) {
-        return r.athlete_name === filterAthlete.slice("__name__:".length);
-      }
-      return r.user_id === filterAthlete;
-    },
-    [filterAthlete],
-  );
-
-  const byNewest = useCallback(
-    (a: CompetitionResult, b: CompetitionResult) =>
-      resultEventInstant(b) - resultEventInstant(a),
-    [],
-  );
-
-  const pending = useMemo(
-    () =>
-      results
-        .filter(
-          (r) =>
-            (r.status === "pending" || r.status === "needs_edit") &&
-            matchesAthleteFilter(r),
-        )
-        .sort(byNewest),
-    [results, matchesAthleteFilter, byNewest],
-  );
-
-  const others = useMemo(
-    () =>
-      results
-        .filter(
-          (r) =>
-            r.status !== "pending" &&
-            r.status !== "needs_edit" &&
-            matchesAthleteFilter(r),
-        )
-        .sort(byNewest),
-    [results, matchesAthleteFilter, byNewest],
-  );
+  const w = useWeryfikacjaWynikow();
 
   return (
     <div className="animate-rise max-w-4xl space-y-8">
@@ -376,394 +26,68 @@ export default function WeryfikacjaPage() {
         </p>
       </div>
 
-      {error ? (
+      {w.error ? (
         <p
           className="border-l-2 border-brand bg-brand/10 px-4 py-3 text-sm"
           role="alert"
         >
-          {error}
+          {w.error}
         </p>
       ) : null}
 
-      <form
-        onSubmit={(e) => void createStaffResult(e)}
-        className="grid gap-3 border border-paper/10 bg-paper/[0.03] p-4 sm:grid-cols-2"
-      >
-        <h2 className="font-display text-xs tracking-[0.14em] text-paper/50 uppercase sm:col-span-2">
-          Wpisz wynik (od razu zaakceptowany)
-        </h2>
+      <StaffResultForm
+        profiles={w.profiles}
+        profileId={w.profileId}
+        onProfileIdChange={w.setProfileId}
+        eventName={w.eventName}
+        onEventNameChange={w.setEventName}
+        eventDate={w.eventDate}
+        onEventDateChange={w.setEventDate}
+        snatch={w.snatch}
+        onSnatchChange={w.setSnatch}
+        cj={w.cj}
+        onCjChange={w.setCj}
+        bodyweight={w.bodyweight}
+        onBodyweightChange={w.setBodyweight}
+        venue={w.venue}
+        onVenueChange={w.setVenue}
+        previewCategory={w.previewCategory}
+        missingProfileInfo={w.missingProfileInfoForCreate}
+        saving={w.saving}
+        onSubmit={(e) => void w.createStaffResult(e)}
+      />
 
-        <label className="flex flex-col gap-1.5 sm:col-span-2">
-          <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
-            Zawodnik (profil)
-          </span>
-          <select
-            className={inputClass}
-            value={profileId}
-            onChange={(e) => setProfileId(e.target.value)}
-            required
-          >
-            <option value="">— Wybierz profil —</option>
-            {profiles.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.display_name}
-                {p.category ? ` · ${p.category}` : ""}
-              </option>
-            ))}
-          </select>
-        </label>
+      {w.loading ? <p className="text-paper/50">Ładowanie…</p> : null}
 
-        <input
-          className={`${inputClass} sm:col-span-2`}
-          placeholder="Nazwa zawodów"
-          value={eventName}
-          onChange={(e) => setEventName(e.target.value)}
-          required
-        />
-        <label className="flex flex-col gap-1.5 sm:col-span-2">
-          <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
-            Data zawodów
-          </span>
-          <input
-            className={inputClass}
-            type="date"
-            value={eventDate}
-            onChange={(e) => setEventDate(e.target.value)}
-            required
-          />
-        </label>
-        <input
-          className={inputClass}
-          placeholder="Rwanie (kg)"
-          type="number"
-          step="0.5"
-          value={snatch}
-          onChange={(e) => setSnatch(e.target.value)}
-        />
-        <input
-          className={inputClass}
-          placeholder="Podrzut (kg)"
-          type="number"
-          step="0.5"
-          value={cj}
-          onChange={(e) => setCj(e.target.value)}
-        />
-        <input
-          className={inputClass}
-          placeholder="Masa ciała (kg)"
-          type="number"
-          step="0.1"
-          value={bodyweight}
-          onChange={(e) => setBodyweight(e.target.value)}
-          required
-        />
-        <div className="flex flex-col justify-center border border-paper/10 bg-chrome/20 px-3 py-2 text-sm text-paper/70">
-          {previewCategory ? (
-            <>
-              Kategoria:{" "}
-              <span className="font-medium text-paper">{previewCategory}</span>
-            </>
-          ) : selectedProfile &&
-            (!selectedProfile.birth_date?.trim() ||
-              !selectedProfile.sex?.trim()) ? (
-            <span className="text-paper/50">
-              Brak daty urodzenia lub płci w profilu
-            </span>
-          ) : (
-            <span className="text-paper/50">Kategoria po podaniu wagi</span>
-          )}
-        </div>
-        <input
-          className={`${inputClass} sm:col-span-2`}
-          placeholder="Miejsce zawodów"
-          value={venue}
-          onChange={(e) => setVenue(e.target.value)}
-        />
-        <button
-          type="submit"
-          disabled={saving}
-          className="bg-brand px-4 py-2 font-display text-xs tracking-[0.12em] uppercase disabled:opacity-50 sm:col-span-2 sm:justify-self-start"
-        >
-          {saving ? "Zapisywanie…" : "Dodaj i zaakceptuj"}
-        </button>
-      </form>
+      <AthleteFilterSelect
+        options={w.athleteFilterOptions}
+        value={w.filterAthlete}
+        onChange={w.setFilterAthlete}
+      />
 
-      {loading ? <p className="text-paper/50">Ładowanie…</p> : null}
-
-      <label className="flex max-w-md flex-col gap-1.5">
-        <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
-          Filtruj według zawodnika
-        </span>
-        <select
-          className={inputClass}
-          value={filterAthlete}
-          onChange={(e) => setFilterAthlete(e.target.value)}
-        >
-          <option value="">Wszyscy zawodnicy</option>
-          {athleteFilterOptions.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      <section className="space-y-4">
-        <h2 className="font-display text-sm tracking-[0.14em] uppercase">
-          Do weryfikacji ({pending.length})
-        </h2>
-        <ul className="space-y-4">
-          {pending.map((r) => (
-            <li
-              key={r.id}
-              className="border border-paper/10 bg-paper/[0.03] p-4 md:p-5"
-            >
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <p className="font-display text-lg uppercase">{r.athlete_name}</p>
-                  <p className="mt-1 text-sm text-paper/60">
-                    {r.event_name}
-                    {r.event_date ? ` · ${formatResultDate(r.event_date)}` : ""}
-                  </p>
-                  {r.venue ? (
-                    <p className="mt-0.5 text-xs text-paper/45">{r.venue}</p>
-                  ) : null}
-                  <p className="mt-2 text-sm text-paper/80">
-                    Rwanie {r.snatch_kg ?? "—"} · Podrzut {r.clean_jerk_kg ?? "—"}{" "}
-                    · Total {r.total_kg ?? "—"} kg
-                    {r.category ? ` · ${r.category}` : ""}
-                    {r.bodyweight_kg != null ? ` · ${r.bodyweight_kg} kg` : ""}
-                  </p>
-                </div>
-                <span className="border border-paper/20 px-2 py-1 font-display text-[10px] tracking-[0.12em] uppercase">
-                  {STATUS_LABEL[r.status]}
-                </span>
-              </div>
-
-              <div className="mt-4 space-y-3">
-                <textarea
-                  className="w-full border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
-                  rows={2}
-                  placeholder="Notatka dla zawodnika (opcjonalnie)"
-                  value={notes[r.id] ?? ""}
-                  onChange={(e) =>
-                    setNotes((prev) => ({ ...prev, [r.id]: e.target.value }))
-                  }
-                />
-                <div className="flex flex-wrap gap-2">
-                  {canStaffEdit(r.status) ? (
-                    <button
-                      type="button"
-                      onClick={() => openEdit(r)}
-                      className="border border-paper/25 px-4 py-2 font-display text-[11px] tracking-[0.12em] uppercase"
-                    >
-                      Edytuj
-                    </button>
-                  ) : null}
-                  <button
-                    type="button"
-                    onClick={() => void review(r.id, "accepted")}
-                    className="bg-brand px-4 py-2 font-display text-[11px] tracking-[0.12em] uppercase"
-                  >
-                    Akceptuj
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => void review(r.id, "rejected")}
-                    className="border border-paper/25 px-4 py-2 font-display text-[11px] tracking-[0.12em] uppercase"
-                  >
-                    Odrzuć
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => void review(r.id, "needs_edit")}
-                    className="border border-paper/25 px-4 py-2 font-display text-[11px] tracking-[0.12em] uppercase"
-                  >
-                    Do edycji
-                  </button>
-                </div>
-              </div>
-            </li>
-          ))}
-          {!loading && pending.length === 0 ? (
-            <li className="text-paper/45">Brak wyników oczekujących.</li>
-          ) : null}
-        </ul>
-      </section>
-
-      {others.length > 0 ? (
-        <section className="space-y-4">
-          <h2 className="font-display text-sm tracking-[0.14em] uppercase">
-            Pozostałe
-          </h2>
-          <ul className="space-y-3">
-            {others.map((r) => (
-              <li
-                key={r.id}
-                className="border border-paper/10 px-4 py-3 text-sm"
-              >
-                <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div>
-                    <p className="font-medium">{r.athlete_name}</p>
-                    <p className="text-paper/60">
-                      {r.event_name}
-                      {r.event_date ? ` · ${formatResultDate(r.event_date)}` : ""}
-                    </p>
-                    <p className="mt-1 text-paper/70">
-                      {r.snatch_kg ?? "—"} / {r.clean_jerk_kg ?? "—"} · total{" "}
-                      {r.total_kg ?? "—"} kg
-                      {r.category ? ` · ${r.category}` : ""}
-                    </p>
-                    {r.reviewer_note ? (
-                      <p className="mt-1 text-xs text-paper/45">
-                        Notatka: {r.reviewer_note}
-                      </p>
-                    ) : null}
-                  </div>
-                  <div className="flex flex-wrap items-start gap-2">
-                    {canStaffEdit(r.status) ? (
-                      <button
-                        type="button"
-                        onClick={() => openEdit(r)}
-                        className="border border-paper/25 px-3 py-1.5 font-display text-[10px] tracking-[0.12em] uppercase"
-                      >
-                        Edytuj
-                      </button>
-                    ) : null}
-                    <span className="font-display text-[10px] tracking-[0.12em] uppercase text-paper/50">
-                      {STATUS_LABEL[r.status]}
-                    </span>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      <Modal
-        open={editing != null}
-        title={
-          editing
-            ? `Edycja — ${editing.athlete_name}`
-            : "Edycja wyniku"
+      <PendingResultsList
+        results={w.pending}
+        loading={w.loading}
+        notes={w.notes}
+        onNoteChange={(id, value) =>
+          w.setNotes((prev) => ({ ...prev, [id]: value }))
         }
-        onClose={closeEdit}
-        wide
-      >
-        {editing ? (
-          <form
-            onSubmit={(e) => void saveEdit(e)}
-            className="grid gap-3 sm:grid-cols-2"
-          >
-            <p className="text-sm text-paper/60 sm:col-span-2">
-              {isCompetitionResult(editing) ? "Zawody" : "Trening"} · status:{" "}
-              {STATUS_LABEL[editing.status]}
-            </p>
-            {isCompetitionResult(editing) ? (
-              <input
-                className={`${inputClass} sm:col-span-2`}
-                placeholder="Nazwa zawodów"
-                value={editEventName}
-                onChange={(e) => setEditEventName(e.target.value)}
-                required
-              />
-            ) : null}
-            <label className="flex flex-col gap-1.5 sm:col-span-2">
-              <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
-                {isCompetitionResult(editing)
-                  ? "Data zawodów"
-                  : "Data treningu"}
-              </span>
-              <input
-                className={inputClass}
-                type="date"
-                value={editEventDate}
-                onChange={(e) => setEditEventDate(e.target.value)}
-                required
-              />
-            </label>
-            <input
-              className={inputClass}
-              placeholder="Rwanie (kg)"
-              type="number"
-              step="0.5"
-              value={editSnatch}
-              onChange={(e) => setEditSnatch(e.target.value)}
-            />
-            <input
-              className={inputClass}
-              placeholder="Podrzut (kg)"
-              type="number"
-              step="0.5"
-              value={editCj}
-              onChange={(e) => setEditCj(e.target.value)}
-            />
-            {isCompetitionResult(editing) ? (
-              <>
-                <input
-                  className={inputClass}
-                  placeholder="Masa ciała (kg)"
-                  type="number"
-                  step="0.1"
-                  value={editBodyweight}
-                  onChange={(e) => setEditBodyweight(e.target.value)}
-                  required
-                />
-                <div className="flex flex-col justify-center border border-paper/10 bg-chrome/20 px-3 py-2 text-sm text-paper/70">
-                  {editPreviewCategory ? (
-                    <>
-                      Kategoria:{" "}
-                      <span className="font-medium text-paper">
-                        {editPreviewCategory}
-                      </span>
-                    </>
-                  ) : editingProfile &&
-                    (!editingProfile.birth_date?.trim() ||
-                      !editingProfile.sex?.trim()) ? (
-                    <span className="text-paper/50">
-                      Brak daty urodzenia lub płci w profilu
-                    </span>
-                  ) : (
-                    <span className="text-paper/50">
-                      Kategoria po podaniu wagi
-                    </span>
-                  )}
-                </div>
-                <input
-                  className={`${inputClass} sm:col-span-2`}
-                  placeholder="Miejsce zawodów"
-                  value={editVenue}
-                  onChange={(e) => setEditVenue(e.target.value)}
-                />
-              </>
-            ) : (
-              <input
-                className={`${inputClass} sm:col-span-2`}
-                placeholder="Miejsce (opcjonalnie)"
-                value={editVenue}
-                onChange={(e) => setEditVenue(e.target.value)}
-              />
-            )}
-            <div className="flex flex-wrap gap-2 sm:col-span-2">
-              <button
-                type="submit"
-                disabled={editSaving}
-                className="bg-brand px-4 py-2 font-display text-xs tracking-[0.12em] uppercase disabled:opacity-50"
-              >
-                {editSaving ? "Zapisywanie…" : "Zapisz zmiany"}
-              </button>
-              <button
-                type="button"
-                onClick={closeEdit}
-                className="border border-paper/25 px-4 py-2 font-display text-xs tracking-[0.12em] uppercase"
-              >
-                Anuluj
-              </button>
-            </div>
-          </form>
-        ) : null}
-      </Modal>
+        onEdit={w.openEdit}
+        onReview={(id, status) => void w.review(id, status)}
+      />
+
+      <OtherResultsList results={w.others} onEdit={w.openEdit} />
+
+      <WeryfikacjaEditModal
+        editing={w.editing}
+        values={w.editValues}
+        onFieldChange={w.setEditField}
+        previewCategory={w.editPreviewCategory}
+        missingProfileInfo={w.missingProfileInfoForEdit}
+        saving={w.editSaving}
+        onSubmit={(e) => void w.saveEdit(e)}
+        onClose={w.closeEdit}
+      />
     </div>
   );
 }

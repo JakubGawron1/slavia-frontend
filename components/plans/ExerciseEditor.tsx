@@ -2,7 +2,7 @@
 
 import type { DragEvent } from "react";
 import type { PlanExercise } from "@/lib/api/generated/models";
-import { buildSetSchemeFromCount, loadModeOf } from "@/lib/plans/helpers";
+import { buildSetSchemeFromCount, emptyExercise, loadModeOf } from "@/lib/plans/helpers";
 import {
   chipActive,
   chipIdle,
@@ -12,7 +12,6 @@ import {
 } from "@/components/plans/styles";
 import { ExerciseSetSchemeEditor } from "@/components/plans/ExerciseSetSchemeEditor";
 import { ExerciseAlternativesEditor } from "@/components/plans/ExerciseAlternativesEditor";
-import { emptyExercise } from "@/lib/plans/helpers";
 
 const PCT_OF_OPTIONS = (
   <>
