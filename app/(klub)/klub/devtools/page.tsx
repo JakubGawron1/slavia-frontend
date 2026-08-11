@@ -68,6 +68,7 @@ export default function DevToolsPage() {
         <DebugTab
           apiBaseUrl={d.apiBaseUrl}
           health={d.health}
+          healthLatencyMs={d.healthLatencyMs}
           activeRole={d.activeRole}
           viewAs={d.viewAs}
           user={d.user}
@@ -75,6 +76,7 @@ export default function DevToolsPage() {
           tokenPresent={d.tokenPresent}
           platformVersion={d.platformVersion}
           onError={d.setActionError}
+          onHealthUpdate={d.onHealthUpdate}
         />
       ) : null}
     </div>

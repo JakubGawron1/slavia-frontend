@@ -190,6 +190,28 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
     ]
   },
   {
+    "version": "1.1.1.1+2",
+    "date": "2026-08-11",
+    "category": "backend",
+    "title": "Refaktor: modulyzacja `db` / handlers / models",
+    "notes": [
+      "`db.rs` → `src/db/*` (domeny + helpers); `models/club.rs` → modele domenowe + facade `club`.",
+      "Handlery: `events/`, `plans/`, `results/`; auth `handlers/{session,email_verify,password_reset}`.",
+      "Cienka warstwa `services/{plans,results}` dla grubej logiki; bez zmiany kontraktu HTTP."
+    ]
+  },
+  {
+    "version": "1.1.1.1+2",
+    "date": "2026-08-11",
+    "category": "frontend",
+    "title": "Refaktor: modulyzacja monolitów UI",
+    "notes": [
+      "Soft limit ~400 linii; foldery domenowe: `components/plans/`, `calendar/`, `results/`, `klub/konta|devtools|calendar/`, `settings/account/`, `home/`.",
+      "Rozbicie StaffPlansInner, StaffCalendar, CalendarMonthGrid, konta, weryfikacja wyników, DevTools, settings, shell, home, obecność.",
+      "Przywrócone panele Debug z 1.1.1.0+1 (schowek, ping health, storage, env, Orval test e-mail) po refaktorze."
+    ]
+  },
+  {
     "version": "1.1.0.24+25",
     "date": "2026-08-11",
     "category": "frontend",

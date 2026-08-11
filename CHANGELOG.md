@@ -12,6 +12,12 @@ Format sekcji:
 
 Opcjonalnie po dacie: `!breaking` (breaking API).
 
+## [1.1.1.1+2] - 2026-08-11
+### Refaktor: modulyzacja monolitów UI
+- Soft limit ~400 linii; foldery domenowe: `components/plans/`, `calendar/`, `results/`, `klub/konta|devtools|calendar/`, `settings/account/`, `home/`.
+- Rozbicie StaffPlansInner, StaffCalendar, CalendarMonthGrid, konta, weryfikacja wyników, DevTools, settings, shell, home, obecność.
+- Przywrócone panele Debug z 1.1.1.0+1 (schowek, ping health, storage, env, Orval test e-mail) po refaktorze.
+
 ## [1.1.1.0+1] - 2026-08-11
 ### DevTools: więcej narzędzi w Debug
 - Panele: schowek (dump/token/user id/API URL), ping health z latency, odśwież `/me`, invalidate/clear React Query, test toastów, twarde wylogowanie.

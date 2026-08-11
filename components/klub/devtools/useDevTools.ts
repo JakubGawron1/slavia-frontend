@@ -34,6 +34,8 @@ export function useDevTools() {
   const { user, activeRole, viewAs } = useKlub();
   const [tab, setTab] = useState<DevToolsTab>("flags");
   const [actionError, setActionError] = useState<string | null>(null);
+  const [healthOverride, setHealthOverride] = useState<string | null>(null);
+  const [healthLatencyMs, setHealthLatencyMs] = useState<number | null>(null);
   const queryClient = useQueryClient();
 
   const flagsQuery = useListFlags({ query: { enabled: tab === "flags" } });
@@ -45,11 +47,18 @@ export function useDevTools() {
   const stableFlags = flagsByKind(flags, "stable");
   const experimentalFlags = flagsByKind(flags, "experimental");
   const stats = (statsQuery.data?.data as SiteStats | undefined) ?? null;
-  const health = healthQuery.data
-    ? JSON.stringify(healthQuery.data.data)
-    : healthQuery.isError
-      ? "Błąd połączenia"
-      : "—";
+  const health =
+    healthOverride ??
+    (healthQuery.data
+      ? JSON.stringify(healthQuery.data.data)
+      : healthQuery.isError
+        ? "Błąd połączenia"
+        : "—");
+
+  function onHealthUpdate(payload: { latencyMs: number; body: string }) {
+    setHealthOverride(payload.body);
+    setHealthLatencyMs(payload.latencyMs);
+  }
 
   const queryError = flagsQuery.error ?? statsQuery.error ?? healthQuery.error;
   const error =
@@ -112,6 +121,8 @@ export function useDevTools() {
     flagsLoading: flagsQuery.isLoading,
     stats,
     health,
+    healthLatencyMs,
+    onHealthUpdate,
     publicRoutes: PUBLIC_ROUTE_MAP,
     klubRoutes,
     rolloutStatuses,

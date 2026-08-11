@@ -1,4 +1,4 @@
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/toast/ToastProvider";
 import { type AttendanceViewStatus } from "@/lib/attendance-ui";
@@ -10,21 +10,12 @@ import {
   type TrainingScheduleDefaults,
 } from "@/lib/events";
 import {
-  acceptWithdrawal as acceptWithdrawalApi,
-  cancelEvent,
-  clearWithdrawal as clearWithdrawalApi,
-  createEvent,
-  deleteEvent,
   getSchedule,
   listAttendance,
   listEvents,
   listProfiles,
-  rejectWithdrawal as rejectWithdrawalApi,
-  restoreEvent as restoreEventApi,
-  updateEvent,
-  updateSchedule,
 } from "@/lib/api/generated/default/default";
-import type { AthleteProfile, EventBody } from "@/lib/api/generated/models";
+import type { AthleteProfile } from "@/lib/api/generated/models";
 import {
   emptyForm,
   type AttendanceRecordLocal,
@@ -33,6 +24,7 @@ import {
   type FormState,
   type RosterAttendanceRow,
 } from "@/components/klub/calendar/staffCalendarTypes";
+import { createStaffCalendarMutations } from "@/components/klub/calendar/staffCalendarMutations";
 
 export type {
   AttendanceRecordLocal,
@@ -226,171 +218,21 @@ export function useStaffCalendar() {
     setCtx({ event: full, x, y });
   }
 
-  async function saveForm(e: FormEvent) {
-    e.preventDefault();
-    if (!form) return;
-    setError(null);
-    const end =
-      form.event_type === "zawody" &&
-      form.end_date &&
-      form.end_date !== form.date
-        ? form.end_date
-        : null;
-    const body: EventBody = {
-      title: form.title,
-      event_type: form.event_type,
-      date: form.date,
-      end_date: end,
-      time: form.time || null,
-      location: form.location || null,
-      description: form.description || null,
-      assigned_athlete_ids:
-        form.event_type === "zawody" ? form.assigned_athlete_ids : [],
-      plan_id: form.plan_id.trim() || null,
-      plan_week: form.plan_week ? Number(form.plan_week) : null,
-      plan_day: form.plan_day ? Number(form.plan_day) : null,
-    };
-    try {
-      if (formMode === "create") {
-        await createEvent(body);
-        toast.success("Dodano wydarzenie", form.title);
-      } else {
-        await updateEvent(form.id, body);
-        toast.success("Zapisano zmiany", form.title);
-      }
-      setForm(null);
-      await load();
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Zapis nieudany";
-      setError(msg);
-      toast.error("Zapis nieudany", msg);
-    }
-  }
-
-  function requestDelete(ev: CalendarEventFull) {
-    setCtx(null);
-    setDialog({ kind: "delete", event: ev });
-  }
-
-  async function confirmDelete() {
-    if (dialog?.kind !== "delete") return;
-    const ev = dialog.event;
-    setDialog(null);
-    setDetail(null);
-    try {
-      await deleteEvent(ev.id);
-      toast.success("Usunięto wydarzenie", ev.title);
-      await load();
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Usuwanie nieudane";
-      setError(msg);
-      toast.error("Usuwanie nieudane", msg);
-    }
-  }
-
-  function requestCancel(ev: CalendarEventFull) {
-    setDialog({ kind: "cancel", event: ev, note: "" });
-  }
-
-  async function confirmCancel() {
-    if (dialog?.kind !== "cancel") return;
-    const { event: ev, note } = dialog;
-    setDialog(null);
-    try {
-      await cancelEvent(ev.id, { cancellation_note: note.trim() || null });
-      toast.success("Odwołano wydarzenie", ev.title);
-      await load();
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Nie udało się odwołać";
-      setError(msg);
-      toast.error("Odwołanie nieudane", msg);
-    }
-  }
-
-  async function restoreEvent(ev: CalendarEventFull, force = false) {
-    try {
-      await restoreEventApi(ev.id, { force });
-      setDialog(null);
-      toast.success(
-        force ? "Przywrócono (wymuszone)" : "Przywrócono wydarzenie",
-        ev.title,
-      );
-      await load();
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Nie udało się przywrócić";
-      if (msg.includes("force=true")) {
-        setDialog({ kind: "restore-force", event: ev, message: msg });
-        return;
-      }
-      setError(msg);
-      toast.error("Przywracanie nieudane", msg);
-    }
-  }
-
-  function goToAttendance() {
-    router.push("/klub/obecnosc");
-  }
-
-  async function acceptWithdrawal(ev: CalendarEventFull, athleteId: string) {
-    try {
-      await acceptWithdrawalApi(ev.id, athleteId);
-      toast.success("Zaakceptowano rezygnację");
-      await load();
-    } catch (err) {
-      toast.error(
-        "Akceptacja nieudana",
-        err instanceof Error ? err.message : undefined,
-      );
-    }
-  }
-
-  async function rejectWithdrawal(ev: CalendarEventFull, athleteId: string) {
-    try {
-      await rejectWithdrawalApi(ev.id, athleteId);
-      toast.success("Odrzucono rezygnację");
-      await load();
-    } catch (err) {
-      toast.error(
-        "Odrzucenie nieudane",
-        err instanceof Error ? err.message : undefined,
-      );
-    }
-  }
-
-  async function clearWithdrawal(ev: CalendarEventFull, athleteId: string) {
-    try {
-      await clearWithdrawalApi(ev.id, athleteId);
-      toast.success("Przywrócono na trening");
-      await load();
-    } catch (err) {
-      toast.error(
-        "Operacja nieudana",
-        err instanceof Error ? err.message : undefined,
-      );
-    }
-  }
-
-  async function saveSchedule(e: FormEvent) {
-    e.preventDefault();
-    if (!schedule) return;
-    setDialog({ kind: "schedule" });
-  }
-
-  async function confirmSchedule() {
-    if (!schedule || dialog?.kind !== "schedule") return;
-    setDialog(null);
-    try {
-      const updated = await updateSchedule(schedule);
-      setSchedule(updated.data as TrainingScheduleDefaults);
-      toast.success("Zapisano terminarz treningów");
-      await load();
-    } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : "Zapis terminarza nieudany";
-      setError(msg);
-      toast.error("Terminarz", msg);
-    }
-  }
+  const mutations = createStaffCalendarMutations({
+    toast,
+    router,
+    form,
+    formMode,
+    dialog,
+    schedule,
+    setForm,
+    setCtx,
+    setDialog,
+    setDetail,
+    setError,
+    setSchedule,
+    load,
+  });
 
   return {
     todayKey,
@@ -417,17 +259,6 @@ export function useStaffCalendar() {
     openCreate,
     openEdit,
     onSelectEvent,
-    saveForm,
-    requestDelete,
-    confirmDelete,
-    requestCancel,
-    confirmCancel,
-    restoreEvent,
-    goToAttendance,
-    acceptWithdrawal,
-    rejectWithdrawal,
-    clearWithdrawal,
-    saveSchedule,
-    confirmSchedule,
+    ...mutations,
   };
 }
