@@ -12,6 +12,13 @@ Format sekcji:
 
 Opcjonalnie po dacie: `!breaking` (breaking API).
 
+## [1.1.1.0+1] - 2026-08-11
+### DevTools: więcej narzędzi w Debug
+- Panele: schowek (dump/token/user id/API URL), ping health z latency, odśwież `/me`, invalidate/clear React Query, test toastów, twarde wylogowanie.
+- Inspector `localStorage` (`slavia_*`) — usuwanie kluczy, reset „Co nowego” / cookies consent, clear poza sesją.
+- Snapshot środowiska przeglądarki (UA, viewport, timezone, online).
+- Test e-mail przez Orval `useSendTestEmail` (bez ręcznego `fetch`).
+
 ## [1.1.0.27+28] - 2026-08-11
 ### Feature: flagi planów treningowych
 - Stable `training_plans` (ON) — gate nav + `/klub/plany` + `/panel/plany` + kafelek sezonu / ops.

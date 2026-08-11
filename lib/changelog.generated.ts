@@ -3,6 +3,18 @@ import type { ChangelogEntry } from "@/lib/changelog";
 
 export const GENERATED_CHANGELOG: ChangelogEntry[] = [
   {
+    "version": "1.1.1.0+1",
+    "date": "2026-08-11",
+    "category": "frontend",
+    "title": "DevTools: więcej narzędzi w Debug",
+    "notes": [
+      "Panele: schowek (dump/token/user id/API URL), ping health z latency, odśwież `/me`, invalidate/clear React Query, test toastów, twarde wylogowanie.",
+      "Inspector `localStorage` (`slavia_*`) — usuwanie kluczy, reset „Co nowego” / cookies consent, clear poza sesją.",
+      "Snapshot środowiska przeglądarki (UA, viewport, timezone, online).",
+      "Test e-mail przez Orval `useSendTestEmail` (bez ręcznego `fetch`)."
+    ]
+  },
+  {
     "version": "1.1.0.22+23",
     "date": "2026-08-11",
     "category": "frontend",

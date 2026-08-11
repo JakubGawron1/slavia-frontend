@@ -3,37 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-import { useListPublicFlags } from "@/lib/api/generated/default/default";
+import { getPanelTheme } from "@/lib/panel-themes";
 import { hasAnyRole } from "@/lib/auth";
-import { PANEL_MODULES, PANEL_SETTINGS } from "@/lib/panel-nav";
-import {
-  EXPERIMENTAL_PANEL_THEMES_FLAG,
-  getPanelTheme,
-  resolvePanelTheme,
-  type PanelThemeId,
-} from "@/lib/panel-themes";
-import { isFlagEnabled } from "@/lib/public-flags";
 import { LoadingScene } from "@/components/loading/LoadingScene";
-import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { STAFF_ROLES } from "@/lib/klub-nav";
+import { PANEL_SETTINGS } from "@/lib/panel-nav";
 import { usePanel } from "./PanelProvider";
-
-function useResolvedPanelTheme(raw?: string | null): PanelThemeId {
-  const flagsQuery = useListPublicFlags({ query: { staleTime: 60_000 } });
-  const allowExperimental = isFlagEnabled(
-    flagsQuery.data?.data ?? [],
-    EXPERIMENTAL_PANEL_THEMES_FLAG,
-  );
-  return resolvePanelTheme(raw, { allowExperimental });
-}
-
-function useVisiblePanelModules() {
-  const flagsQuery = useListPublicFlags({ query: { staleTime: 60_000 } });
-  const flags = flagsQuery.data?.data;
-  return PANEL_MODULES.filter(
-    (mod) => !mod.flag || isFlagEnabled(flags, mod.flag),
-  );
-}
+import { PanelHeaderActions } from "./shell/PanelHeaderActions";
+import { buildPanelNavItems, isPanelNavActive } from "./shell/panelNav";
+import { PanelPreviewBanner } from "./shell/PanelPreviewBanner";
+import { useResolvedPanelTheme, useVisiblePanelModules } from "./shell/usePanelShellTheme";
 
 export function PanelShell({ children }: { children: ReactNode }) {
   const { user, actor, viewAs, loading, error, logout, clearViewAs } = usePanel();
@@ -69,68 +48,21 @@ export function PanelShell({ children }: { children: ReactNode }) {
   const isStaff = hasAnyRole(staffSource, STAFF_ROLES);
 
   const previewBanner = viewAs ? (
-    <div className="relative z-50 flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-amber-500/40 bg-amber-500/15 px-4 py-2.5 text-sm">
-      <p>
-        Tryb podglądu:{" "}
-        <span className="font-medium text-paper">{viewAs.displayName}</span>{" "}
-        <span className="text-paper/55">({viewAs.email})</span>
-        <span className="ml-2 text-paper/45">· tylko odczyt</span>
-      </p>
-      <button
-        type="button"
-        onClick={() => void clearViewAs()}
-        className="panel-control border border-paper/30 px-3 py-1 font-display text-[11px] tracking-[0.12em] uppercase transition-colors hover:border-paper hover:bg-paper/10"
-      >
-        Zakończ podgląd
-      </button>
-    </div>
+    <PanelPreviewBanner
+      displayName={viewAs.displayName}
+      email={viewAs.email}
+      onClear={() => void clearViewAs()}
+    />
   ) : null;
 
   const actions = (bellVariant: "default" | "onBrand" = "default") => (
-    <div className="flex max-w-full flex-wrap items-center justify-end gap-1.5 sm:gap-2">
-      <NotificationBell variant={bellVariant} />
-      {isStaff ? (
-        <Link
-          href="/klub"
-          className="panel-control border border-paper/20 px-2.5 py-1.5 font-display text-[10px] tracking-[0.1em] uppercase transition-colors hover:border-brand sm:px-3 sm:text-[11px]"
-        >
-          <span className="sm:hidden">Klub</span>
-          <span className="hidden sm:inline">Panel klubowy</span>
-        </Link>
-      ) : null}
-      <Link
-        href="/"
-        className="panel-control border border-paper/15 px-2.5 py-1.5 font-display text-[10px] tracking-[0.1em] text-paper/70 uppercase sm:px-3 sm:text-[11px]"
-      >
-        Witryna
-      </Link>
-      <button
-        type="button"
-        onClick={logout}
-        className="panel-control border border-paper/15 px-2.5 py-1.5 font-display text-[10px] tracking-[0.1em] text-paper/70 uppercase sm:px-3 sm:text-[11px]"
-      >
-        Wyloguj
-      </button>
-    </div>
+    <PanelHeaderActions isStaff={isStaff} onLogout={logout} bellVariant={bellVariant} />
   );
 
-  const navItems = [
-    { href: "/panel", label: "Pulpit", exact: true },
-    ...modules.map((mod) => ({
-      href: mod.href,
-      label: mod.label,
-      exact: false,
-    })),
-    {
-      href: PANEL_SETTINGS.href,
-      label: PANEL_SETTINGS.label,
-      exact: false,
-    },
-  ];
+  const navItems = buildPanelNavItems(modules);
 
   function isActive(href: string, exact: boolean) {
-    if (exact) return pathname === href;
-    return pathname === href || pathname.startsWith(`${href}/`);
+    return isPanelNavActive(pathname, href, exact);
   }
 
   function wrap(node: ReactNode) {
