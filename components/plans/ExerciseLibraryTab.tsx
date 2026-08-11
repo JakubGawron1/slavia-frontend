@@ -86,11 +86,16 @@ export function ExerciseLibraryTab({
       {libEdit ? (
         <div className={panelClass}>
           <p className={sectionLabel}>Edycja ćwiczenia</p>
-          <input
-            className={inputClass}
-            value={libEdit.name}
-            onChange={(e) => setLibEdit({ ...libEdit, name: e.target.value })}
-          />
+          <label className="space-y-1.5">
+            <span className="block text-[10px] tracking-wider text-paper/40 uppercase">
+              Nazwa
+            </span>
+            <input
+              className={inputClass}
+              value={libEdit.name}
+              onChange={(e) => setLibEdit({ ...libEdit, name: e.target.value })}
+            />
+          </label>
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="space-y-1.5">
               <span className="block text-[10px] tracking-wider text-paper/40 uppercase">
@@ -121,33 +126,49 @@ export function ExerciseLibraryTab({
               />
             </label>
           </div>
-          <input
-            className={inputClass}
-            placeholder="Tagi (po przecinku)"
-            value={(libEdit.tags ?? []).join(", ")}
-            onChange={(e) =>
-              setLibEdit({
-                ...libEdit,
-                tags: e.target.value
-                  .split(",")
-                  .map((t) => t.trim())
-                  .filter(Boolean),
-              })
-            }
-          />
-          <textarea
-            className={inputClass}
-            rows={2}
-            placeholder="Notatki"
-            value={libEdit.notes ?? ""}
-            onChange={(e) => setLibEdit({ ...libEdit, notes: e.target.value || null })}
-          />
-          <input
-            className={inputClass}
-            placeholder="URL wideo (opcjonalnie)"
-            value={libEdit.video_url ?? ""}
-            onChange={(e) => setLibEdit({ ...libEdit, video_url: e.target.value || null })}
-          />
+          <label className="space-y-1.5">
+            <span className="block text-[10px] tracking-wider text-paper/40 uppercase">
+              Tagi
+            </span>
+            <input
+              className={inputClass}
+              placeholder="Po przecinku"
+              value={(libEdit.tags ?? []).join(", ")}
+              onChange={(e) =>
+                setLibEdit({
+                  ...libEdit,
+                  tags: e.target.value
+                    .split(",")
+                    .map((t) => t.trim())
+                    .filter(Boolean),
+                })
+              }
+            />
+          </label>
+          <label className="space-y-1.5">
+            <span className="block text-[10px] tracking-wider text-paper/40 uppercase">
+              Notatki
+            </span>
+            <textarea
+              className={inputClass}
+              rows={2}
+              value={libEdit.notes ?? ""}
+              onChange={(e) => setLibEdit({ ...libEdit, notes: e.target.value || null })}
+            />
+          </label>
+          <label className="space-y-1.5">
+            <span className="block text-[10px] tracking-wider text-paper/40 uppercase">
+              URL wideo{" "}
+              <span className="normal-case tracking-normal text-paper/30">
+                (opcjonalnie)
+              </span>
+            </span>
+            <input
+              className={inputClass}
+              value={libEdit.video_url ?? ""}
+              onChange={(e) => setLibEdit({ ...libEdit, video_url: e.target.value || null })}
+            />
+          </label>
           <div className="flex flex-wrap gap-2">
             <button type="button" className={btnPrimary} onClick={() => void saveEdit()}>
               Zapisz

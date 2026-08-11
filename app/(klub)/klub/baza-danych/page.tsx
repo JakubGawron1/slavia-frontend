@@ -192,15 +192,17 @@ export default function BazaDanychPage() {
       </div>
 
       <div className="space-y-3 border border-paper/10 p-4">
-        <p className="font-display text-[11px] tracking-[0.14em] text-paper/45 uppercase">
-          Upsert wiersza (JSON)
-        </p>
-        <textarea
-          className="h-48 w-full border border-paper/20 bg-chrome/40 p-3 font-mono text-xs outline-none focus:border-brand"
-          value={editJson}
-          onChange={(e) => setEditJson(e.target.value)}
-          placeholder='{"id":"…", ...}'
-        />
+        <label className="flex flex-col gap-1.5">
+          <span className="font-display text-[11px] tracking-[0.14em] text-paper/45 uppercase">
+            Upsert wiersza (JSON)
+          </span>
+          <textarea
+            className="h-48 w-full border border-paper/20 bg-chrome/40 p-3 font-mono text-xs outline-none focus:border-brand"
+            value={editJson}
+            onChange={(e) => setEditJson(e.target.value)}
+            placeholder='{"id":"…", ...}'
+          />
+        </label>
         <button
           type="button"
           onClick={() => void saveRow()}

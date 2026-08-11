@@ -52,13 +52,20 @@ export function PendingResultsList({
             </div>
 
             <div className="mt-4 space-y-3">
-              <textarea
-                className="w-full border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
-                rows={2}
-                placeholder="Notatka dla zawodnika (opcjonalnie)"
-                value={notes[r.id] ?? ""}
-                onChange={(e) => onNoteChange(r.id, e.target.value)}
-              />
+              <label className="flex flex-col gap-1.5">
+                <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
+                  Notatka dla zawodnika{" "}
+                  <span className="normal-case tracking-normal text-paper/35">
+                    (opcjonalnie)
+                  </span>
+                </span>
+                <textarea
+                  className="w-full border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
+                  rows={2}
+                  value={notes[r.id] ?? ""}
+                  onChange={(e) => onNoteChange(r.id, e.target.value)}
+                />
+              </label>
               <div className="flex flex-wrap gap-2">
                 {canEditResultStatus(r.status) ? (
                   <button

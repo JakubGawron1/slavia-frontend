@@ -151,13 +151,17 @@ export default function ObecnoscScanClient() {
       ) : null}
 
       <form onSubmit={checkIn} className="space-y-3 border border-paper/10 p-4">
-        <input
-          className="w-full border border-paper/20 bg-chrome/40 px-3 py-2 font-mono text-sm outline-none focus:border-brand"
-          placeholder="Token z QR"
-          value={token}
-          onChange={(e) => setToken(e.target.value)}
-          required
-        />
+        <label className="flex flex-col gap-1.5">
+          <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
+            Token z QR
+          </span>
+          <input
+            className="w-full border border-paper/20 bg-chrome/40 px-3 py-2 font-mono text-sm outline-none focus:border-brand"
+            value={token}
+            onChange={(e) => setToken(e.target.value)}
+            required
+          />
+        </label>
         <div className="flex flex-wrap gap-2">
           <button
             type="submit"

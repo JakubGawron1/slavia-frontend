@@ -34,6 +34,7 @@ export function emptyExercise(partial?: Partial<PlanExercise>): PlanExercise {
     alternatives: [],
     sort_order: 0,
     set_scheme: [],
+    individual_load: false,
     ...partial,
   };
 }
@@ -174,7 +175,7 @@ export function usesExercisePr(
 
 /** Rozwiń jednolity schemat (sets×reps@%) do listy serii albo użyj set_scheme. */
 export function expandSetScheme(ex: PlanExercise): PlanSet[] {
-  if (ex.set_scheme && ex.set_scheme.length > 0) {
+  if (isIndividualLoad(ex) && ex.set_scheme && ex.set_scheme.length > 0) {
     return ex.set_scheme;
   }
   const n = Math.max(1, ex.sets ?? 1);
@@ -270,22 +271,84 @@ export type LoadMode = "kg" | "pct";
 export function loadModeOf(ex: {
   load_kg?: number | null;
   load_pct?: number | null;
+  pct_of?: string | null;
 }): LoadMode {
-  if (ex.load_pct != null) return "pct";
+  // pct_of trzyma tryb % także gdy load_pct jest chwilowo puste (np. backspace)
+  if (ex.load_pct != null || ex.pct_of != null) return "pct";
   return "kg";
 }
 
-/** Kg XOR %1RM — nie wysyłamy obu naraz. */
+export function isIndividualLoad(
+  ex: Pick<PlanExercise, "individual_load" | "set_scheme">,
+): boolean {
+  if (ex.individual_load) return true;
+  // legacy: rozpis bez flagi (API zwraca default false)
+  return (ex.set_scheme?.length ?? 0) > 0;
+}
+
+/** Wspólny → indywidualny: flaga + rozpis serii z pól ćwiczenia. */
+export function toIndividualLoad(ex: PlanExercise): PlanExercise {
+  const scheme = ex.set_scheme ?? [];
+  const set_scheme =
+    scheme.length > 0
+      ? scheme
+      : buildSetSchemeFromCount(Math.max(1, ex.sets ?? 3), ex);
+  return {
+    ...ex,
+    individual_load: true,
+    set_scheme,
+    sets: set_scheme.length,
+  };
+}
+
+/** Indywidualny → wspólny: obciążenie z 1. serii na ćwiczenie, bez set_scheme. */
+export function toUniformLoad(ex: PlanExercise): PlanExercise {
+  const scheme = ex.set_scheme ?? [];
+  const first = scheme[0];
+  return {
+    ...ex,
+    individual_load: false,
+    sets: scheme.length > 0 ? scheme.length : (ex.sets ?? null),
+    reps: first?.reps ?? ex.reps ?? null,
+    load_kg: first ? (first.load_kg ?? null) : (ex.load_kg ?? null),
+    load_pct: first ? (first.load_pct ?? null) : (ex.load_pct ?? null),
+    pct_of: first ? (first.pct_of ?? null) : (ex.pct_of ?? null),
+    set_scheme: [],
+  };
+}
+
+/** Kg XOR %1RM — nie wysyłamy obu naraz; przy wspólnym czyści set_scheme. */
 export function normalizeExerciseLoad(ex: PlanExercise): PlanExercise {
-  const mode = loadModeOf(ex);
+  if (!isIndividualLoad(ex)) {
+    const mode = loadModeOf(ex);
+    if (mode === "pct") {
+      return { ...ex, load_kg: null, set_scheme: [], individual_load: false };
+    }
+    return {
+      ...ex,
+      load_pct: null,
+      pct_of: null,
+      set_scheme: [],
+      individual_load: false,
+    };
+  }
+
   const set_scheme = (ex.set_scheme ?? []).map((s) => {
     if (loadModeOf(s) === "pct") {
       return { ...s, load_kg: null };
     }
     return { ...s, load_pct: null, pct_of: null };
   });
+  // przy indywidualnym obciążenie ćwiczenia jest szablonem — XOR wg 1. serii lub ćwiczenia
+  const mode = loadModeOf(set_scheme[0] ?? ex);
   if (mode === "pct") {
-    return { ...ex, load_kg: null, set_scheme };
+    return { ...ex, load_kg: null, set_scheme, individual_load: true };
   }
-  return { ...ex, load_pct: null, pct_of: null, set_scheme };
+  return {
+    ...ex,
+    load_pct: null,
+    pct_of: null,
+    set_scheme,
+    individual_load: true,
+  };
 }

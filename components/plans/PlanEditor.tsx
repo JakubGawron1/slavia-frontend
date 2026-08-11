@@ -56,23 +56,34 @@ export function PlanEditor({ editor }: { editor: StaffPlansEditor }) {
       <section className="space-y-3">
         <p className={sectionLabel}>Podstawowe</p>
         <div className="grid gap-3 sm:grid-cols-2">
-          <input
-            className={`${inputClass} sm:col-span-2`}
-            placeholder="Tytuł"
-            value={editing.title}
-            onChange={(e) =>
-              editor.setEditingTracked({ ...editing, title: e.target.value })
-            }
-            required
-          />
-          <input
-            className={inputClass}
-            placeholder="Etykieta (opcjonalnie)"
-            value={editing.week_label ?? ""}
-            onChange={(e) =>
-              editor.setEditingTracked({ ...editing, week_label: e.target.value })
-            }
-          />
+          <label className="flex flex-col gap-1.5 sm:col-span-2">
+            <span className="block text-[10px] tracking-wider text-paper/40 uppercase">
+              Tytuł
+            </span>
+            <input
+              className={inputClass}
+              value={editing.title}
+              onChange={(e) =>
+                editor.setEditingTracked({ ...editing, title: e.target.value })
+              }
+              required
+            />
+          </label>
+          <label className="flex flex-col gap-1.5">
+            <span className="block text-[10px] tracking-wider text-paper/40 uppercase">
+              Etykieta{" "}
+              <span className="normal-case tracking-normal text-paper/30">
+                (opcjonalnie)
+              </span>
+            </span>
+            <input
+              className={inputClass}
+              value={editing.week_label ?? ""}
+              onChange={(e) =>
+                editor.setEditingTracked({ ...editing, week_label: e.target.value })
+              }
+            />
+          </label>
           <div className="flex flex-wrap items-center gap-4 text-sm">
             <label className="flex items-center gap-2">
               <input
@@ -101,15 +112,19 @@ export function PlanEditor({ editor }: { editor: StaffPlansEditor }) {
               Plan sezonu
             </label>
           </div>
-          <textarea
-            className={`${inputClass} sm:col-span-2`}
-            placeholder="Opis programu"
-            rows={2}
-            value={editing.description ?? ""}
-            onChange={(e) =>
-              editor.setEditingTracked({ ...editing, description: e.target.value })
-            }
-          />
+          <label className="flex flex-col gap-1.5 sm:col-span-2">
+            <span className="block text-[10px] tracking-wider text-paper/40 uppercase">
+              Opis programu
+            </span>
+            <textarea
+              className={inputClass}
+              rows={2}
+              value={editing.description ?? ""}
+              onChange={(e) =>
+                editor.setEditingTracked({ ...editing, description: e.target.value })
+              }
+            />
+          </label>
         </div>
       </section>
 

@@ -2,7 +2,13 @@
 
 import type { DragEvent } from "react";
 import type { PlanExercise } from "@/lib/api/generated/models";
-import { buildSetSchemeFromCount, emptyExercise, loadModeOf } from "@/lib/plans/helpers";
+import {
+  emptyExercise,
+  isIndividualLoad,
+  loadModeOf,
+  toIndividualLoad,
+  toUniformLoad,
+} from "@/lib/plans/helpers";
 import {
   chipActive,
   chipIdle,
@@ -43,6 +49,7 @@ export function ExerciseEditor({
   onDrop: (i: number) => void;
 }) {
   const patch = (p: Partial<PlanExercise>) => onPatch(index, p);
+  const individual = isIndividualLoad(ex);
 
   return (
     <div
@@ -70,114 +77,139 @@ export function ExerciseEditor({
         />
       </div>
 
-      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-        <label className="space-y-1">
-          <span className="block text-[10px] tracking-wider text-paper/40 uppercase">
-            Serie
-          </span>
-          <input
-            className={inputClass}
-            type="number"
-            value={ex.sets ?? ""}
-            onChange={(e) =>
-              patch({ sets: e.target.value ? Number(e.target.value) : null })
-            }
-          />
-        </label>
-        <label className="space-y-1">
-          <span className="block text-[10px] tracking-wider text-paper/40 uppercase">
-            Powt.
-          </span>
-          <input
-            className={inputClass}
-            value={ex.reps ?? ""}
-            onChange={(e) => patch({ reps: e.target.value || null })}
-          />
-        </label>
-        <div className="space-y-1 sm:col-span-2">
-          <span className="block text-[10px] tracking-wider text-paper/40 uppercase">
-            Obciążenie
-          </span>
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              className={loadModeOf(ex) === "kg" ? chipActive : chipIdle}
-              onClick={() => patch({ load_pct: null, pct_of: null })}
-            >
-              Kg
-            </button>
-            <button
-              type="button"
-              className={loadModeOf(ex) === "pct" ? chipActive : chipIdle}
-              onClick={() =>
-                patch({
-                  load_kg: null,
-                  load_pct: ex.load_pct ?? 70,
-                  pct_of: ex.pct_of ?? "exercise",
-                })
-              }
-            >
-              % 1RM
-            </button>
-          </div>
+      <div className="space-y-1">
+        <span className="block text-[10px] tracking-wider text-paper/40 uppercase">
+          Obciążenie serii
+        </span>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            className={!individual ? chipActive : chipIdle}
+            onClick={() => patch(toUniformLoad(ex))}
+          >
+            Wspólny ciężar
+          </button>
+          <button
+            type="button"
+            className={individual ? chipActive : chipIdle}
+            onClick={() => patch(toIndividualLoad(ex))}
+          >
+            Indywidualny
+          </button>
         </div>
-        {loadModeOf(ex) === "kg" ? (
-          <label className="space-y-1 sm:col-span-2">
+      </div>
+
+      {!individual ? (
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+          <label className="space-y-1">
             <span className="block text-[10px] tracking-wider text-paper/40 uppercase">
-              Kg
+              Serie
             </span>
             <input
               className={inputClass}
               type="number"
-              step="0.5"
-              value={ex.load_kg ?? ""}
+              value={ex.sets ?? ""}
               onChange={(e) =>
-                patch({
-                  load_kg: e.target.value ? Number(e.target.value) : null,
-                  load_pct: null,
-                  pct_of: null,
-                })
+                patch({ sets: e.target.value ? Number(e.target.value) : null })
               }
             />
           </label>
-        ) : (
-          <>
-            <label className="space-y-1">
-              <span className="block text-[10px] tracking-wider text-paper/40 uppercase">
+          <label className="space-y-1">
+            <span className="block text-[10px] tracking-wider text-paper/40 uppercase">
+              Powt.
+            </span>
+            <input
+              className={inputClass}
+              value={ex.reps ?? ""}
+              onChange={(e) => patch({ reps: e.target.value || null })}
+            />
+          </label>
+          <div className="space-y-1 sm:col-span-2">
+            <span className="block text-[10px] tracking-wider text-paper/40 uppercase">
+              Obciążenie
+            </span>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                className={loadModeOf(ex) === "kg" ? chipActive : chipIdle}
+                onClick={() => patch({ load_pct: null, pct_of: null })}
+              >
+                Kg
+              </button>
+              <button
+                type="button"
+                className={loadModeOf(ex) === "pct" ? chipActive : chipIdle}
+                onClick={() =>
+                  patch({
+                    load_kg: null,
+                    load_pct: ex.load_pct ?? 70,
+                    pct_of: ex.pct_of ?? "exercise",
+                  })
+                }
+              >
                 % 1RM
+              </button>
+            </div>
+          </div>
+          {loadModeOf(ex) === "kg" ? (
+            <label className="space-y-1 sm:col-span-2">
+              <span className="block text-[10px] tracking-wider text-paper/40 uppercase">
+                Kg
               </span>
               <input
                 className={inputClass}
                 type="number"
-                value={ex.load_pct ?? ""}
+                step="0.5"
+                value={ex.load_kg ?? ""}
                 onChange={(e) =>
                   patch({
-                    load_pct: e.target.value ? Number(e.target.value) : null,
-                    load_kg: null,
+                    load_kg: e.target.value ? Number(e.target.value) : null,
+                    load_pct: null,
+                    pct_of: null,
                   })
                 }
               />
             </label>
-            <label className="space-y-1">
-              <span className="block text-[10px] tracking-wider text-paper/40 uppercase">
-                % z
-              </span>
-              <select
-                className={inputClass}
-                value={ex.pct_of ?? ""}
-                onChange={(e) =>
-                  patch({
-                    pct_of: (e.target.value || null) as PlanExercise["pct_of"],
-                    load_kg: null,
-                  })
-                }
-              >
-                {PCT_OF_OPTIONS}
-              </select>
-            </label>
-          </>
-        )}
-      </div>
+          ) : (
+            <>
+              <label className="space-y-1">
+                <span className="block text-[10px] tracking-wider text-paper/40 uppercase">
+                  % 1RM
+                </span>
+                <input
+                  className={inputClass}
+                  type="number"
+                  value={ex.load_pct ?? ""}
+                  onChange={(e) =>
+                    patch({
+                      load_pct: e.target.value ? Number(e.target.value) : null,
+                      load_kg: null,
+                      pct_of: ex.pct_of ?? "exercise",
+                    })
+                  }
+                />
+              </label>
+              <label className="space-y-1">
+                <span className="block text-[10px] tracking-wider text-paper/40 uppercase">
+                  % z
+                </span>
+                <select
+                  className={inputClass}
+                  value={ex.pct_of ?? ""}
+                  onChange={(e) =>
+                    patch({
+                      pct_of: (e.target.value || null) as PlanExercise["pct_of"],
+                      load_kg: null,
+                    })
+                  }
+                >
+                  {PCT_OF_OPTIONS}
+                </select>
+              </label>
+            </>
+          )}
+        </div>
+      ) : null}
 
       <input
         className={inputClass}
@@ -195,16 +227,6 @@ export function ExerciseEditor({
           />
           Warm-up
         </label>
-        <button
-          type="button"
-          className={linkDanger}
-          onClick={() => {
-            const n = Math.max(1, ex.sets ?? 3);
-            patch({ set_scheme: buildSetSchemeFromCount(n, ex), sets: n });
-          }}
-        >
-          Rozpisz serie
-        </button>
         <button
           type="button"
           className={linkBtn}
@@ -251,7 +273,7 @@ export function ExerciseEditor({
         </button>
       </div>
 
-      <ExerciseSetSchemeEditor ex={ex} onPatch={patch} />
+      {individual ? <ExerciseSetSchemeEditor ex={ex} onPatch={patch} /> : null}
       <ExerciseAlternativesEditor ex={ex} onPatch={patch} />
     </div>
   );

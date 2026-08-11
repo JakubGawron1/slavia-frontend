@@ -36,23 +36,33 @@ export default function LogiPage() {
         </p>
       </div>
 
-      <div className="flex flex-wrap gap-3">
-        <input
-          className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
-          placeholder="Źródło (users, cms…)"
-          value={source}
-          onChange={(e) => setSource(e.target.value)}
-        />
-        <select
-          className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
-          value={level}
-          onChange={(e) => setLevel(e.target.value)}
-        >
-          <option value="">Wszystkie poziomy</option>
-          <option value="info">info</option>
-          <option value="warn">warn</option>
-          <option value="error">error</option>
-        </select>
+      <div className="flex flex-wrap items-end gap-3">
+        <label className="flex flex-col gap-1.5">
+          <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
+            Źródło
+          </span>
+          <input
+            className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
+            placeholder="users, cms…"
+            value={source}
+            onChange={(e) => setSource(e.target.value)}
+          />
+        </label>
+        <label className="flex flex-col gap-1.5">
+          <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
+            Poziom
+          </span>
+          <select
+            className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
+            value={level}
+            onChange={(e) => setLevel(e.target.value)}
+          >
+            <option value="">Wszystkie poziomy</option>
+            <option value="info">info</option>
+            <option value="warn">warn</option>
+            <option value="error">error</option>
+          </select>
+        </label>
         <button
           type="button"
           onClick={() => void logsQuery.refetch()}

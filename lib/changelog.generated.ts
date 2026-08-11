@@ -45,6 +45,16 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
     ]
   },
   {
+    "version": "1.1.1.4+5",
+    "date": "2026-08-11",
+    "category": "backend",
+    "title": "Feature: `PlanExercise.individual_load`",
+    "notes": [
+      "Flaga `individual_load` (default `false`): obciążenie per seria vs wspólne z pól ćwiczenia.",
+      "Kompatybilne wstecz — brak pola w starym JSON = wspólny ciężar; OpenAPI + klient FE zaktualizowane."
+    ]
+  },
+  {
     "version": "1.1.0.20+21",
     "date": "2026-08-11",
     "category": "backend",
@@ -143,6 +153,38 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
       "Model: `weeks`/`days`, `%1RM`, warm-up, alternatives, wersje, szablony, archiwum, publish.",
       "CRUD `/api/groups`, `/api/exercise-library`; `copy` / `new-version` / `ai-draft` / `progress/all`.",
       "`CalendarEvent.plan_id` (+ week/day); flaga `experimental_club_assistant`; soft-migracja legacy."
+    ]
+  },
+  {
+    "version": "1.1.1.4+5",
+    "date": "2026-08-11",
+    "category": "frontend",
+    "title": "Feature: wspólny vs indywidualny ciężar serii",
+    "notes": [
+      "Przełącznik w edytorze ćwiczenia: wspólny ciężar (sets×reps@load) albo obciążenie per seria.",
+      "Usunięto osobny przycisk „Rozpisz serie” — tryb indywidualny buduje `set_scheme`.",
+      "Helpers: `isIndividualLoad` / `toIndividualLoad` / `toUniformLoad`; `normalizeExerciseLoad` respektuje flagę.",
+      "Legacy: niepuste `set_scheme` bez flagi nadal traktowane jako indywidualne."
+    ]
+  },
+  {
+    "version": "1.1.1.2+3",
+    "date": "2026-08-11",
+    "category": "frontend",
+    "title": "Fix: tryb % nie przełącza się na kg przy backspace",
+    "notes": [
+      "`loadModeOf` uznaje `pct_of` jako tryb % także gdy `load_pct` jest puste.",
+      "Edycja % w ćwiczeniu / seriach zachowuje `pct_of`, więc backspace nie flipuje przełącznika na Kg."
+    ]
+  },
+  {
+    "version": "1.1.1.3+4",
+    "date": "2026-08-11",
+    "category": "frontend",
+    "title": "Fix: widoczne etykiety pól w formularzach",
+    "notes": [
+      "Inputy/selecty/textarea z samym placeholderem dostały wrapping `<label>` + podpis (wyniki, konta, plany, CMS, logi, obecność, baza).",
+      "Placeholdery zostają tylko jako podpowiedź formatu (np. slug, URL), nie zamiast nazwy pola."
     ]
   },
   {

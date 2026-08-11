@@ -11,6 +11,18 @@ Format:
 - zdanie zrozumiałe dla zwykłego użytkownika
 ```
 
+## [1.1.1.4+5] - 2026-08-11
+### Wspólny albo indywidualny ciężar w planie
+- Przy ćwiczeniu wybierasz: ten sam ciężar na wszystkie serie albo osobny ciężar na każdą serię.
+
+## [1.1.1.3+4] - 2026-08-11
+### Czytelniejsze formularze
+- Pola w formularzach mają teraz podpisane etykiety — nie trzeba domyślać się znaczenia z samego placeholdera.
+
+## [1.1.1.2+3] - 2026-08-11
+### Poprawka: kasowanie % w planie
+- Usuwanie ostatniej cyfry w polu procentu nie przełącza już automatycznie na kilogramy.
+
 ## [1.1.0.26+27] - 2026-08-11
 ### Obciążenie: kg albo procent
 - W planie treningowym wybierasz albo stałe kg, albo % 1RM — nie trzeba wypełniać obu.

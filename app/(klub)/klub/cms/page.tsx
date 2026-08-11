@@ -145,37 +145,51 @@ export default function CmsAdminPage() {
           className="space-y-4 border border-paper/10 bg-paper/[0.03] p-4 md:p-6"
         >
           <div className="grid gap-3 sm:grid-cols-2">
-            <input
-              className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
-              placeholder="Tytuł"
-              value={editing.title}
-              onChange={(e) =>
-                setEditing({ ...editing, title: e.target.value })
-              }
-              required
-            />
-            <input
-              className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
-              placeholder="slug (np. o-klubie)"
-              value={editing.slug}
-              onChange={(e) =>
-                setEditing({ ...editing, slug: e.target.value })
-              }
-              required
-            />
-            <select
-              className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
-              value={editing.status}
-              onChange={(e) =>
-                setEditing({
-                  ...editing,
-                  status: e.target.value as CmsStatus,
-                })
-              }
-            >
-              <option value="draft">Szkic</option>
-              <option value="published">Opublikowana</option>
-            </select>
+            <label className="flex flex-col gap-1.5">
+              <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
+                Tytuł
+              </span>
+              <input
+                className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
+                value={editing.title}
+                onChange={(e) =>
+                  setEditing({ ...editing, title: e.target.value })
+                }
+                required
+              />
+            </label>
+            <label className="flex flex-col gap-1.5">
+              <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
+                Slug
+              </span>
+              <input
+                className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
+                placeholder="np. o-klubie"
+                value={editing.slug}
+                onChange={(e) =>
+                  setEditing({ ...editing, slug: e.target.value })
+                }
+                required
+              />
+            </label>
+            <label className="flex flex-col gap-1.5">
+              <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
+                Status
+              </span>
+              <select
+                className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
+                value={editing.status}
+                onChange={(e) =>
+                  setEditing({
+                    ...editing,
+                    status: e.target.value as CmsStatus,
+                  })
+                }
+              >
+                <option value="draft">Szkic</option>
+                <option value="published">Opublikowana</option>
+              </select>
+            </label>
           </div>
 
           <div className="space-y-3">
@@ -188,23 +202,28 @@ export default function CmsAdminPage() {
                 className="border border-paper/10 bg-chrome/30 p-3"
               >
                 <div className="mb-2 flex flex-wrap gap-2">
-                  <select
-                    className="border border-paper/20 bg-chrome/40 px-2 py-1 text-xs"
-                    value={block.type}
-                    onChange={(e) => {
-                      const blocks = [...editing.blocks];
-                      blocks[index] = { ...block, type: e.target.value };
-                      setEditing({ ...editing, blocks });
-                    }}
-                  >
-                    <option value="heading">Nagłówek</option>
-                    <option value="paragraph">Akapit</option>
-                    <option value="image">Obraz (URL)</option>
-                    <option value="html">HTML</option>
-                  </select>
+                  <label className="flex flex-col gap-1">
+                    <span className="font-display text-[10px] tracking-[0.12em] text-paper/45 uppercase">
+                      Typ bloku
+                    </span>
+                    <select
+                      className="border border-paper/20 bg-chrome/40 px-2 py-1 text-xs"
+                      value={block.type}
+                      onChange={(e) => {
+                        const blocks = [...editing.blocks];
+                        blocks[index] = { ...block, type: e.target.value };
+                        setEditing({ ...editing, blocks });
+                      }}
+                    >
+                      <option value="heading">Nagłówek</option>
+                      <option value="paragraph">Akapit</option>
+                      <option value="image">Obraz (URL)</option>
+                      <option value="html">HTML</option>
+                    </select>
+                  </label>
                   <button
                     type="button"
-                    className="text-xs text-brand"
+                    className="self-end text-xs text-brand"
                     onClick={() => {
                       const blocks = editing.blocks.filter((_, i) => i !== index);
                       setEditing({ ...editing, blocks });
@@ -213,21 +232,22 @@ export default function CmsAdminPage() {
                     Usuń blok
                   </button>
                 </div>
-                <textarea
-                  className="w-full border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
-                  rows={block.type === "paragraph" || block.type === "html" ? 4 : 2}
-                  value={block.content}
-                  onChange={(e) => {
-                    const blocks = [...editing.blocks];
-                    blocks[index] = { ...block, content: e.target.value };
-                    setEditing({ ...editing, blocks });
-                  }}
-                  placeholder={
-                    block.type === "image"
-                      ? "https://…"
-                      : "Treść bloku…"
-                  }
-                />
+                <label className="flex flex-col gap-1.5">
+                  <span className="font-display text-[10px] tracking-[0.12em] text-paper/45 uppercase">
+                    {block.type === "image" ? "URL obrazu" : "Treść bloku"}
+                  </span>
+                  <textarea
+                    className="w-full border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
+                    rows={block.type === "paragraph" || block.type === "html" ? 4 : 2}
+                    value={block.content}
+                    onChange={(e) => {
+                      const blocks = [...editing.blocks];
+                      blocks[index] = { ...block, content: e.target.value };
+                      setEditing({ ...editing, blocks });
+                    }}
+                    placeholder={block.type === "image" ? "https://…" : undefined}
+                  />
+                </label>
               </div>
             ))}
             <button

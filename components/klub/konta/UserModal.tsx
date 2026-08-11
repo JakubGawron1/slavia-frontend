@@ -57,30 +57,42 @@ export function CreateUserModal({
         </p>
       ) : null}
       <form onSubmit={onSubmit} className={formGridClass}>
-        <input
-          className={inputClass}
-          placeholder="Nazwa"
-          value={form.name}
-          onChange={(e) => onFormChange({ ...form, name: e.target.value })}
-          required
-        />
-        <input
-          className={inputClass}
-          placeholder="E-mail"
-          type="email"
-          value={form.email}
-          onChange={(e) => onFormChange({ ...form, email: e.target.value })}
-          required
-        />
-        <input
-          className={`${inputClass} sm:col-span-2`}
-          placeholder="Hasło"
-          type="password"
-          value={form.password}
-          onChange={(e) => onFormChange({ ...form, password: e.target.value })}
-          required
-          minLength={6}
-        />
+        <label className="flex flex-col gap-1.5">
+          <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
+            Nazwa
+          </span>
+          <input
+            className={inputClass}
+            value={form.name}
+            onChange={(e) => onFormChange({ ...form, name: e.target.value })}
+            required
+          />
+        </label>
+        <label className="flex flex-col gap-1.5">
+          <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
+            E-mail
+          </span>
+          <input
+            className={inputClass}
+            type="email"
+            value={form.email}
+            onChange={(e) => onFormChange({ ...form, email: e.target.value })}
+            required
+          />
+        </label>
+        <label className="flex flex-col gap-1.5 sm:col-span-2">
+          <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
+            Hasło
+          </span>
+          <input
+            className={inputClass}
+            type="password"
+            value={form.password}
+            onChange={(e) => onFormChange({ ...form, password: e.target.value })}
+            required
+            minLength={6}
+          />
+        </label>
         <PhotoUploadField
           className="sm:col-span-2"
           value={form.photoUrl}
@@ -157,29 +169,44 @@ export function EditUserModal({
         </p>
       ) : null}
       <form onSubmit={onSubmit} className={formGridClass}>
-        <input
-          className={inputClass}
-          placeholder="Nazwa"
-          value={name}
-          onChange={(e) => onNameChange(e.target.value)}
-          required
-        />
-        <input
-          className={inputClass}
-          placeholder="E-mail"
-          type="email"
-          value={email}
-          onChange={(e) => onEmailChange(e.target.value)}
-          required
-        />
-        <input
-          className={`${inputClass} sm:col-span-2`}
-          placeholder="Nowe hasło (opcjonalnie)"
-          type="password"
-          value={password}
-          onChange={(e) => onPasswordChange(e.target.value)}
-          minLength={6}
-        />
+        <label className="flex flex-col gap-1.5">
+          <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
+            Nazwa
+          </span>
+          <input
+            className={inputClass}
+            value={name}
+            onChange={(e) => onNameChange(e.target.value)}
+            required
+          />
+        </label>
+        <label className="flex flex-col gap-1.5">
+          <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
+            E-mail
+          </span>
+          <input
+            className={inputClass}
+            type="email"
+            value={email}
+            onChange={(e) => onEmailChange(e.target.value)}
+            required
+          />
+        </label>
+        <label className="flex flex-col gap-1.5 sm:col-span-2">
+          <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
+            Nowe hasło{" "}
+            <span className="normal-case tracking-normal text-paper/35">
+              (opcjonalnie)
+            </span>
+          </span>
+          <input
+            className={inputClass}
+            type="password"
+            value={password}
+            onChange={(e) => onPasswordChange(e.target.value)}
+            minLength={6}
+          />
+        </label>
         <PhotoUploadField
           className="sm:col-span-2"
           value={photoUrl}

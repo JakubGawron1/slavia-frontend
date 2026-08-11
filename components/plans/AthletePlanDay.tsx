@@ -110,13 +110,18 @@ export function AthletePlanDay({
         ))}
       </ul>
 
-      <textarea
-        className="w-full border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
-        rows={2}
-        placeholder="Komentarz do trenera (feedback)"
-        value={feedback}
-        onChange={(e) => updateFeedback(e.target.value)}
-      />
+      <label className="block space-y-1.5">
+        <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
+          Komentarz do trenera
+        </span>
+        <textarea
+          className="w-full border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
+          rows={2}
+          placeholder="Feedback po treningu"
+          value={feedback}
+          onChange={(e) => updateFeedback(e.target.value)}
+        />
+      </label>
 
       {coachReply ? (
         <div className="border border-brand/30 bg-brand/[0.08] p-3 text-sm">

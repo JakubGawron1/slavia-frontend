@@ -12,6 +12,23 @@ Format sekcji:
 
 Opcjonalnie po dacie: `!breaking` (breaking API).
 
+## [1.1.1.4+5] - 2026-08-11
+### Feature: wspólny vs indywidualny ciężar serii
+- Przełącznik w edytorze ćwiczenia: wspólny ciężar (sets×reps@load) albo obciążenie per seria.
+- Usunięto osobny przycisk „Rozpisz serie” — tryb indywidualny buduje `set_scheme`.
+- Helpers: `isIndividualLoad` / `toIndividualLoad` / `toUniformLoad`; `normalizeExerciseLoad` respektuje flagę.
+- Legacy: niepuste `set_scheme` bez flagi nadal traktowane jako indywidualne.
+
+## [1.1.1.3+4] - 2026-08-11
+### Fix: widoczne etykiety pól w formularzach
+- Inputy/selecty/textarea z samym placeholderem dostały wrapping `<label>` + podpis (wyniki, konta, plany, CMS, logi, obecność, baza).
+- Placeholdery zostają tylko jako podpowiedź formatu (np. slug, URL), nie zamiast nazwy pola.
+
+## [1.1.1.2+3] - 2026-08-11
+### Fix: tryb % nie przełącza się na kg przy backspace
+- `loadModeOf` uznaje `pct_of` jako tryb % także gdy `load_pct` jest puste.
+- Edycja % w ćwiczeniu / seriach zachowuje `pct_of`, więc backspace nie flipuje przełącznika na Kg.
+
 ## [1.1.1.1+2] - 2026-08-11
 ### Refaktor: modulyzacja monolitów UI
 - Soft limit ~400 linii; foldery domenowe: `components/plans/`, `calendar/`, `results/`, `klub/konta|devtools|calendar/`, `settings/account/`, `home/`.

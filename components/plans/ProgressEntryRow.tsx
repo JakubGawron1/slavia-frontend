@@ -106,42 +106,52 @@ export function ProgressEntryRow({
 
       {(ex.alternatives ?? []).length > 0 ? (
         <div className="mt-3">
-          <p className="text-xs text-paper/45">Zamiennik (kontuzja)</p>
-          <select
-            className="mt-1 w-full border border-paper/20 bg-chrome/40 px-3 py-2 text-sm"
-            value={entry.selected_alternative_id ?? ""}
-            onChange={(e) =>
-              onPatch({ selected_alternative_id: e.target.value || null })
-            }
-          >
-            <option value="">Ćwiczenie główne</option>
-            {(ex.alternatives ?? []).map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.name || "Zamiennik"}
-                {a.reason ? ` — ${a.reason}` : ""}
-              </option>
-            ))}
-          </select>
+          <label className="block space-y-1">
+            <span className="text-xs text-paper/45">Zamiennik (kontuzja)</span>
+            <select
+              className="w-full border border-paper/20 bg-chrome/40 px-3 py-2 text-sm"
+              value={entry.selected_alternative_id ?? ""}
+              onChange={(e) =>
+                onPatch({ selected_alternative_id: e.target.value || null })
+              }
+            >
+              <option value="">Ćwiczenie główne</option>
+              {(ex.alternatives ?? []).map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.name || "Zamiennik"}
+                  {a.reason ? ` — ${a.reason}` : ""}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
       ) : null}
 
       <div className="mt-3 grid gap-2 sm:grid-cols-2">
-        <input
-          className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
-          placeholder="Faktyczne obciążenie (kg)"
-          type="number"
-          step="0.5"
-          value={entry.actual_load_kg ?? ""}
-          onChange={(e) =>
-            onPatch({ actual_load_kg: e.target.value ? Number(e.target.value) : null })
-          }
-        />
-        <input
-          className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
-          placeholder="Notatka"
-          value={entry.athlete_note ?? ""}
-          onChange={(e) => onPatch({ athlete_note: e.target.value || null })}
-        />
+        <label className="space-y-1">
+          <span className="block text-[10px] tracking-wider text-paper/40 uppercase">
+            Faktyczne obciążenie (kg)
+          </span>
+          <input
+            className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
+            type="number"
+            step="0.5"
+            value={entry.actual_load_kg ?? ""}
+            onChange={(e) =>
+              onPatch({ actual_load_kg: e.target.value ? Number(e.target.value) : null })
+            }
+          />
+        </label>
+        <label className="space-y-1">
+          <span className="block text-[10px] tracking-wider text-paper/40 uppercase">
+            Notatka
+          </span>
+          <input
+            className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
+            value={entry.athlete_note ?? ""}
+            onChange={(e) => onPatch({ athlete_note: e.target.value || null })}
+          />
+        </label>
       </div>
     </li>
   );

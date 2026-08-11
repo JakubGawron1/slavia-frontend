@@ -20,6 +20,14 @@ export const GENERATED_USER_CHANGELOG: UserChangelogEntry[] = [
     ]
   },
   {
+    "version": "1.1.1.3+4",
+    "date": "2026-08-11",
+    "title": "Czytelniejsze formularze",
+    "notes": [
+      "Pola w formularzach mają teraz podpisane etykiety — nie trzeba domyślać się znaczenia z samego placeholdera."
+    ]
+  },
+  {
     "version": "1.1.0.25+26",
     "date": "2026-08-11",
     "title": "Czytelniejsze plany treningowe",
@@ -67,11 +75,27 @@ export const GENERATED_USER_CHANGELOG: UserChangelogEntry[] = [
     ]
   },
   {
+    "version": "1.1.1.2+3",
+    "date": "2026-08-11",
+    "title": "Poprawka: kasowanie % w planie",
+    "notes": [
+      "Usuwanie ostatniej cyfry w polu procentu nie przełącza już automatycznie na kilogramy."
+    ]
+  },
+  {
     "version": "1.1.0.23+24",
     "date": "2026-08-11",
     "title": "Spójniejsze potwierdzenia usuwania",
     "notes": [
       "Usuwanie w panelu klubu (plany, konta, CMS, wiadomości) pyta w stylu aplikacji, nie w okienku przeglądarki."
+    ]
+  },
+  {
+    "version": "1.1.1.4+5",
+    "date": "2026-08-11",
+    "title": "Wspólny albo indywidualny ciężar w planie",
+    "notes": [
+      "Przy ćwiczeniu wybierasz: ten sam ciężar na wszystkie serie albo osobny ciężar na każdą serię."
     ]
   },
   {

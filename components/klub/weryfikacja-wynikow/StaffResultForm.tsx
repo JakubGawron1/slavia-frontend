@@ -25,6 +25,9 @@ type StaffResultFormProps = {
   onSubmit: (e: FormEvent) => void;
 };
 
+const fieldLabelClass =
+  "font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase";
+
 export function StaffResultForm({
   profiles,
   profileId,
@@ -56,9 +59,7 @@ export function StaffResultForm({
       </h2>
 
       <label className="flex flex-col gap-1.5 sm:col-span-2">
-        <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
-          Zawodnik (profil)
-        </span>
+        <span className={fieldLabelClass}>Zawodnik (profil)</span>
         <select
           className={resultInputClass}
           value={profileId}
@@ -75,17 +76,17 @@ export function StaffResultForm({
         </select>
       </label>
 
-      <input
-        className={`${resultInputClass} sm:col-span-2`}
-        placeholder="Nazwa zawodów"
-        value={eventName}
-        onChange={(e) => onEventNameChange(e.target.value)}
-        required
-      />
       <label className="flex flex-col gap-1.5 sm:col-span-2">
-        <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
-          Data zawodów
-        </span>
+        <span className={fieldLabelClass}>Nazwa zawodów</span>
+        <input
+          className={resultInputClass}
+          value={eventName}
+          onChange={(e) => onEventNameChange(e.target.value)}
+          required
+        />
+      </label>
+      <label className="flex flex-col gap-1.5 sm:col-span-2">
+        <span className={fieldLabelClass}>Data zawodów</span>
         <input
           className={resultInputClass}
           type="date"
@@ -94,41 +95,49 @@ export function StaffResultForm({
           required
         />
       </label>
-      <input
-        className={resultInputClass}
-        placeholder="Rwanie (kg)"
-        type="number"
-        step="0.5"
-        value={snatch}
-        onChange={(e) => onSnatchChange(e.target.value)}
-      />
-      <input
-        className={resultInputClass}
-        placeholder="Podrzut (kg)"
-        type="number"
-        step="0.5"
-        value={cj}
-        onChange={(e) => onCjChange(e.target.value)}
-      />
-      <input
-        className={resultInputClass}
-        placeholder="Masa ciała (kg)"
-        type="number"
-        step="0.1"
-        value={bodyweight}
-        onChange={(e) => onBodyweightChange(e.target.value)}
-        required
-      />
+      <label className="flex flex-col gap-1.5">
+        <span className={fieldLabelClass}>Rwanie (kg)</span>
+        <input
+          className={resultInputClass}
+          type="number"
+          step="0.5"
+          value={snatch}
+          onChange={(e) => onSnatchChange(e.target.value)}
+        />
+      </label>
+      <label className="flex flex-col gap-1.5">
+        <span className={fieldLabelClass}>Podrzut (kg)</span>
+        <input
+          className={resultInputClass}
+          type="number"
+          step="0.5"
+          value={cj}
+          onChange={(e) => onCjChange(e.target.value)}
+        />
+      </label>
+      <label className="flex flex-col gap-1.5">
+        <span className={fieldLabelClass}>Masa ciała (kg)</span>
+        <input
+          className={resultInputClass}
+          type="number"
+          step="0.1"
+          value={bodyweight}
+          onChange={(e) => onBodyweightChange(e.target.value)}
+          required
+        />
+      </label>
       <ResultCategoryPreview
         category={previewCategory}
         missingProfileInfo={missingProfileInfo}
       />
-      <input
-        className={`${resultInputClass} sm:col-span-2`}
-        placeholder="Miejsce zawodów"
-        value={venue}
-        onChange={(e) => onVenueChange(e.target.value)}
-      />
+      <label className="flex flex-col gap-1.5 sm:col-span-2">
+        <span className={fieldLabelClass}>Miejsce zawodów</span>
+        <input
+          className={resultInputClass}
+          value={venue}
+          onChange={(e) => onVenueChange(e.target.value)}
+        />
+      </label>
       <button
         type="submit"
         disabled={saving}

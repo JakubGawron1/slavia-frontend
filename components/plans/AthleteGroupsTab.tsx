@@ -54,12 +54,16 @@ export function AthleteGroupsTab({
       {groupForm ? (
         <div className={panelClass}>
           <p className={sectionLabel}>{groupForm.id ? "Edycja grupy" : "Nowa grupa"}</p>
-          <input
-            className={inputClass}
-            placeholder="Nazwa grupy"
-            value={groupForm.name}
-            onChange={(e) => setGroupForm({ ...groupForm, name: e.target.value })}
-          />
+          <label className="space-y-1.5">
+            <span className="block text-[10px] tracking-wider text-paper/40 uppercase">
+              Nazwa grupy
+            </span>
+            <input
+              className={inputClass}
+              value={groupForm.name}
+              onChange={(e) => setGroupForm({ ...groupForm, name: e.target.value })}
+            />
+          </label>
           <div>
             <p className={`${sectionLabel} mb-2`}>Członkowie</p>
             <div className="flex max-h-48 flex-wrap gap-x-4 gap-y-2 overflow-y-auto">

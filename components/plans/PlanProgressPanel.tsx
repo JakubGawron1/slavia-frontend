@@ -34,18 +34,23 @@ export function PlanProgressPanel({
           >
             <p className="text-sm font-medium">{name}</p>
             <p className="text-sm text-paper/70">{row.athlete_feedback}</p>
-            <textarea
-              className={inputClass}
-              rows={2}
-              placeholder="Odpowiedź trenera po sesji…"
-              value={replyDrafts[row.user_id] ?? ""}
-              onChange={(e) =>
-                setReplyDrafts((prev) => ({
-                  ...prev,
-                  [row.user_id]: e.target.value,
-                }))
-              }
-            />
+            <label className="space-y-1">
+              <span className="block text-[10px] tracking-wider text-paper/40 uppercase">
+                Odpowiedź trenera
+              </span>
+              <textarea
+                className={inputClass}
+                rows={2}
+                placeholder="Po sesji…"
+                value={replyDrafts[row.user_id] ?? ""}
+                onChange={(e) =>
+                  setReplyDrafts((prev) => ({
+                    ...prev,
+                    [row.user_id]: e.target.value,
+                  }))
+                }
+              />
+            </label>
             <button
               type="button"
               className={btnSecondary}

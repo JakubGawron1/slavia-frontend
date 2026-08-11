@@ -52,13 +52,17 @@ export function ProfileModal({
         </p>
       ) : null}
       <form onSubmit={onSubmit} className={formGridClass}>
-        <input
-          className={`${inputClass} sm:col-span-2`}
-          placeholder="Imię i nazwisko"
-          value={form.name}
-          onChange={(e) => onFieldChange("name", e.target.value)}
-          required
-        />
+        <label className="flex flex-col gap-1.5 sm:col-span-2">
+          <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
+            Imię i nazwisko
+          </span>
+          <input
+            className={inputClass}
+            value={form.name}
+            onChange={(e) => onFieldChange("name", e.target.value)}
+            required
+          />
+        </label>
 
         <label className="flex flex-col gap-1.5 sm:col-span-2">
           <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
@@ -106,23 +110,31 @@ export function ProfileModal({
 
         {form.accountMode === "new" && mode === "create" ? (
           <>
-            <input
-              className={inputClass}
-              placeholder="E-mail konta"
-              type="email"
-              value={form.accountEmail}
-              onChange={(e) => onFieldChange("accountEmail", e.target.value)}
-              required
-            />
-            <input
-              className={inputClass}
-              placeholder="Hasło konta"
-              type="password"
-              value={form.accountPassword}
-              onChange={(e) => onFieldChange("accountPassword", e.target.value)}
-              required
-              minLength={6}
-            />
+            <label className="flex flex-col gap-1.5">
+              <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
+                E-mail konta
+              </span>
+              <input
+                className={inputClass}
+                type="email"
+                value={form.accountEmail}
+                onChange={(e) => onFieldChange("accountEmail", e.target.value)}
+                required
+              />
+            </label>
+            <label className="flex flex-col gap-1.5">
+              <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
+                Hasło konta
+              </span>
+              <input
+                className={inputClass}
+                type="password"
+                value={form.accountPassword}
+                onChange={(e) => onFieldChange("accountPassword", e.target.value)}
+                required
+                minLength={6}
+              />
+            </label>
             <p className="text-xs text-paper/45 sm:col-span-2">
               Zostanie utworzone konto z rolą zawodnik i powiązane z tym
               profilem.
@@ -130,14 +142,18 @@ export function ProfileModal({
           </>
         ) : null}
 
-        <input
-          className={inputClass}
-          placeholder="Masa ciała (kg)"
-          type="number"
-          step="0.1"
-          value={form.weight}
-          onChange={(e) => onFieldChange("weight", e.target.value)}
-        />
+        <label className="flex flex-col gap-1.5">
+          <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
+            Masa ciała (kg)
+          </span>
+          <input
+            className={inputClass}
+            type="number"
+            step="0.1"
+            value={form.weight}
+            onChange={(e) => onFieldChange("weight", e.target.value)}
+          />
+        </label>
         <div className="flex flex-col justify-center border border-paper/10 bg-chrome/20 px-3 py-2 text-sm text-paper/70">
           {computedCategory ? (
             <>
@@ -187,12 +203,17 @@ export function ProfileModal({
           hint="Przy powiązanym koncie zawodnika synchronizowane ze zdjęciem konta."
           inputClassName={inputClass}
         />
-        <textarea
-          className={`min-h-[4.5rem] ${inputClass} sm:col-span-2`}
-          placeholder="Krótki opis (widoczny na stronie Zawodnicy)"
-          value={form.notes}
-          onChange={(e) => onFieldChange("notes", e.target.value)}
-        />
+        <label className="flex flex-col gap-1.5 sm:col-span-2">
+          <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
+            Opis
+          </span>
+          <textarea
+            className={`min-h-[4.5rem] ${inputClass}`}
+            placeholder="Widoczny na stronie Zawodnicy"
+            value={form.notes}
+            onChange={(e) => onFieldChange("notes", e.target.value)}
+          />
+        </label>
         <div className="flex flex-wrap gap-2 sm:col-span-2">
           <button
             type="submit"

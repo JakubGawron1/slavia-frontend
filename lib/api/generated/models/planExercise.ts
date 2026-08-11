@@ -3,7 +3,7 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 1.1.0.22+23
+ * OpenAPI spec version: 1.1.1.4+5
  */
 import type { PctOfLift } from './pctOfLift';
 import type { PlanExerciseAlt } from './planExerciseAlt';
@@ -12,6 +12,8 @@ import type { PlanSet } from './planSet';
 export interface PlanExercise {
   alternatives?: PlanExerciseAlt[];
   id: string;
+  /** true = obciążenie per seria (`set_scheme`); false = wspólne z pól ćwiczenia. */
+  individual_load?: boolean;
   is_warmup?: boolean;
   /** @nullable */
   load_kg?: number | null;
