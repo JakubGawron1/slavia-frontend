@@ -17,6 +17,7 @@ Opcjonalnie po dacie: `!breaking` (breaking API).
 - Soft limit ~400 linii; foldery domenowe: `components/plans/`, `calendar/`, `results/`, `klub/konta|devtools|calendar/`, `settings/account/`, `home/`.
 - Rozbicie StaffPlansInner, StaffCalendar, CalendarMonthGrid, konta, weryfikacja wyników, DevTools, settings, shell, home, obecność.
 - Przywrócone panele Debug z 1.1.1.0+1 (schowek, ping health, storage, env, Orval test e-mail) po refaktorze.
+- Fix hydration: `Footer` jako Server Component (wersja z SSR); nawigacja flag → `FooterNav` client.
 
 ## [1.1.1.0+1] - 2026-08-11
 ### DevTools: więcej narzędzi w Debug
