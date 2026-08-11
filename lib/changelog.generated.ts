@@ -3,6 +3,27 @@ import type { ChangelogEntry } from "@/lib/changelog";
 
 export const GENERATED_CHANGELOG: ChangelogEntry[] = [
   {
+    "version": "1.1.0.16+17",
+    "date": "2026-08-11",
+    "category": "backend",
+    "title": "Perf: szybsza kompilacja (local + HF)",
+    "notes": [
+      "Tokio: zamiast `full` tylko `rt-multi-thread`, `macros`, `net`, `sync`.",
+      "Profil `dev`: `debug = \"line-tables-only\"`, `opt-level = 1` dla zależności.",
+      "`.cargo/config.toml`: incremental + `/DEBUG:FASTLINK` (Windows MSVC).",
+      "Dockerfile (HF): mold + BuildKit cache mounts (`registry` / `git` / `target`)."
+    ]
+  },
+  {
+    "version": "1.1.0.6+6",
+    "date": "2026-08-07",
+    "category": "mobile",
+    "title": "Feature: stub analizy toru sztangi",
+    "notes": [
+      "Ekran `/panel/analiza-toru` + wpis w Więcej / pulpicie — kieruje do pełnego narzędzia web (tracking lokalny w przeglądarce)."
+    ]
+  },
+  {
     "version": "1.1.0.5+5",
     "date": "2026-08-07",
     "category": "frontend",
