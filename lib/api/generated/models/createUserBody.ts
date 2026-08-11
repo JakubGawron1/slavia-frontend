@@ -3,14 +3,18 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 1.1.1.4+5
+ * OpenAPI spec version: 1.1.1.12+13
  */
 import type { Role } from './role';
 
 export interface CreateUserBody {
   display_name: string;
   email: string;
-  password: string;
+  /**
+     * Wymagane dla adresów `.dev` / `.local`. Dla zwykłych e-maili pomijane — user ustawia hasło z maila.
+     * @nullable
+     */
+  password?: string | null;
   /** @nullable */
   photo_url?: string | null;
   roles: Role[];

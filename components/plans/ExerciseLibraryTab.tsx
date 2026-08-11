@@ -8,6 +8,11 @@ import {
 } from "@/lib/api/generated/exercise-library/exercise-library";
 import { useToast } from "@/components/toast/ToastProvider";
 import {
+  ExerciseTagPicker,
+  ExerciseTagsManager,
+  useExerciseTagCatalog,
+} from "@/components/plans/ExerciseTagsManager";
+import {
   btnPrimary,
   btnSecondary,
   inputClass,
@@ -27,6 +32,7 @@ export function ExerciseLibraryTab({
   onRequestDelete: (id: string) => void;
 }) {
   const toast = useToast();
+  const { tags: catalog, setTags: setCatalog } = useExerciseTagCatalog();
   const [libName, setLibName] = useState("");
   const [libEdit, setLibEdit] = useState<ExerciseLibraryItem | null>(null);
 
@@ -62,6 +68,8 @@ export function ExerciseLibraryTab({
 
   return (
     <div className="space-y-6">
+      <ExerciseTagsManager tags={catalog} onChange={setCatalog} />
+
       <div className="flex flex-wrap items-end gap-3 border border-paper/10 bg-paper/[0.03] p-4">
         <label className="min-w-[200px] flex-1 space-y-1.5">
           <span className={sectionLabel}>Nowe ćwiczenie</span>
@@ -126,25 +134,16 @@ export function ExerciseLibraryTab({
               />
             </label>
           </div>
-          <label className="space-y-1.5">
+          <div className="space-y-1.5">
             <span className="block text-[10px] tracking-wider text-paper/40 uppercase">
               Tagi
             </span>
-            <input
-              className={inputClass}
-              placeholder="Po przecinku"
-              value={(libEdit.tags ?? []).join(", ")}
-              onChange={(e) =>
-                setLibEdit({
-                  ...libEdit,
-                  tags: e.target.value
-                    .split(",")
-                    .map((t) => t.trim())
-                    .filter(Boolean),
-                })
-              }
+            <ExerciseTagPicker
+              catalog={catalog}
+              selected={libEdit.tags ?? []}
+              onChange={(tags) => setLibEdit({ ...libEdit, tags })}
             />
-          </label>
+          </div>
           <label className="space-y-1.5">
             <span className="block text-[10px] tracking-wider text-paper/40 uppercase">
               Notatki

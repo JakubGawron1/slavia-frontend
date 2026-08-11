@@ -3,7 +3,7 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 1.1.1.4+5
+ * OpenAPI spec version: 1.1.1.12+13
  */
 import {
   useMutation,
@@ -25,6 +25,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  CompleteInviteBody,
   ConfirmEmailBody,
   ErrorBody,
   ForgotPasswordBody,
@@ -59,7 +60,90 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   return result;
 };
 
-export type confirmEmailResponse200 = {
+export type completeInviteResponse200 = {
+  data: OkResponse
+  status: 200
+}
+
+export type completeInviteResponse400 = {
+  data: ErrorBody
+  status: 400
+}
+
+export type completeInviteResponseSuccess = (completeInviteResponse200) & {
+  headers: Headers;
+};
+export type completeInviteResponseError = (completeInviteResponse400) & {
+  headers: Headers;
+};
+
+export type completeInviteResponse = (completeInviteResponseSuccess | completeInviteResponseError)
+
+export const getCompleteInviteUrl = () => {
+
+
+
+
+  return `/api/auth/complete-invite`
+}
+
+export const completeInvite = async (completeInviteBody: CompleteInviteBody, options?: Parameters<typeof customFetch>[1]): Promise<completeInviteResponse> => {
+
+  return customFetch<completeInviteResponse>(getCompleteInviteUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(completeInviteBody)
+  }
+);}
+
+
+
+
+
+export const getCompleteInviteMutationOptions = <TError = ErrorBody,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof completeInvite>>, TError,{data: CompleteInviteBody}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof completeInvite>>, TError,{data: CompleteInviteBody}, TContext> => {
+
+const mutationKey = ['completeInvite'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof completeInvite>>, {data: CompleteInviteBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  completeInvite(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CompleteInviteMutationResult = NonNullable<Awaited<ReturnType<typeof completeInvite>>>
+    export type CompleteInviteMutationBody = CompleteInviteBody
+    export type CompleteInviteMutationError = ErrorBody
+
+    export const useCompleteInvite = <TError = ErrorBody,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof completeInvite>>, TError,{data: CompleteInviteBody}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof completeInvite>>,
+        TError,
+        {data: CompleteInviteBody},
+        TContext
+      > => {
+      return useMutation(getCompleteInviteMutationOptions(options), queryClient);
+    }
+    export type confirmEmailResponse200 = {
   data: OkResponse
   status: 200
 }

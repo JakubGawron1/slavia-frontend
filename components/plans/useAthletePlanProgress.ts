@@ -40,7 +40,7 @@ export function useAthletePlanProgress(planFromUrl: string | null, scopeKey: str
   const load = useCallback(async () => {
     try {
       const [res, statsRes] = await Promise.all([
-        listPlans(),
+        listPlans({ mine: true }),
         athleteStats().catch(() => null),
       ]);
       const list = (res.data as TrainingPlan[]) ?? [];

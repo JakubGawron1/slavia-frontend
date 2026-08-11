@@ -6,6 +6,7 @@ import {
   updateProfile,
 } from "@/lib/api/generated/default/default";
 import type { useToast } from "@/components/toast/ToastProvider";
+import { isDevEmail } from "@/lib/email";
 import { resolveWeightCategory } from "@/lib/weightlifting-categories";
 import {
   type AccountLinkMode,
@@ -111,15 +112,21 @@ export function useKontaProfiles({
         }
         userId = profileForm.userId;
       } else if (mode === "new") {
-        if (!profileForm.accountEmail.trim() || !profileForm.accountPassword) {
-          setError("Podaj e-mail i hasło dla nowego konta.");
-          toast.error("Profil", "Podaj e-mail i hasło dla nowego konta.");
+        const email = profileForm.accountEmail.trim();
+        if (!email) {
+          setError("Podaj e-mail dla nowego konta.");
+          toast.error("Profil", "Podaj e-mail dla nowego konta.");
+          return;
+        }
+        if (isDevEmail(email) && profileForm.accountPassword.length < 6) {
+          setError("Dla adresów .dev / .local podaj hasło (min. 6 znaków).");
+          toast.error("Profil", "Dla adresów .dev / .local podaj hasło.");
           return;
         }
         const created = (
           await createUserApi({
-            email: profileForm.accountEmail.trim(),
-            password: profileForm.accountPassword,
+            email,
+            password: isDevEmail(email) ? profileForm.accountPassword : null,
             display_name: profileForm.name,
             roles: ["zawodnik"],
             photo_url: profileForm.photoUrl.trim() || null,

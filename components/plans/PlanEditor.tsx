@@ -5,6 +5,7 @@ import type { StaffPlansEditor } from "@/components/plans/useStaffPlansEditor";
 import { ExerciseEditor } from "@/components/plans/ExerciseEditor";
 import { PlanAssignmentPanel } from "@/components/plans/PlanAssignmentPanel";
 import { PlanProgressPanel } from "@/components/plans/PlanProgressPanel";
+import { useToast } from "@/components/toast/ToastProvider";
 import {
   btnOutlineBrand,
   btnPrimary,
@@ -17,20 +18,56 @@ import {
   panelClass,
   sectionLabel,
 } from "@/components/plans/styles";
+import { BackLink } from "@/components/ui/BackLink";
 
 export function PlanEditor({ editor }: { editor: StaffPlansEditor }) {
   const { editing } = editor;
+  const toast = useToast();
   if (!editing) return null;
 
   const kind = planAssignmentKind(editing);
   const weeks = editor.weeksOf(editing);
   const currentExercises = editor.currentDayExercises();
+  const canCopyToNext = editor.weekIdx < weeks.length - 1;
+  const canPasteFromPrev = editor.weekIdx > 0;
+
+  function handleCopyWeekResult(
+    result: { ok: boolean; reason?: "missing" | "empty" | "same" | "none"; count?: number },
+    fromLabel: string,
+    toLabel: string,
+  ) {
+    if (result.ok) {
+      if (result.count != null) {
+        toast.success(
+          `Skopiowano ${fromLabel} → ${result.count} tygodni (Pon→Pon…)`,
+        );
+      } else {
+        toast.success(`Skopiowano ${fromLabel} → ${toLabel} (Pon→Pon…)`);
+      }
+      return;
+    }
+    if (result.reason === "empty") {
+      toast.error("Kopiowanie", `${fromLabel} nie ma jeszcze ćwiczeń`);
+      return;
+    }
+    if (result.reason === "none") {
+      toast.error("Kopiowanie", "Dodaj co najmniej dwa tygodnie");
+      return;
+    }
+    toast.error("Kopiowanie", "Nie udało się skopiować tygodnia");
+  }
 
   return (
     <form onSubmit={(e) => void editor.save(e, false)} className={panelClass}>
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-paper/10 pb-4">
         <div>
-          <p className={sectionLabel}>
+          <BackLink
+            fallbackHref="/klub/plany"
+            onBack={editor.closeEditing}
+          >
+            Lista planów
+          </BackLink>
+          <p className={`${sectionLabel} mt-3`}>
             {editing.id ? "Edycja planu" : "Nowy plan"}
             {editing.version ? ` · v${editing.version}` : ""}
           </p>
@@ -172,6 +209,66 @@ export function PlanEditor({ editor }: { editor: StaffPlansEditor }) {
             + Tydzień
           </button>
         </div>
+
+        {weeks.length > 1 ? (
+          <div className="flex flex-wrap items-center gap-2">
+            {canPasteFromPrev ? (
+              <button
+                type="button"
+                className={btnSecondary}
+                title="Wkleja ćwiczenia z poprzedniego tygodnia: Pon→Pon, Wt→Wt…"
+                onClick={() => {
+                  const from = weeks[editor.weekIdx - 1]?.week_index ?? editor.weekIdx;
+                  const to = weeks[editor.weekIdx]?.week_index ?? editor.weekIdx + 1;
+                  handleCopyWeekResult(
+                    editor.pasteFromPreviousWeek(),
+                    `T${from}`,
+                    `T${to}`,
+                  );
+                }}
+              >
+                Wklej z T{weeks[editor.weekIdx - 1]?.week_index}
+              </button>
+            ) : null}
+            {canCopyToNext ? (
+              <button
+                type="button"
+                className={btnSecondary}
+                title="Kopiuje ćwiczenia do następnego tygodnia: Pon→Pon, Wt→Wt…"
+                onClick={() => {
+                  const from = weeks[editor.weekIdx]?.week_index ?? editor.weekIdx + 1;
+                  const to = weeks[editor.weekIdx + 1]?.week_index ?? editor.weekIdx + 2;
+                  const result = editor.copyCurrentWeekToNext();
+                  handleCopyWeekResult(result, `T${from}`, `T${to}`);
+                  if (result.ok) {
+                    editor.setWeekIdx(editor.weekIdx + 1);
+                    editor.setDayIdx(0);
+                  }
+                }}
+              >
+                Kopiuj → T{weeks[editor.weekIdx + 1]?.week_index}
+              </button>
+            ) : null}
+            <button
+              type="button"
+              className={btnSecondary}
+              title="Kopiuje ćwiczenia bieżącego tygodnia do wszystkich pozostałych: Pon→Pon…"
+              onClick={() => {
+                const from = weeks[editor.weekIdx]?.week_index ?? editor.weekIdx + 1;
+                handleCopyWeekResult(
+                  editor.copyCurrentWeekToAll(),
+                  `T${from}`,
+                  "wszystkie tygodnie",
+                );
+              }}
+            >
+              Kopiuj do wszystkich tygodni
+            </button>
+            <p className="text-[11px] text-paper/40">
+              Dopasowanie po dniu tygodnia · nadpisuje docelowe dni · Ctrl+Z cofa
+            </p>
+          </div>
+        ) : null}
 
         <div className="flex flex-wrap items-center gap-2">
           <p className={sectionLabel}>Dzień</p>

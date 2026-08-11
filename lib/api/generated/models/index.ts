@@ -3,7 +3,7 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 1.1.1.4+5
+ * OpenAPI spec version: 1.1.1.12+13
  */
 
 export * from './aiDraftBody';
@@ -24,6 +24,7 @@ export * from './cmsPageBody';
 export * from './cmsStatus';
 export * from './coachReplyBody';
 export * from './competitionResult';
+export * from './completeInviteBody';
 export * from './confirmEmailBody';
 export * from './contactMessage';
 export * from './contactMessageBody';
@@ -36,6 +37,7 @@ export * from './errorBody';
 export * from './eventBody';
 export * from './eventWithdrawal';
 export * from './exerciseLibraryItem';
+export * from './exerciseTagsBody';
 export * from './featureFlag';
 export * from './flagKind';
 export * from './flagRolloutStatus';

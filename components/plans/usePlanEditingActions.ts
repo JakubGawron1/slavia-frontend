@@ -7,6 +7,10 @@ import type {
   PlanWeek,
   TrainingPlan,
 } from "@/lib/api/generated/models";
+import {
+  copyWeekExercisesByDayOfWeek,
+  weekHasAnyExercises,
+} from "@/lib/plans/copyWeek";
 import { emptyExercise, ensureWeeks } from "@/lib/plans/helpers";
 
 /**
@@ -31,6 +35,71 @@ export function usePlanEditingActions(
       JSON.parse(JSON.stringify(weeksOf(editing))) as PlanWeek[],
     );
     setEditingTracked({ ...editing, weeks });
+  }
+
+  /**
+   * Kopiuje ćwiczenia z tygodnia `fromIdx` do `toIdx` po dniu tygodnia (Pon→Pon…).
+   * Zwraca false gdy indeksy nieprawidłowe lub źródło puste.
+   */
+  function copyWeekTo(
+    fromIdx: number,
+    toIdx: number,
+  ): { ok: boolean; reason?: "missing" | "empty" | "same" } {
+    if (!editing) return { ok: false, reason: "missing" };
+    if (fromIdx === toIdx) return { ok: false, reason: "same" };
+    const weeks = weeksOf(editing);
+    const source = weeks[fromIdx];
+    const target = weeks[toIdx];
+    if (!source || !target) return { ok: false, reason: "missing" };
+    if (!weekHasAnyExercises(source)) return { ok: false, reason: "empty" };
+
+    updateWeeks((ws) => {
+      const src = ws[fromIdx];
+      const dst = ws[toIdx];
+      if (!src || !dst) return ws;
+      ws[toIdx] = copyWeekExercisesByDayOfWeek(src, dst);
+      return ws;
+    });
+    return { ok: true };
+  }
+
+  /** Kopiuje bieżący tydzień → następny (T{n} → T{n+1}). */
+  function copyCurrentWeekToNext() {
+    return copyWeekTo(weekIdx, weekIdx + 1);
+  }
+
+  /** Wkleja ćwiczenia z poprzedniego tygodnia do bieżącego. */
+  function pasteFromPreviousWeek() {
+    return copyWeekTo(weekIdx - 1, weekIdx);
+  }
+
+  /**
+   * Kopiuje bieżący tydzień do wszystkich pozostałych (Pon→Pon…).
+   * Jedna mutacja = jedno Ctrl+Z.
+   */
+  function copyCurrentWeekToAll(): {
+    ok: boolean;
+    reason?: "missing" | "empty" | "none";
+    count?: number;
+  } {
+    if (!editing) return { ok: false, reason: "missing" };
+    const weeks = weeksOf(editing);
+    const source = weeks[weekIdx];
+    if (!source) return { ok: false, reason: "missing" };
+    if (!weekHasAnyExercises(source)) return { ok: false, reason: "empty" };
+    if (weeks.length < 2) return { ok: false, reason: "none" };
+
+    let count = 0;
+    updateWeeks((ws) => {
+      const src = ws[weekIdx];
+      if (!src) return ws;
+      return ws.map((w, i) => {
+        if (i === weekIdx) return w;
+        count += 1;
+        return copyWeekExercisesByDayOfWeek(src, w);
+      });
+    });
+    return { ok: true, count };
   }
 
   function currentDayExercises(): PlanExercise[] {
@@ -106,6 +175,10 @@ export function usePlanEditingActions(
   return {
     weeksOf,
     updateWeeks,
+    copyWeekTo,
+    copyCurrentWeekToNext,
+    copyCurrentWeekToAll,
+    pasteFromPreviousWeek,
     currentDayExercises,
     setDayExercises,
     addExercise,

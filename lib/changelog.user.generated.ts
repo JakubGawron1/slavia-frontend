@@ -12,6 +12,23 @@ export const GENERATED_USER_CHANGELOG: UserChangelogEntry[] = [
     ]
   },
   {
+    "version": "1.1.1.8+9",
+    "date": "2026-08-11",
+    "title": "Aktualne liczby na stronie głównej",
+    "notes": [
+      "Pasek pod banerem (zawodnicy, Sinclair, rekord PB, dni treningów) pokazuje dane z klubu na żywo."
+    ]
+  },
+  {
+    "version": "1.1.1.7+8",
+    "date": "2026-08-11",
+    "title": "Aktywacja konta z e-maila",
+    "notes": [
+      "Po utworzeniu konta dostajesz mail z linkiem — potwierdzasz adres i ustawiasz własne hasło.",
+      "Adresy testowe (.dev / .local) nadal bez weryfikacji; wtedy hasło ustawia admin przy tworzeniu."
+    ]
+  },
+  {
     "version": "1.1.0.24+25",
     "date": "2026-08-11",
     "title": "Checkboxy w kolorach motywu",
@@ -35,6 +52,22 @@ export const GENERATED_USER_CHANGELOG: UserChangelogEntry[] = [
       "Edycja planu w klubie jest jaśniej podzielona (przypisanie, tygodnie, ćwiczenia).",
       "Biblioteka i grupy wyglądają spójniej z resztą panelu.",
       "W panelu zawodnika wybór planu i widok sesji są czytelniejsze."
+    ]
+  },
+  {
+    "version": "1.1.1.12+13",
+    "date": "2026-08-11",
+    "title": "Fix: tylko własne plany w panelu",
+    "notes": [
+      "W panelu zawodnika (także gdy masz role kadry) widać wyłącznie plany przypisane do Ciebie, Twojej grupy albo do wszystkich — nie cudze indywidualne."
+    ]
+  },
+  {
+    "version": "1.1.1.13+14",
+    "date": "2026-08-11",
+    "title": "Kopiowanie planu na wszystkie tygodnie",
+    "notes": [
+      "W edytorze planu jednym kliknięciem skopiujesz ćwiczenia bieżącego tygodnia na wszystkie pozostałe tygodnie."
     ]
   },
   {
@@ -88,6 +121,47 @@ export const GENERATED_USER_CHANGELOG: UserChangelogEntry[] = [
     "title": "Spójniejsze potwierdzenia usuwania",
     "notes": [
       "Usuwanie w panelu klubu (plany, konta, CMS, wiadomości) pyta w stylu aplikacji, nie w okienku przeglądarki."
+    ]
+  },
+  {
+    "version": "1.1.1.6+7",
+    "date": "2026-08-11",
+    "title": "Strzałka wstecz w aplikacji",
+    "notes": [
+      "Na podstronach (Sinclair, analiza toru, Co nowego, ustawienia, powiadomienia) zawsze jest strzałka wstecz — także gdy wejdziesz z pulpitu."
+    ]
+  },
+  {
+    "version": "1.1.1.10+11",
+    "date": "2026-08-11",
+    "title": "Strzałka wstecz w panelu web",
+    "notes": [
+      "Na ustawieniach, Sinclairze, „Co nowego” i w wybranych narzędziach klubu jest strzałka wstecz (wraca do poprzedniej strony albo na pulpit).",
+      "W edytorze planu wrócisz do listy jednym kliknięciem u góry."
+    ]
+  },
+  {
+    "version": "1.1.1.5+6",
+    "date": "2026-08-11",
+    "title": "Szybkie kopiowanie tygodnia w planie",
+    "notes": [
+      "W wielotygodniowym planie możesz skopiować ćwiczenia z jednego tygodnia na następny jednym kliknięciem (poniedziałek → poniedziałek i tak dalej)."
+    ]
+  },
+  {
+    "version": "1.1.1.9+10",
+    "date": "2026-08-11",
+    "title": "Tagi ćwiczeń na wspólnej liście",
+    "notes": [
+      "W bibliotece ćwiczeń możesz dodać i usuwać tagi klubu, a potem zaznaczać je przy każdym ćwiczeniu — bez wpisywania ręcznie po przecinku."
+    ]
+  },
+  {
+    "version": "1.1.1.11+12",
+    "date": "2026-08-11",
+    "title": "Top 3 Sinclair na żywo",
+    "notes": [
+      "Na stronie głównej podium Sinclair bierze się z aktualnych wyników zawodów klubu."
     ]
   },
   {

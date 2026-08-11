@@ -3,6 +3,16 @@ import type { ChangelogEntry } from "@/lib/changelog";
 
 export const GENERATED_CHANGELOG: ChangelogEntry[] = [
   {
+    "version": "1.1.1.14+15",
+    "date": "2026-08-11",
+    "category": "frontend",
+    "title": "Chore: Next.js 16.3 + TypeScript 7",
+    "notes": [
+      "`next` / `eslint-config-next` → 16.3.0 (natywne type-check przez `tsc` CLI).",
+      "`typescript` ^7 — naprawia błąd builda „does not provide the compiler API”."
+    ]
+  },
+  {
     "version": "1.1.1.0+1",
     "date": "2026-08-11",
     "category": "frontend",
@@ -94,6 +104,49 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
     ]
   },
   {
+    "version": "1.1.1.9+10",
+    "date": "2026-08-11",
+    "category": "backend",
+    "title": "Feature: katalog tagów biblioteki ćwiczeń",
+    "notes": [
+      "Meta `exercise_library_tags` + seed z defaultów / istniejących tagów.",
+      "`GET /api/exercise-library/tags`, `PUT /api/exercise-library/tags` (Trener).",
+      "Model `ExerciseTagsBody`; OpenAPI zaktualizowane."
+    ]
+  },
+  {
+    "version": "1.1.1.9+10",
+    "date": "2026-08-11",
+    "category": "frontend",
+    "title": "Feature: klubowa lista tagów ćwiczeń",
+    "notes": [
+      "Zakładka Biblioteka: zarządzanie tagami (dodaj / usuń) zamiast wpisywania po przecinku.",
+      "Przy edycji ćwiczenia: chipy z katalogu (toggle).",
+      "API: `GET/PUT /api/exercise-library/tags` + `ExerciseTagsManager.tsx`."
+    ]
+  },
+  {
+    "version": "1.1.1.5+6",
+    "date": "2026-08-11",
+    "category": "frontend",
+    "title": "Feature: kopiowanie ćwiczeń tydzień → tydzień",
+    "notes": [
+      "W edytorze planu: „Kopiuj → T{n+1}” oraz „Wklej z T{n-1}”.",
+      "Dopasowanie po `day_of_week` (Pon→Pon…); brakujące dni w celu są tworzone.",
+      "Nowe UUID ćwiczeń/zamienników; nadpisanie docelowych dni (Ctrl+Z cofa).",
+      "Helper: `lib/plans/copyWeek.ts`."
+    ]
+  },
+  {
+    "version": "1.1.1.13+14",
+    "date": "2026-08-11",
+    "category": "frontend",
+    "title": "Feature: kopiuj tydzień do wszystkich tygodni",
+    "notes": [
+      "W edytorze planu: „Kopiuj do wszystkich tygodni” (Pon→Pon…, nowe UUID, jedno Ctrl+Z)."
+    ]
+  },
+  {
     "version": "1.1.0.21+22",
     "date": "2026-08-11",
     "category": "backend",
@@ -156,6 +209,38 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
     ]
   },
   {
+    "version": "1.1.1.8+9",
+    "date": "2026-08-11",
+    "category": "backend",
+    "title": "Feature: publiczny terminarz treningów",
+    "notes": [
+      "`GET /api/public/training-schedule` — bez auth, zwraca `TrainingScheduleDefaults` (dni/godziny) do strony głównej."
+    ]
+  },
+  {
+    "version": "1.1.1.10+11",
+    "date": "2026-08-11",
+    "category": "frontend",
+    "title": "Feature: strzałka wstecz na desktopie (web)",
+    "notes": [
+      "Komponent `BackLink`: `history.back()` albo fallback na pulpit / listę.",
+      "Panel: Sinclair, Co nowego, ustawienia.",
+      "Klub: Sinclair, Co nowego, ustawienia, DevTools, baza, logi, podgląd.",
+      "Edytor planu: „Lista planów”; polityka prywatności → strona główna."
+    ]
+  },
+  {
+    "version": "1.1.1.7+8",
+    "date": "2026-08-11",
+    "category": "frontend",
+    "title": "Feature: tworzenie konta bez hasła (invite mail)",
+    "notes": [
+      "Formularz konta / profilu: hasło wymagane tylko dla `.dev` / `.local`.",
+      "Zwykły e-mail → toast o wysłanym linku; strona `/ustaw-haslo` (complete-invite).",
+      "Helper `lib/email.ts` (`isDevEmail`); mutator: publiczny `complete-invite`."
+    ]
+  },
+  {
     "version": "1.1.1.4+5",
     "date": "2026-08-11",
     "category": "frontend",
@@ -165,6 +250,91 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
       "Usunięto osobny przycisk „Rozpisz serie” — tryb indywidualny buduje `set_scheme`.",
       "Helpers: `isIndividualLoad` / `toIndividualLoad` / `toUniformLoad`; `normalizeExerciseLoad` respektuje flagę.",
       "Legacy: niepuste `set_scheme` bez flagi nadal traktowane jako indywidualne."
+    ]
+  },
+  {
+    "version": "1.1.1.7+8",
+    "date": "2026-08-11",
+    "category": "backend",
+    "title": "Feature: zaproszenie po create (verify + set password)",
+    "notes": [
+      "`CreateUserBody.password` opcjonalne; wymagane tylko dla e-maili `.dev` / `.local`.",
+      "Po utworzeniu zwykłego konta: token `Invite` (48h) + mail z linkiem `/ustaw-haslo`.",
+      "`POST /api/auth/complete-invite` — ustawia hasło i oznacza `email_verified`.",
+      "Przy błędzie wysyłki maila konto jest rollbackowane (`delete_user`)."
+    ]
+  },
+  {
+    "version": "1.1.1.8+9",
+    "date": "2026-08-11",
+    "category": "frontend",
+    "title": "Feature: żywy pasek statystyk na stronie głównej",
+    "notes": [
+      "SSR pobiera publiczne profile, wyniki i terminarz treningów; metryki (kadra, Sinclair, PB, dni treningowe) z API zamiast hardcodu.",
+      "Helper `lib/home-stats.ts`; fallback do dotychczasowych wartości przy błędzie API.",
+      "Revalidate 60 s."
+    ]
+  },
+  {
+    "version": "1.1.1.11+12",
+    "date": "2026-08-11",
+    "category": "frontend",
+    "title": "Feature: żywy Top 3 Sinclair na stronie głównej",
+    "notes": [
+      "Ranking z publicznych profili/wyników (`topSinclairPodium`); wspólny fetch z paskiem statystyk.",
+      "Pusty stan gdy brak zaakceptowanych startów; fallback hardcodu przy błędzie API."
+    ]
+  },
+  {
+    "version": "1.1.1.6+7",
+    "date": "2026-08-11",
+    "category": "frontend",
+    "title": "Fix (mobile): strzałka wstecz na podstronach",
+    "notes": [
+      "Zawsze widoczny `BackButton` na DetailScaffold / powiadomieniach; fallback na pulpit gdy brak stacku.",
+      "Pulpit: podstrony narzędziowe przez `push` zamiast `go`.",
+      "Gest / Back myszy / Alt+← z podstrony bez stacku też wraca na pulpit."
+    ]
+  },
+  {
+    "version": "1.1.1.12+13",
+    "date": "2026-08-11",
+    "category": "backend",
+    "title": "Fix: `GET /api/plans?mine=true` respektuje przypisania",
+    "notes": [
+      "Query `mine=true` zawsze filtruje przez `plans_for_user(effective_id)` — także dla Trener/Superadmin.",
+      "Panel kadry bez `mine` nadal zwraca pełną listę.",
+      "`PUT …/progress`: usunięty bypass edytora — postęp tylko na planach dostępnych dla effective_id."
+    ]
+  },
+  {
+    "version": "1.1.1.12+13",
+    "date": "2026-08-11",
+    "category": "mobile",
+    "title": "Fix: lista planów z `mine=true`",
+    "notes": [
+      "`AthleteRepository.plans()` woła `/api/plans?mine=true` — konta kadry nie dostają cudzych planów w widoku zawodnika."
+    ]
+  },
+  {
+    "version": "1.1.1.12+13",
+    "date": "2026-08-11",
+    "category": "frontend",
+    "title": "Fix: panel zawodnika tylko z własnymi planami",
+    "notes": [
+      "`listPlans({ mine: true })` w `useAthletePlanProgress` i na pulpicie panelu.",
+      "Superadmin/Trener nie widzi cudzych przypisań w swoim panelu zawodnika."
+    ]
+  },
+  {
+    "version": "1.1.1.6+7",
+    "date": "2026-08-11",
+    "category": "mobile",
+    "title": "Fix: strzałka wstecz na podstronach",
+    "notes": [
+      "`DetailScaffold` / powiadomienia: zawsze `BackButton`; bez stacku → powrót na pulpit.",
+      "Pulpit: Sinclair / analiza toru / Co nowego / Ustawienia przez `push` (stack + gest wstecz).",
+      "Gest / Back myszy / Alt+←: z podstrony bez stacku też wraca na pulpit."
     ]
   },
   {

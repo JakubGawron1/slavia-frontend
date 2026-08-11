@@ -11,6 +11,44 @@ Format:
 - zdanie zrozumiałe dla zwykłego użytkownika
 ```
 
+## [1.1.1.13+14] - 2026-08-11
+### Kopiowanie planu na wszystkie tygodnie
+- W edytorze planu jednym kliknięciem skopiujesz ćwiczenia bieżącego tygodnia na wszystkie pozostałe tygodnie.
+
+## [1.1.1.12+13] - 2026-08-11
+### Fix: tylko własne plany w panelu
+- W panelu zawodnika (także gdy masz role kadry) widać wyłącznie plany przypisane do Ciebie, Twojej grupy albo do wszystkich — nie cudze indywidualne.
+
+## [1.1.1.11+12] - 2026-08-11
+### Top 3 Sinclair na żywo
+- Na stronie głównej podium Sinclair bierze się z aktualnych wyników zawodów klubu.
+
+## [1.1.1.10+11] - 2026-08-11
+### Strzałka wstecz w panelu web
+- Na ustawieniach, Sinclairze, „Co nowego” i w wybranych narzędziach klubu jest strzałka wstecz (wraca do poprzedniej strony albo na pulpit).
+- W edytorze planu wrócisz do listy jednym kliknięciem u góry.
+
+## [1.1.1.9+10] - 2026-08-11
+### Tagi ćwiczeń na wspólnej liście
+- W bibliotece ćwiczeń możesz dodać i usuwać tagi klubu, a potem zaznaczać je przy każdym ćwiczeniu — bez wpisywania ręcznie po przecinku.
+
+## [1.1.1.8+9] - 2026-08-11
+### Aktualne liczby na stronie głównej
+- Pasek pod banerem (zawodnicy, Sinclair, rekord PB, dni treningów) pokazuje dane z klubu na żywo.
+
+## [1.1.1.7+8] - 2026-08-11
+### Aktywacja konta z e-maila
+- Po utworzeniu konta dostajesz mail z linkiem — potwierdzasz adres i ustawiasz własne hasło.
+- Adresy testowe (.dev / .local) nadal bez weryfikacji; wtedy hasło ustawia admin przy tworzeniu.
+
+## [1.1.1.6+7] - 2026-08-11
+### Strzałka wstecz w aplikacji
+- Na podstronach (Sinclair, analiza toru, Co nowego, ustawienia, powiadomienia) zawsze jest strzałka wstecz — także gdy wejdziesz z pulpitu.
+
+## [1.1.1.5+6] - 2026-08-11
+### Szybkie kopiowanie tygodnia w planie
+- W wielotygodniowym planie możesz skopiować ćwiczenia z jednego tygodnia na następny jednym kliknięciem (poniedziałek → poniedziałek i tak dalej).
+
 ## [1.1.1.4+5] - 2026-08-11
 ### Wspólny albo indywidualny ciężar w planie
 - Przy ćwiczeniu wybierasz: ten sam ciężar na wszystkie serie albo osobny ciężar na każdą serię.

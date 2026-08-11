@@ -1,12 +1,14 @@
 "use client";
 
 import { SinclairCalculator } from "@/components/SinclairCalculator";
+import { BackLink } from "@/components/ui/BackLink";
 
 export default function PanelSinclairPage() {
   return (
     <div className="animate-rise mx-auto max-w-4xl space-y-6">
       <div>
-        <p className="font-display text-sm tracking-[0.22em] text-brand uppercase">
+        <BackLink fallbackHref="/panel" />
+        <p className="mt-3 font-display text-sm tracking-[0.22em] text-brand uppercase">
           Narzędzie
         </p>
         <h1 className="mt-2 font-display text-3xl font-semibold uppercase">

@@ -1,6 +1,7 @@
 "use client";
 
 import { AccountSettingsForm } from "@/components/settings/AccountSettingsForm";
+import { BackLink } from "@/components/ui/BackLink";
 import { usePanel } from "@/components/panel/PanelProvider";
 
 export default function PanelUstawieniaPage() {
@@ -10,7 +11,8 @@ export default function PanelUstawieniaPage() {
   return (
     <div className="animate-rise mx-auto max-w-6xl space-y-6">
       <div>
-        <p className="font-display text-sm tracking-[0.22em] text-brand uppercase">
+        <BackLink fallbackHref="/panel" />
+        <p className="mt-3 font-display text-sm tracking-[0.22em] text-brand uppercase">
           Konto
         </p>
         <h1 className="mt-2 font-display text-3xl font-semibold uppercase">

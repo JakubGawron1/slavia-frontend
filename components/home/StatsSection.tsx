@@ -1,6 +1,10 @@
-import { stats } from "./data";
+import type { HomeStat } from "@/lib/home-stats";
 
-export function StatsSection() {
+type Props = {
+  stats: HomeStat[];
+};
+
+export function StatsSection({ stats }: Props) {
   return (
     <section className="border-b border-mist bg-surface">
       <div className="mx-auto grid max-w-7xl grid-cols-2 lg:grid-cols-4">

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { BackLink } from "@/components/ui/BackLink";
 
 export const metadata: Metadata = {
   title: "Polityka prywatności",
@@ -21,7 +22,8 @@ export default function PolitykaPrywatnosciPage() {
 
       <div className="relative mx-auto max-w-3xl px-5 pt-28 pb-16 md:px-8 md:pt-32 md:pb-20">
         <header className="animate-rise">
-          <p className="font-display text-sm tracking-[0.28em] text-brand uppercase">
+          <BackLink fallbackHref="/" />
+          <p className="mt-3 font-display text-sm tracking-[0.28em] text-brand uppercase">
             RODO · Cookies
           </p>
           <div className="animate-bar mt-3 h-1 w-14 bg-brand" />

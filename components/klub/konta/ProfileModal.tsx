@@ -1,5 +1,6 @@
 import type { FormEvent } from "react";
 import type { PublicUser } from "@/lib/api/generated/models";
+import { isDevEmail } from "@/lib/email";
 import { PhotoUploadField } from "@/components/settings/PhotoUploadField";
 import { Modal } from "@/components/ui/Modal";
 import {
@@ -122,22 +123,31 @@ export function ProfileModal({
                 required
               />
             </label>
-            <label className="flex flex-col gap-1.5">
-              <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
-                Hasło konta
-              </span>
-              <input
-                className={inputClass}
-                type="password"
-                value={form.accountPassword}
-                onChange={(e) => onFieldChange("accountPassword", e.target.value)}
-                required
-                minLength={6}
-              />
-            </label>
+            {isDevEmail(form.accountEmail) ? (
+              <label className="flex flex-col gap-1.5">
+                <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
+                  Hasło konta
+                </span>
+                <input
+                  className={inputClass}
+                  type="password"
+                  value={form.accountPassword}
+                  onChange={(e) => onFieldChange("accountPassword", e.target.value)}
+                  required
+                  minLength={6}
+                />
+              </label>
+            ) : (
+              <p className="text-xs text-paper/45 self-end">
+                Link do ustawienia hasła pójdzie na e-mail.
+              </p>
+            )}
             <p className="text-xs text-paper/45 sm:col-span-2">
               Zostanie utworzone konto z rolą zawodnik i powiązane z tym
-              profilem.
+              profilem
+              {isDevEmail(form.accountEmail)
+                ? " (adres .dev / .local — bez weryfikacji)."
+                : "."}
             </p>
           </>
         ) : null}

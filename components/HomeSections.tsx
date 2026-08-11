@@ -1,3 +1,4 @@
+import type { HomeRankingRow, HomeStat } from "@/lib/home-stats";
 import { HomeFaq } from "./HomeFaq";
 import { AboutSection } from "./home/AboutSection";
 import { GroupsSection } from "./home/GroupsSection";
@@ -8,23 +9,27 @@ import { StatsSection } from "./home/StatsSection";
 import { ToolsSection } from "./home/ToolsSection";
 
 type HomeSectionsProps = {
+  stats: HomeStat[];
+  ranking: HomeRankingRow[];
   blogEnabled?: boolean;
   ogloszeniaEnabled?: boolean;
   calendarEnabled?: boolean;
 };
 
 export function HomeSections({
+  stats,
+  ranking,
   blogEnabled = true,
   ogloszeniaEnabled = true,
   calendarEnabled = true,
 }: HomeSectionsProps) {
   return (
     <>
-      <StatsSection />
+      <StatsSection stats={stats} />
       <AboutSection />
       <HistorySection />
       <GroupsSection />
-      <RankingSection />
+      <RankingSection ranking={ranking} />
       <ToolsSection
         blogEnabled={blogEnabled}
         ogloszeniaEnabled={ogloszeniaEnabled}

@@ -3,7 +3,7 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 1.1.1.4+5
+ * OpenAPI spec version: 1.1.1.12+13
  */
 import {
   useMutation,
@@ -27,6 +27,7 @@ import type {
 import type {
   ErrorBody,
   ExerciseLibraryItem,
+  ExerciseTagsBody,
   LibraryItemBody,
   OkResponse
 } from '../models';
@@ -263,6 +264,212 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getCreateLibraryItemMutationOptions(options), queryClient);
+    }
+    export type listLibraryTagsResponse200 = {
+  data: ExerciseTagsBody
+  status: 200
+}
+
+export type listLibraryTagsResponse401 = {
+  data: ErrorBody
+  status: 401
+}
+
+export type listLibraryTagsResponse403 = {
+  data: ErrorBody
+  status: 403
+}
+
+export type listLibraryTagsResponseSuccess = (listLibraryTagsResponse200) & {
+  headers: Headers;
+};
+export type listLibraryTagsResponseError = (listLibraryTagsResponse401 | listLibraryTagsResponse403) & {
+  headers: Headers;
+};
+
+export type listLibraryTagsResponse = (listLibraryTagsResponseSuccess | listLibraryTagsResponseError)
+
+export const getListLibraryTagsUrl = () => {
+
+
+
+
+  return `/api/exercise-library/tags`
+}
+
+export const listLibraryTags = async ( options?: Parameters<typeof customFetch>[1]): Promise<listLibraryTagsResponse> => {
+
+  return customFetch<listLibraryTagsResponse>(getListLibraryTagsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListLibraryTagsQueryKey = () => {
+    return [
+    `/api/exercise-library/tags`
+    ] as const;
+    }
+
+
+export const getListLibraryTagsQueryOptions = <TData = Awaited<ReturnType<typeof listLibraryTags>>, TError = ErrorBody>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listLibraryTags>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListLibraryTagsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listLibraryTags>>> = ({ signal }) => listLibraryTags({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listLibraryTags>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListLibraryTagsQueryResult = NonNullable<Awaited<ReturnType<typeof listLibraryTags>>>
+export type ListLibraryTagsQueryError = ErrorBody
+
+
+export function useListLibraryTags<TData = Awaited<ReturnType<typeof listLibraryTags>>, TError = ErrorBody>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listLibraryTags>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listLibraryTags>>,
+          TError,
+          Awaited<ReturnType<typeof listLibraryTags>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListLibraryTags<TData = Awaited<ReturnType<typeof listLibraryTags>>, TError = ErrorBody>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listLibraryTags>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listLibraryTags>>,
+          TError,
+          Awaited<ReturnType<typeof listLibraryTags>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListLibraryTags<TData = Awaited<ReturnType<typeof listLibraryTags>>, TError = ErrorBody>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listLibraryTags>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useListLibraryTags<TData = Awaited<ReturnType<typeof listLibraryTags>>, TError = ErrorBody>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listLibraryTags>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListLibraryTagsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export type setLibraryTagsResponse200 = {
+  data: ExerciseTagsBody
+  status: 200
+}
+
+export type setLibraryTagsResponse401 = {
+  data: ErrorBody
+  status: 401
+}
+
+export type setLibraryTagsResponse403 = {
+  data: ErrorBody
+  status: 403
+}
+
+export type setLibraryTagsResponseSuccess = (setLibraryTagsResponse200) & {
+  headers: Headers;
+};
+export type setLibraryTagsResponseError = (setLibraryTagsResponse401 | setLibraryTagsResponse403) & {
+  headers: Headers;
+};
+
+export type setLibraryTagsResponse = (setLibraryTagsResponseSuccess | setLibraryTagsResponseError)
+
+export const getSetLibraryTagsUrl = () => {
+
+
+
+
+  return `/api/exercise-library/tags`
+}
+
+export const setLibraryTags = async (exerciseTagsBody: ExerciseTagsBody, options?: Parameters<typeof customFetch>[1]): Promise<setLibraryTagsResponse> => {
+
+  return customFetch<setLibraryTagsResponse>(getSetLibraryTagsUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(exerciseTagsBody)
+  }
+);}
+
+
+
+
+
+export const getSetLibraryTagsMutationOptions = <TError = ErrorBody,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setLibraryTags>>, TError,{data: ExerciseTagsBody}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof setLibraryTags>>, TError,{data: ExerciseTagsBody}, TContext> => {
+
+const mutationKey = ['setLibraryTags'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof setLibraryTags>>, {data: ExerciseTagsBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  setLibraryTags(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SetLibraryTagsMutationResult = NonNullable<Awaited<ReturnType<typeof setLibraryTags>>>
+    export type SetLibraryTagsMutationBody = ExerciseTagsBody
+    export type SetLibraryTagsMutationError = ErrorBody
+
+    export const useSetLibraryTags = <TError = ErrorBody,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setLibraryTags>>, TError,{data: ExerciseTagsBody}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof setLibraryTags>>,
+        TError,
+        {data: ExerciseTagsBody},
+        TContext
+      > => {
+      return useMutation(getSetLibraryTagsMutationOptions(options), queryClient);
     }
     export type deleteLibraryItemResponse200 = {
   data: OkResponse

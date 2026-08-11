@@ -12,6 +12,63 @@ Format sekcji:
 
 Opcjonalnie po dacie: `!breaking` (breaking API).
 
+## [1.1.1.14+15] - 2026-08-11
+### Chore: Next.js 16.3 + TypeScript 7
+- `next` / `eslint-config-next` → 16.3.0 (natywne type-check przez `tsc` CLI).
+- `typescript` ^7 — naprawia błąd builda „does not provide the compiler API”.
+
+## [1.1.1.13+14] - 2026-08-11
+### Feature: kopiuj tydzień do wszystkich tygodni
+- W edytorze planu: „Kopiuj do wszystkich tygodni” (Pon→Pon…, nowe UUID, jedno Ctrl+Z).
+
+## [1.1.1.12+13] - 2026-08-11
+### Fix: panel zawodnika tylko z własnymi planami
+- `listPlans({ mine: true })` w `useAthletePlanProgress` i na pulpicie panelu.
+- Superadmin/Trener nie widzi cudzych przypisań w swoim panelu zawodnika.
+
+## [1.1.1.11+12] - 2026-08-11
+### Feature: żywy Top 3 Sinclair na stronie głównej
+- Ranking z publicznych profili/wyników (`topSinclairPodium`); wspólny fetch z paskiem statystyk.
+- Pusty stan gdy brak zaakceptowanych startów; fallback hardcodu przy błędzie API.
+
+## [1.1.1.10+11] - 2026-08-11
+### Feature: strzałka wstecz na desktopie (web)
+- Komponent `BackLink`: `history.back()` albo fallback na pulpit / listę.
+- Panel: Sinclair, Co nowego, ustawienia.
+- Klub: Sinclair, Co nowego, ustawienia, DevTools, baza, logi, podgląd.
+- Edytor planu: „Lista planów”; polityka prywatności → strona główna.
+
+## [1.1.1.9+10] - 2026-08-11
+### Feature: klubowa lista tagów ćwiczeń
+- Zakładka Biblioteka: zarządzanie tagami (dodaj / usuń) zamiast wpisywania po przecinku.
+- Przy edycji ćwiczenia: chipy z katalogu (toggle).
+- API: `GET/PUT /api/exercise-library/tags` + `ExerciseTagsManager.tsx`.
+
+## [1.1.1.8+9] - 2026-08-11
+### Feature: żywy pasek statystyk na stronie głównej
+- SSR pobiera publiczne profile, wyniki i terminarz treningów; metryki (kadra, Sinclair, PB, dni treningowe) z API zamiast hardcodu.
+- Helper `lib/home-stats.ts`; fallback do dotychczasowych wartości przy błędzie API.
+- Revalidate 60 s.
+
+## [1.1.1.7+8] - 2026-08-11
+### Feature: tworzenie konta bez hasła (invite mail)
+- Formularz konta / profilu: hasło wymagane tylko dla `.dev` / `.local`.
+- Zwykły e-mail → toast o wysłanym linku; strona `/ustaw-haslo` (complete-invite).
+- Helper `lib/email.ts` (`isDevEmail`); mutator: publiczny `complete-invite`.
+
+## [1.1.1.6+7] - 2026-08-11
+### Fix (mobile): strzałka wstecz na podstronach
+- Zawsze widoczny `BackButton` na DetailScaffold / powiadomieniach; fallback na pulpit gdy brak stacku.
+- Pulpit: podstrony narzędziowe przez `push` zamiast `go`.
+- Gest / Back myszy / Alt+← z podstrony bez stacku też wraca na pulpit.
+
+## [1.1.1.5+6] - 2026-08-11
+### Feature: kopiowanie ćwiczeń tydzień → tydzień
+- W edytorze planu: „Kopiuj → T{n+1}” oraz „Wklej z T{n-1}”.
+- Dopasowanie po `day_of_week` (Pon→Pon…); brakujące dni w celu są tworzone.
+- Nowe UUID ćwiczeń/zamienników; nadpisanie docelowych dni (Ctrl+Z cofa).
+- Helper: `lib/plans/copyWeek.ts`.
+
 ## [1.1.1.4+5] - 2026-08-11
 ### Feature: wspólny vs indywidualny ciężar serii
 - Przełącznik w edytorze ćwiczenia: wspólny ciężar (sets×reps@load) albo obciążenie per seria.

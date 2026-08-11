@@ -122,13 +122,16 @@ export default function PanelHomePage() {
   const flagsQuery = useListPublicFlags({ query: { staleTime: 60_000 } });
   const flags = flagsQuery.data?.data;
   const plansEnabled = isFlagEnabled(flags, TRAINING_PLANS_FLAG);
-  const plansQuery = useListPlans(undefined, {
-    query: {
-      queryKey: ["/api/plans", scopeKey],
-      staleTime: 30_000,
-      enabled: plansEnabled,
+  const plansQuery = useListPlans(
+    { mine: true },
+    {
+      query: {
+        queryKey: ["/api/plans", { mine: true }, scopeKey],
+        staleTime: 30_000,
+        enabled: plansEnabled,
+      },
     },
-  });
+  );
   const modules = PANEL_MODULES.filter(
     (mod) => !mod.flag || isFlagEnabled(flags, mod.flag),
   );

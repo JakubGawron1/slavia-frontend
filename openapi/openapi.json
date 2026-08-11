@@ -6,7 +6,7 @@
     "license": {
       "name": ""
     },
-    "version": "1.1.1.4+5"
+    "version": "1.1.1.12+13"
   },
   "paths": {
     "/api/admin/db/tables": {
@@ -1010,6 +1010,46 @@
             "bearer_auth": []
           }
         ]
+      }
+    },
+    "/api/auth/complete-invite": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "operationId": "complete_invite",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompleteInviteBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Hasło ustawione i e-mail zweryfikowany",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Nieprawidłowy token / hasło",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/auth/email/confirm": {
@@ -2861,6 +2901,104 @@
         ]
       }
     },
+    "/api/exercise-library/tags": {
+      "get": {
+        "tags": [
+          "exercise-library"
+        ],
+        "operationId": "list_library_tags",
+        "responses": {
+          "200": {
+            "description": "Klubowa lista tagów",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExerciseTagsBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "exercise-library"
+        ],
+        "operationId": "set_library_tags",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExerciseTagsBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Zapisano listę tagów",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExerciseTagsBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
     "/api/exercise-library/{id}": {
       "delete": {
         "tags": [
@@ -3628,6 +3766,15 @@
             "name": "archived",
             "in": "query",
             "description": "Filtr archiwum",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "mine",
+            "in": "query",
+            "description": "Tylko plany przypisane do mnie (panel zawodnika)",
             "required": false,
             "schema": {
               "type": "boolean"
@@ -4616,6 +4763,26 @@
                   "items": {
                     "$ref": "#/components/schemas/CompetitionResult"
                   }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/training-schedule": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "operationId": "list_public_training_schedule",
+        "responses": {
+          "200": {
+            "description": "Publiczny terminarz treningów klubowych",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrainingScheduleDefaults"
                 }
               }
             }
@@ -5917,6 +6084,21 @@
           }
         }
       },
+      "CompleteInviteBody": {
+        "type": "object",
+        "required": [
+          "token",
+          "new_password"
+        ],
+        "properties": {
+          "new_password": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          }
+        }
+      },
       "ConfirmEmailBody": {
         "type": "object",
         "required": [
@@ -6103,7 +6285,6 @@
         "type": "object",
         "required": [
           "email",
-          "password",
           "display_name",
           "roles"
         ],
@@ -6115,7 +6296,11 @@
             "type": "string"
           },
           "password": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Wymagane dla adresów `.dev` / `.local`. Dla zwykłych e-maili pomijane — user ustawia hasło z maila."
           },
           "photo_url": {
             "type": [
@@ -6356,6 +6541,21 @@
               "string",
               "null"
             ]
+          }
+        }
+      },
+      "ExerciseTagsBody": {
+        "type": "object",
+        "description": "Klubowa lista tagów ćwiczeń (meta `exercise_library_tags`).",
+        "required": [
+          "tags"
+        ],
+        "properties": {
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },

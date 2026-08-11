@@ -6,6 +6,7 @@ import {
   type UserChangelogEntry,
 } from "@/lib/user-changelog";
 import { SLAVIA_VERSION } from "@/lib/version";
+import { BackLink } from "@/components/ui/BackLink";
 
 function EntryCard({ entry }: { entry: UserChangelogEntry }) {
   return (
@@ -44,7 +45,8 @@ export function UserChangelogView({ homeHref }: UserChangelogViewProps) {
   return (
     <div className="animate-rise mx-auto max-w-3xl space-y-6">
       <div>
-        <p className="font-display text-sm tracking-[0.22em] text-brand uppercase">
+        <BackLink fallbackHref={homeHref} />
+        <p className="mt-3 font-display text-sm tracking-[0.22em] text-brand uppercase">
           Aktualizacje
         </p>
         <h1 className="mt-2 font-display text-3xl font-semibold uppercase">

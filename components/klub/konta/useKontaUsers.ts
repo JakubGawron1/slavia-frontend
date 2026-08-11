@@ -1,5 +1,6 @@
 import { FormEvent, useState } from "react";
 import type { AuthUser, Role } from "@/lib/auth";
+import { isDevEmail } from "@/lib/email";
 import type { PublicUser } from "@/lib/api/generated/models";
 import {
   createUser as createUserApi,
@@ -64,17 +65,26 @@ export function useKontaUsers({ user, toast, setError, load }: UseKontaUsersArgs
   async function createUser(e: FormEvent) {
     e.preventDefault();
     setError(null);
+    const email = createUserForm.email.trim();
+    if (isDevEmail(email) && createUserForm.password.length < 6) {
+      const msg = "Dla adresów .dev / .local hasło musi mieć co najmniej 6 znaków.";
+      setError(msg);
+      toast.error("Tworzenie konta", msg);
+      return;
+    }
     try {
       await createUserApi({
-        email: createUserForm.email,
-        password: createUserForm.password,
+        email,
+        password: isDevEmail(email) ? createUserForm.password : null,
         display_name: createUserForm.name,
         roles: createUserForm.roles,
         photo_url: createUserForm.photoUrl.trim() || null,
       });
       toast.success(
-        "Utworzono konto",
-        createUserForm.name || createUserForm.email,
+        isDevEmail(email)
+          ? "Utworzono konto"
+          : "Utworzono konto — wysłano link do e-maila",
+        createUserForm.name || email,
       );
       closeUserModal();
       await load();

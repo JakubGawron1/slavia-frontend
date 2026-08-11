@@ -1,7 +1,11 @@
 import Link from "next/link";
-import { ranking } from "./data";
+import type { HomeRankingRow } from "@/lib/home-stats";
 
-export function RankingSection() {
+type Props = {
+  ranking: HomeRankingRow[];
+};
+
+export function RankingSection({ ranking }: Props) {
   return (
     <section className="bg-background py-16 md:py-24">
       <div className="mx-auto max-w-7xl px-5 md:px-8">
@@ -16,33 +20,39 @@ export function RankingSection() {
           od kategorii wagowej i płci.
         </p>
 
-        <ol className="mt-12 divide-y divide-mist border-y border-mist">
-          {ranking.map((row) => (
-            <li
-              key={row.name}
-              className="grid gap-3 py-6 md:grid-cols-[3rem_minmax(0,1.2fr)_minmax(0,1fr)_auto] md:items-center md:gap-6"
-            >
-              <span className="font-display text-3xl text-brand md:text-4xl">
-                {row.place}
-              </span>
-              <div>
-                <p className="font-display text-xl tracking-wide text-ink uppercase md:text-2xl">
-                  {row.name}
-                </p>
-                <p className="mt-1 text-sm text-steel-soft">{row.meta}</p>
-              </div>
-              <p className="text-steel-soft">
-                Dwubój{" "}
-                <span className="font-display text-ink uppercase">
-                  {row.total}
+        {ranking.length === 0 ? (
+          <p className="mt-12 border-y border-mist py-8 text-base text-steel-soft">
+            Brak zaakceptowanych wyników zawodów do rankingu Sinclair.
+          </p>
+        ) : (
+          <ol className="mt-12 divide-y divide-mist border-y border-mist">
+            {ranking.map((row) => (
+              <li
+                key={`${row.place}-${row.name}`}
+                className="grid gap-3 py-6 md:grid-cols-[3rem_minmax(0,1.2fr)_minmax(0,1fr)_auto] md:items-center md:gap-6"
+              >
+                <span className="font-display text-3xl text-brand md:text-4xl">
+                  {row.place}
                 </span>
-              </p>
-              <p className="font-display text-2xl tracking-tight text-brand md:text-right md:text-3xl">
-                {row.sinclair}
-              </p>
-            </li>
-          ))}
-        </ol>
+                <div>
+                  <p className="font-display text-xl tracking-wide text-ink uppercase md:text-2xl">
+                    {row.name}
+                  </p>
+                  <p className="mt-1 text-sm text-steel-soft">{row.meta}</p>
+                </div>
+                <p className="text-steel-soft">
+                  Dwubój{" "}
+                  <span className="font-display text-ink uppercase">
+                    {row.total}
+                  </span>
+                </p>
+                <p className="font-display text-2xl tracking-tight text-brand md:text-right md:text-3xl">
+                  {row.sinclair}
+                </p>
+              </li>
+            ))}
+          </ol>
+        )}
 
         <div className="mt-8">
           <Link

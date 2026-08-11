@@ -6,6 +6,7 @@ import { FlagsTab } from "@/components/klub/devtools/FlagsTab";
 import { RoutesTab } from "@/components/klub/devtools/RoutesTab";
 import { StatsTab } from "@/components/klub/devtools/StatsTab";
 import { useDevTools } from "@/components/klub/devtools/useDevTools";
+import { BackLink } from "@/components/ui/BackLink";
 
 export default function DevToolsPage() {
   const d = useDevTools();
@@ -13,7 +14,8 @@ export default function DevToolsPage() {
   return (
     <div className="animate-rise max-w-5xl space-y-6">
       <div>
-        <p className="font-display text-sm tracking-[0.22em] text-brand uppercase">
+        <BackLink fallbackHref="/klub" />
+        <p className="mt-3 font-display text-sm tracking-[0.22em] text-brand uppercase">
           Narzędzia
         </p>
         <h1 className="mt-2 font-display text-3xl font-semibold uppercase">

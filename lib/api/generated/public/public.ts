@@ -3,7 +3,7 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 1.1.1.4+5
+ * OpenAPI spec version: 1.1.1.12+13
  */
 import {
   useQuery
@@ -24,7 +24,8 @@ import type {
   AthleteProfile,
   CompetitionResult,
   ListPublicEventsParams,
-  PublicCalendarEvent
+  PublicCalendarEvent,
+  TrainingScheduleDefaults
 } from '../models';
 
 import { customFetch } from '../../mutator';
@@ -363,6 +364,112 @@ export function useListPublicResults<TData = Awaited<ReturnType<typeof listPubli
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getListPublicResultsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export type listPublicTrainingScheduleResponse200 = {
+  data: TrainingScheduleDefaults
+  status: 200
+}
+
+export type listPublicTrainingScheduleResponseSuccess = (listPublicTrainingScheduleResponse200) & {
+  headers: Headers;
+};
+;
+
+export type listPublicTrainingScheduleResponse = (listPublicTrainingScheduleResponseSuccess)
+
+export const getListPublicTrainingScheduleUrl = () => {
+
+
+
+
+  return `/api/public/training-schedule`
+}
+
+export const listPublicTrainingSchedule = async ( options?: Parameters<typeof customFetch>[1]): Promise<listPublicTrainingScheduleResponse> => {
+
+  return customFetch<listPublicTrainingScheduleResponse>(getListPublicTrainingScheduleUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListPublicTrainingScheduleQueryKey = () => {
+    return [
+    `/api/public/training-schedule`
+    ] as const;
+    }
+
+
+export const getListPublicTrainingScheduleQueryOptions = <TData = Awaited<ReturnType<typeof listPublicTrainingSchedule>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPublicTrainingSchedule>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListPublicTrainingScheduleQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listPublicTrainingSchedule>>> = ({ signal }) => listPublicTrainingSchedule({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listPublicTrainingSchedule>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListPublicTrainingScheduleQueryResult = NonNullable<Awaited<ReturnType<typeof listPublicTrainingSchedule>>>
+export type ListPublicTrainingScheduleQueryError = unknown
+
+
+export function useListPublicTrainingSchedule<TData = Awaited<ReturnType<typeof listPublicTrainingSchedule>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPublicTrainingSchedule>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listPublicTrainingSchedule>>,
+          TError,
+          Awaited<ReturnType<typeof listPublicTrainingSchedule>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListPublicTrainingSchedule<TData = Awaited<ReturnType<typeof listPublicTrainingSchedule>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPublicTrainingSchedule>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listPublicTrainingSchedule>>,
+          TError,
+          Awaited<ReturnType<typeof listPublicTrainingSchedule>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListPublicTrainingSchedule<TData = Awaited<ReturnType<typeof listPublicTrainingSchedule>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPublicTrainingSchedule>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useListPublicTrainingSchedule<TData = Awaited<ReturnType<typeof listPublicTrainingSchedule>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPublicTrainingSchedule>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListPublicTrainingScheduleQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
