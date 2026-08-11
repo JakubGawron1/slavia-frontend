@@ -11,6 +11,46 @@ Format:
 - zdanie zrozumiałe dla zwykłego użytkownika
 ```
 
+## [1.1.0.26+27] - 2026-08-11
+### Obciążenie: kg albo procent
+- W planie treningowym wybierasz albo stałe kg, albo % 1RM — nie trzeba wypełniać obu.
+
+## [1.1.0.25+26] - 2026-08-11
+### Czytelniejsze plany treningowe
+- Edycja planu w klubie jest jaśniej podzielona (przypisanie, tygodnie, ćwiczenia).
+- Biblioteka i grupy wyglądają spójniej z resztą panelu.
+- W panelu zawodnika wybór planu i widok sesji są czytelniejsze.
+
+## [1.1.0.24+25] - 2026-08-11
+### Checkboxy w kolorach motywu
+- Zaznaczenia w ustawieniach i panelach dopasowują się do wybranego motywu kolorystycznego.
+
+## [1.1.0.23+24] - 2026-08-11
+### Spójniejsze potwierdzenia usuwania
+- Usuwanie w panelu klubu (plany, konta, CMS, wiadomości) pyta w stylu aplikacji, nie w okienku przeglądarki.
+
+## [1.1.0.22+23] - 2026-08-11
+### % obciążenia z PR ćwiczenia
+- Trener może ustawić np. 80% PR tego samego ruchu co w planie (deadlift itd.).
+- System nie wylicza kg z profilu — dobierasz ciężar według własnego PR.
+
+## [1.1.0.21+22] - 2026-08-11
+### Plan sezonu i odpowiedź trenera
+- Na pulpicie widać aktywny plan sezonu — jednym kliknięciem otwierasz ćwiczenia.
+- Gdy trener odpowie na Twój komentarz przy planie, zobaczysz tę odpowiedź w panelu (i w aplikacji).
+
+## [1.1.0.20+21] - 2026-08-11
+### Plany treningowe — serie i plan osobisty
+- Widać pełną rozpiskę ćwiczeń (serie i procent obciążenia).
+- Trener może przypisać plan tylko do Ciebie albo do grupy.
+- Filtr „tylko dziś” w panelu planów.
+
+## [1.1.0.19+20] - 2026-08-11
+### Lepsze plany treningowe
+- Trener układa plany na tygodnie i dni, korzysta z katalogu programów i biblioteki ćwiczeń.
+- Możesz odhaczać ćwiczenia, wybrać zamiennik przy kontuzji, dodać komentarz do trenera i zobaczyć odznakę ukończenia planu.
+- Obciążenia mogą być podane jako procent Twojego najlepszego wyniku (rwanie / podrzut).
+
 ## [1.1.0.5+4] - 2026-08-07
 
 ### Agenda kalendarza

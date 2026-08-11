@@ -18,6 +18,7 @@ import { useKlub } from "@/components/klub/KlubProvider";
 import { PhotoUploadField } from "@/components/settings/PhotoUploadField";
 import { ImageHolder } from "@/components/settings/ImageHolder";
 import { useToast } from "@/components/toast/ToastProvider";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { Modal } from "@/components/ui/Modal";
 import { resolveWeightCategory } from "@/lib/weightlifting-categories";
 
@@ -82,6 +83,12 @@ export default function KontaPage() {
   const [profileModal, setProfileModal] = useState<ProfileModalMode>("closed");
   const [editingProfileId, setEditingProfileId] = useState<string | null>(null);
   const [profileForm, setProfileForm] = useState(emptyProfileForm);
+  const [confirmDelete, setConfirmDelete] = useState<
+    | { kind: "user"; id: string; name: string }
+    | { kind: "profile"; id: string; name: string }
+    | null
+  >(null);
+  const [confirmBusy, setConfirmBusy] = useState(false);
 
   const computedCategory = useMemo(() => {
     const bw = profileForm.weight ? Number(profileForm.weight) : NaN;
@@ -265,17 +272,34 @@ export default function KontaPage() {
     }
   }
 
-  async function removeUser(id: string) {
-    if (!confirm("Na pewno usunąć konto?")) return;
+  function removeUser(id: string, name: string) {
+    setConfirmDelete({ kind: "user", id, name });
+  }
+
+  async function runConfirmDelete() {
+    if (!confirmDelete) return;
+    setConfirmBusy(true);
     try {
-      await deleteUser(id);
-      toast.success("Usunięto konto");
-      if (editingUserId === id) closeUserModal();
+      if (confirmDelete.kind === "user") {
+        await deleteUser(confirmDelete.id);
+        toast.success("Usunięto konto");
+        if (editingUserId === confirmDelete.id) closeUserModal();
+      } else {
+        await deleteProfile(confirmDelete.id);
+        toast.success("Usunięto profil");
+        if (editingProfileId === confirmDelete.id) closeProfileModal();
+      }
+      setConfirmDelete(null);
       await load();
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Błąd usuwania";
       setError(msg);
-      toast.error("Usuwanie konta", msg);
+      toast.error(
+        confirmDelete.kind === "user" ? "Usuwanie konta" : "Usuwanie profilu",
+        msg,
+      );
+    } finally {
+      setConfirmBusy(false);
     }
   }
 
@@ -339,18 +363,8 @@ export default function KontaPage() {
     }
   }
 
-  async function removeProfile(id: string) {
-    if (!confirm("Usunąć profil zawodnika?")) return;
-    try {
-      await deleteProfile(id);
-      toast.success("Usunięto profil");
-      if (editingProfileId === id) closeProfileModal();
-      await load();
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Błąd usuwania profilu";
-      setError(msg);
-      toast.error("Usuwanie profilu", msg);
-    }
+  function removeProfile(id: string, name: string) {
+    setConfirmDelete({ kind: "profile", id, name });
   }
 
   function toggleCreateRole(role: Role) {
@@ -488,7 +502,7 @@ export default function KontaPage() {
                         <button
                           type="button"
                           className="text-xs text-brand underline-offset-2 hover:underline"
-                          onClick={() => void removeUser(u.id)}
+                          onClick={() => removeUser(u.id, u.display_name)}
                         >
                           Usuń
                         </button>
@@ -563,7 +577,9 @@ export default function KontaPage() {
                       <button
                         type="button"
                         className="text-xs text-brand underline-offset-2 hover:underline"
-                        onClick={() => void removeProfile(p.id)}
+                        onClick={() =>
+                          removeProfile(p.id, p.display_name)
+                        }
                       >
                         Usuń
                       </button>
@@ -939,6 +955,21 @@ export default function KontaPage() {
           </div>
         </form>
       </Modal>
+
+      <ConfirmModal
+        open={confirmDelete !== null}
+        title={
+          confirmDelete?.kind === "user" ? "Usuń konto" : "Usuń profil"
+        }
+        message={
+          confirmDelete?.kind === "user"
+            ? `Na pewno usunąć konto „${confirmDelete.name}”?`
+            : `Na pewno usunąć profil zawodnika „${confirmDelete?.name ?? ""}”?`
+        }
+        busy={confirmBusy}
+        onConfirm={() => void runConfirmDelete()}
+        onClose={() => setConfirmDelete(null)}
+      />
     </div>
   );
 }

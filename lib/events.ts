@@ -48,6 +48,9 @@ export type CalendarEventFull = {
     at: string;
     status: WithdrawalStatus;
   }>;
+  plan_id?: string | null;
+  plan_week?: number | null;
+  plan_day?: number | null;
   created_by: string;
   created_at: string;
   updated_at: string;

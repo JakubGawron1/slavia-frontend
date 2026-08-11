@@ -6,7 +6,7 @@
     "license": {
       "name": ""
     },
-    "version": "1.1.0.17+18"
+    "version": "1.1.0.22+23"
   },
   "paths": {
     "/api/admin/db/tables": {
@@ -2750,6 +2750,247 @@
         ]
       }
     },
+    "/api/exercise-library": {
+      "get": {
+        "tags": [
+          "exercise-library"
+        ],
+        "operationId": "list_library",
+        "responses": {
+          "200": {
+            "description": "Biblioteka ćwiczeń",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ExerciseLibraryItem"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "exercise-library"
+        ],
+        "operationId": "create_library_item",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryItemBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Dodano ćwiczenie do biblioteki",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExerciseLibraryItem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Nieprawidłowe dane",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/exercise-library/{id}": {
+      "delete": {
+        "tags": [
+          "exercise-library"
+        ],
+        "operationId": "delete_library_item",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID pozycji",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usunięto pozycję",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "exercise-library"
+        ],
+        "operationId": "update_library_item",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID pozycji",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryItemBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Zaktualizowano pozycję",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExerciseLibraryItem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nie znaleziono",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
     "/api/flags/public": {
       "get": {
         "operationId": "list_public_flags",
@@ -2768,6 +3009,247 @@
             }
           }
         }
+      }
+    },
+    "/api/groups": {
+      "get": {
+        "tags": [
+          "groups"
+        ],
+        "operationId": "list_groups",
+        "responses": {
+          "200": {
+            "description": "Lista grup zawodników",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AthleteGroup"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "groups"
+        ],
+        "operationId": "create_group",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Utworzono grupę",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AthleteGroup"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Nieprawidłowe dane",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/groups/{id}": {
+      "delete": {
+        "tags": [
+          "groups"
+        ],
+        "operationId": "delete_group",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID grupy",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usunięto grupę",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "groups"
+        ],
+        "operationId": "update_group",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID grupy",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Zaktualizowano grupę",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AthleteGroup"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nie znaleziono",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
       }
     },
     "/api/health": {
@@ -3132,6 +3614,26 @@
     "/api/plans": {
       "get": {
         "operationId": "list_plans",
+        "parameters": [
+          {
+            "name": "templates",
+            "in": "query",
+            "description": "Tylko szablony katalogu",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "archived",
+            "in": "query",
+            "description": "Filtr archiwum",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Lista planów treningowych",
@@ -3202,6 +3704,58 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/plans/ai-draft": {
+      "post": {
+        "operationId": "ai_draft_plan",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AiDraftBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Szkic planu (stub / AI)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrainingPlan"
                 }
               }
             }
@@ -3358,6 +3912,205 @@
         ]
       }
     },
+    "/api/plans/{id}/coach-reply": {
+      "put": {
+        "operationId": "save_coach_reply",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID planu",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoachReplyBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Zapisano odpowiedź trenera",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrainingPlanProgress"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Plan / postęp nie istnieje",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/plans/{id}/copy": {
+      "post": {
+        "operationId": "copy_plan",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID planu źródłowego",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Skopiowano plan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrainingPlan"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Plan nie istnieje",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/plans/{id}/new-version": {
+      "post": {
+        "operationId": "new_plan_version",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID planu",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Utworzono nową wersję planu",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrainingPlan"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Plan nie istnieje",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
     "/api/plans/{id}/progress": {
       "get": {
         "operationId": "get_my_progress",
@@ -3466,6 +4219,62 @@
           },
           "404": {
             "description": "Plan nie istnieje",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/plans/{id}/progress/all": {
+      "get": {
+        "operationId": "list_plan_progress_all",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID planu",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Postęp wszystkich przypisanych",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrainingPlanProgress"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {
@@ -4361,6 +5170,26 @@
   },
   "components": {
     "schemas": {
+      "AiDraftBody": {
+        "type": "object",
+        "required": [
+          "prompt"
+        ],
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "description": "Opis / prompt (np. „8 tygodni peaking, 3 sesje/tyg”)"
+          },
+          "weeks": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
       "ApproveAttendanceBody": {
         "type": "object",
         "properties": {
@@ -4476,6 +5305,40 @@
             ]
           },
           "title": {
+            "type": "string"
+          }
+        }
+      },
+      "AthleteGroup": {
+        "type": "object",
+        "description": "Grupa zawodników do przypisań planów (087).",
+        "required": [
+          "id",
+          "name",
+          "created_by",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string"
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "member_user_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "name": {
+            "type": "string"
+          },
+          "updated_at": {
             "type": "string"
           }
         }
@@ -4779,6 +5642,29 @@
           "locked": {
             "type": "boolean"
           },
+          "plan_day": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "plan_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Powiązany plan treningowy (089)."
+          },
+          "plan_week": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
           "source": {
             "type": "string",
             "description": "\"seeded\" | \"manual\""
@@ -4918,6 +5804,21 @@
           "draft",
           "published"
         ]
+      },
+      "CoachReplyBody": {
+        "type": "object",
+        "required": [
+          "user_id",
+          "coach_reply"
+        ],
+        "properties": {
+          "coach_reply": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          }
+        }
       },
       "CompetitionResult": {
         "type": "object",
@@ -5335,6 +6236,29 @@
               "null"
             ]
           },
+          "plan_day": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "plan_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Opcjonalne powiązanie z planem treningowym (089)."
+          },
+          "plan_week": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
           "time": {
             "type": [
               "string",
@@ -5368,6 +6292,66 @@
             "$ref": "#/components/schemas/WithdrawalStatus"
           },
           "user_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "ExerciseLibraryItem": {
+        "type": "object",
+        "description": "Biblioteka ćwiczeń klubowa (082).",
+        "required": [
+          "id",
+          "name",
+          "created_by",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string"
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "default_reps": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "default_sets": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "updated_at": {
+            "type": "string"
+          },
+          "video_url": {
             "type": [
               "string",
               "null"
@@ -5445,6 +6429,26 @@
           }
         }
       },
+      "GroupBody": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "member_user_ids": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
       "HealthResponse": {
         "type": "object",
         "required": [
@@ -5470,6 +6474,52 @@
           "imagekit",
           "cloudinary"
         ]
+      },
+      "LibraryItemBody": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "default_reps": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "default_sets": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "name": {
+            "type": "string"
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "tags": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "video_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
       },
       "LogLevel": {
         "type": "string",
@@ -5594,13 +6644,37 @@
           }
         }
       },
+      "PctOfLift": {
+        "type": "string",
+        "description": "Bazowy boje do %1RM (091/092).\n`Exercise` = % PR tego samego ćwiczenia co w planie (zawodnik dobiera kg sam — brak w profilu).",
+        "enum": [
+          "snatch",
+          "clean_jerk",
+          "total",
+          "exercise"
+        ]
+      },
       "PlanBody": {
         "type": "object",
         "required": [
-          "title",
-          "exercises"
+          "title"
         ],
         "properties": {
+          "archived": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "assigned_group_ids": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
           "assigned_user_ids": {
             "type": [
               "array",
@@ -5620,7 +6694,25 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PlanExercise"
-            }
+            },
+            "description": "Legacy — jeśli podane bez `weeks`, trafia do dnia 1."
+          },
+          "is_season_active": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Wyróżnij jako plan sezonu (pulpit zawodnika)."
+          },
+          "is_template": {
+            "type": "boolean"
+          },
+          "publish": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "true = ustaw published_at + signed_by (121)."
           },
           "title": {
             "type": "string"
@@ -5630,11 +6722,125 @@
               "string",
               "null"
             ]
+          },
+          "weeks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlanWeek"
+            }
+          }
+        }
+      },
+      "PlanDay": {
+        "type": "object",
+        "required": [
+          "day_of_week"
+        ],
+        "properties": {
+          "day_of_week": {
+            "type": "integer",
+            "format": "int32",
+            "description": "1 = poniedziałek … 7 = niedziela",
+            "minimum": 0
+          },
+          "exercises": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlanExercise"
+            }
+          },
+          "label": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
       "PlanExercise": {
         "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "alternatives": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlanExerciseAlt"
+            }
+          },
+          "id": {
+            "type": "string"
+          },
+          "is_warmup": {
+            "type": "boolean"
+          },
+          "load_kg": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
+          "load_pct": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
+          "name": {
+            "type": "string"
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Notatki trenera widoczne dla zawodnika (094)."
+          },
+          "pct_of": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PctOfLift"
+              }
+            ]
+          },
+          "reps": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "set_scheme": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlanSet"
+            },
+            "description": "Rozpisane serie (jeśli puste — używane `sets`/`reps`/`load_pct` jako jednolity schemat)."
+          },
+          "sets": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "sort_order": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "PlanExerciseAlt": {
+        "type": "object",
+        "description": "Zamiennik ćwiczenia (kontuzja / przeciwwskazanie) — 135.",
         "required": [
           "id",
           "name"
@@ -5650,14 +6856,32 @@
             ],
             "format": "double"
           },
+          "load_pct": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
           "name": {
             "type": "string"
           },
-          "notes": {
+          "pct_of": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PctOfLift"
+              }
+            ]
+          },
+          "reason": {
             "type": [
               "string",
               "null"
-            ]
+            ],
+            "description": "Powód zamiennika (np. kontuzja barku)."
           },
           "reps": {
             "type": [
@@ -5700,6 +6924,78 @@
           },
           "exercise_id": {
             "type": "string"
+          },
+          "selected_alternative_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Wybrany zamiennik (kontuzja) — 135."
+          }
+        }
+      },
+      "PlanSet": {
+        "type": "object",
+        "description": "Pojedyncza seria w rozpisie ćwiczenia.",
+        "properties": {
+          "is_warmup": {
+            "type": "boolean"
+          },
+          "load_kg": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
+          "load_pct": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
+          "pct_of": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PctOfLift"
+              }
+            ]
+          },
+          "reps": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "PlanWeek": {
+        "type": "object",
+        "required": [
+          "week_index"
+        ],
+        "properties": {
+          "days": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlanDay"
+            }
+          },
+          "label": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "week_index": {
+            "type": "integer",
+            "format": "int32",
+            "description": "1-based",
+            "minimum": 0
           }
         }
       },
@@ -5772,6 +7068,12 @@
           "entries"
         ],
         "properties": {
+          "athlete_feedback": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "entries": {
             "type": "array",
             "items": {
@@ -6128,19 +7430,26 @@
         "required": [
           "id",
           "title",
-          "exercises",
-          "assigned_user_ids",
           "created_by",
           "created_at",
           "updated_at"
         ],
         "properties": {
+          "archived": {
+            "type": "boolean"
+          },
+          "assigned_group_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "assigned_user_ids": {
             "type": "array",
             "items": {
               "type": "string"
             },
-            "description": "Puste = widoczny dla wszystkich zawodników"
+            "description": "Puste (+ puste grupy) = widoczny dla wszystkich zawodników"
           },
           "created_at": {
             "type": "string"
@@ -6158,10 +7467,42 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PlanExercise"
-            }
+            },
+            "description": "Płaska lista (legacy); synchronizowana z `weeks` przy normalizacji."
           },
           "id": {
             "type": "string"
+          },
+          "is_season_active": {
+            "type": "boolean",
+            "description": "Wyróżniony plan sezonu — jeden na klub (pulpit zawodnika)."
+          },
+          "is_template": {
+            "type": "boolean"
+          },
+          "parent_plan_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "published_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "signed_by": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "template_id": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "title": {
             "type": "string"
@@ -6169,11 +7510,23 @@
           "updated_at": {
             "type": "string"
           },
+          "version": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
           "week_label": {
             "type": [
               "string",
               "null"
-            ]
+            ],
+            "description": "Legacy / skrót UI — preferuj `weeks`."
+          },
+          "weeks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlanWeek"
+            }
           }
         }
       },
@@ -6183,10 +7536,36 @@
           "id",
           "plan_id",
           "user_id",
-          "entries",
           "updated_at"
         ],
         "properties": {
+          "athlete_feedback": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Komentarz zwrotny zawodnika → trener (095)."
+          },
+          "coach_replied_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "coach_reply": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Odpowiedź trenera na feedback (po sesji)."
+          },
+          "completed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Badge „plan ukończony” (098)."
+          },
           "entries": {
             "type": "array",
             "items": {
@@ -6551,6 +7930,14 @@
     {
       "name": "public",
       "description": "Publiczne endpointy strony klubu"
+    },
+    {
+      "name": "groups",
+      "description": "Grupy zawodników"
+    },
+    {
+      "name": "exercise-library",
+      "description": "Biblioteka ćwiczeń"
     }
   ]
 }

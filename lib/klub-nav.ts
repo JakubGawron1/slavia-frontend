@@ -55,6 +55,7 @@ export const KLUB_NAV: KlubNavCategory[] = [
         href: "/klub/plany",
         label: "Plany treningowe",
         roles: ["trener", "superadmin"],
+        flag: "training_plans",
       },
       {
         href: "/klub/kalendarz",

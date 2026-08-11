@@ -3,21 +3,36 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 1.1.0.17+18
+ * OpenAPI spec version: 1.1.0.22+23
  */
+import type { PctOfLift } from './pctOfLift';
+import type { PlanExerciseAlt } from './planExerciseAlt';
+import type { PlanSet } from './planSet';
 
 export interface PlanExercise {
+  alternatives?: PlanExerciseAlt[];
   id: string;
+  is_warmup?: boolean;
   /** @nullable */
   load_kg?: number | null;
-  name: string;
   /** @nullable */
+  load_pct?: number | null;
+  name: string;
+  /**
+     * Notatki trenera widoczne dla zawodnika (094).
+     * @nullable
+     */
   notes?: string | null;
+  pct_of?: null | PctOfLift;
   /** @nullable */
   reps?: string | null;
+  /** Rozpisane serie (jeśli puste — używane `sets`/`reps`/`load_pct` jako jednolity schemat). */
+  set_scheme?: PlanSet[];
   /**
      * @minimum 0
      * @nullable
      */
   sets?: number | null;
+  /** @minimum 0 */
+  sort_order?: number;
 }

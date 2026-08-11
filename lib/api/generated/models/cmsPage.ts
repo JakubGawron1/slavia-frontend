@@ -3,7 +3,7 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 1.1.0.17+18
+ * OpenAPI spec version: 1.1.0.22+23
  */
 import type { CmsBlock } from './cmsBlock';
 import type { CmsStatus } from './cmsStatus';

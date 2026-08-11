@@ -235,6 +235,7 @@ function HeaderInner() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [flagsReady, setFlagsReady] = useState(false);
   const flagsQuery = useListPublicFlags({ query: { staleTime: 60_000 } });
 
   useEffect(() => {
@@ -252,6 +253,16 @@ function HeaderInner() {
     return () => window.removeEventListener("storage", sync);
   }, [pathname]);
 
+  // SSR i pierwszy paint klienta: te same linki (flagi = undefined → show-all).
+  // Filtrowanie flag dopiero po hydracji + załadowaniu query — bez mismatch.
+  useEffect(() => {
+    if (flagsQuery.isFetched || flagsQuery.isError) {
+      setFlagsReady(true);
+    }
+  }, [flagsQuery.isFetched, flagsQuery.isError]);
+
+  const navFlags = flagsReady ? flagsQuery.data?.data : undefined;
+
   return (
     <HeaderChrome
       pathname={pathname}
@@ -259,7 +270,7 @@ function HeaderInner() {
       onToggle={() => setOpen((v) => !v)}
       onClose={() => setOpen(false)}
       user={user}
-      navLinks={visibleNavLinks(flagsQuery.data?.data)}
+      navLinks={visibleNavLinks(navFlags)}
     />
   );
 }

@@ -6,11 +6,16 @@ export const PUBLIC_CALENDAR_FLAG = "public_calendar";
 export const CLUB_CALENDAR_FLAG = "club_calendar";
 /** Kalendarz zawodnika `/panel/kalendarz` */
 export const ATHLETE_CALENDAR_FLAG = "athlete_calendar";
+/** Plany treningowe — klub + panel zawodnika */
+export const TRAINING_PLANS_FLAG = "training_plans";
 /** Globalne powiadomienia toast (panele + witryna) */
 export const UI_TOASTS_FLAG = "ui_toasts";
 /** E-maile powiadomień (skład / plany / kontakt) — experimental */
 export const EXPERIMENTAL_NOTIFICATION_EMAILS_FLAG =
   "experimental_notification_emails";
+/** Szkic AI planu — experimental / stub */
+export const EXPERIMENTAL_CLUB_ASSISTANT_FLAG =
+  "experimental_club_assistant";
 
 /**
  * Egzekwuje flagi funkcji na podstawie listy publicznej (`/api/flags/public`).

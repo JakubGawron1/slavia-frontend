@@ -8,6 +8,7 @@ import {
 } from "@/lib/api/generated/contact/contact";
 import type { ContactMessage } from "@/lib/api/generated/models";
 import { useToast } from "@/components/toast/ToastProvider";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 
 function formatDate(iso: string): string {
   try {
@@ -25,6 +26,7 @@ export default function WiadomosciPage() {
   const [filter, setFilter] = useState<"all" | "unread" | "read">("all");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ContactMessage | null>(null);
 
   const messagesQuery = useListContactMessages({
     query: { placeholderData: (prev) => prev },
@@ -87,19 +89,20 @@ export default function WiadomosciPage() {
     }
   }
 
-  async function removeMessage(message: ContactMessage) {
-    if (
-      !window.confirm(
-        `Usunąć wiadomość „${message.subject}” od ${message.name}?`,
-      )
-    ) {
-      return;
-    }
+  function removeMessage(message: ContactMessage) {
+    setDeleteTarget(message);
+  }
+
+  async function confirmRemoveMessage() {
+    if (!deleteTarget) return;
     setActionError(null);
     try {
-      await deleteMutation.mutateAsync({ id: message.id });
-      toast.success("Usunięto wiadomość", message.subject);
-      setSelectedId((current) => (current === message.id ? null : current));
+      await deleteMutation.mutateAsync({ id: deleteTarget.id });
+      toast.success("Usunięto wiadomość", deleteTarget.subject);
+      setSelectedId((current) =>
+        current === deleteTarget.id ? null : current,
+      );
+      setDeleteTarget(null);
     } catch (err) {
       const msg =
         err instanceof Error ? err.message : "Nie udało się usunąć wiadomości.";
@@ -288,7 +291,7 @@ export default function WiadomosciPage() {
                 <button
                   type="button"
                   disabled={busy}
-                  onClick={() => void removeMessage(selected)}
+                  onClick={() => removeMessage(selected)}
                   className="border border-brand/50 px-4 py-2.5 font-display text-[11px] tracking-[0.12em] text-brand uppercase transition-colors hover:border-brand hover:bg-brand/10 disabled:opacity-60"
                 >
                   {deleteMutation.isPending ? "Usuwanie…" : "Usuń"}
@@ -303,6 +306,19 @@ export default function WiadomosciPage() {
           )}
         </div>
       </div>
+
+      <ConfirmModal
+        open={deleteTarget !== null}
+        title="Usuń wiadomość"
+        message={
+          deleteTarget
+            ? `Na pewno usunąć wiadomość „${deleteTarget.subject}” od ${deleteTarget.name}?`
+            : null
+        }
+        busy={deleteMutation.isPending}
+        onConfirm={() => void confirmRemoveMessage()}
+        onClose={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

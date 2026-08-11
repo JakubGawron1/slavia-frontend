@@ -3,7 +3,7 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 1.1.0.17+18
+ * OpenAPI spec version: 1.1.0.22+23
  */
 import {
   useMutation,
@@ -25,6 +25,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AiDraftBody,
   ApproveAttendanceBody,
   AthleteCalendarEvent,
   AthleteProfile,
@@ -36,6 +37,7 @@ import type {
   CheckInBody,
   CmsPage,
   CmsPageBody,
+  CoachReplyBody,
   CompetitionResult,
   CreateResultBody,
   CreateUserBody,
@@ -46,6 +48,7 @@ import type {
   ListEventsParams,
   ListLogsParams,
   ListMyEventsParams,
+  ListPlansParams,
   ListResultsParams,
   OkResponse,
   PlanBody,
@@ -3712,17 +3715,24 @@ export type listPlansResponseError = (listPlansResponse401 | listPlansResponse40
 
 export type listPlansResponse = (listPlansResponseSuccess | listPlansResponseError)
 
-export const getListPlansUrl = () => {
+export const getListPlansUrl = (params?: ListPlansParams,) => {
+  const normalizedParams = new URLSearchParams();
 
+  Object.entries(params || {}).forEach(([key, value]) => {
 
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
 
+  const stringifiedParams = normalizedParams.toString();
 
-  return `/api/plans`
+  return stringifiedParams.length > 0 ? `/api/plans?${stringifiedParams}` : `/api/plans`
 }
 
-export const listPlans = async ( options?: Parameters<typeof customFetch>[1]): Promise<listPlansResponse> => {
+export const listPlans = async (params?: ListPlansParams, options?: Parameters<typeof customFetch>[1]): Promise<listPlansResponse> => {
 
-  return customFetch<listPlansResponse>(getListPlansUrl(),
+  return customFetch<listPlansResponse>(getListPlansUrl(params),
   {
     ...options,
     method: 'GET'
@@ -3735,23 +3745,23 @@ export const listPlans = async ( options?: Parameters<typeof customFetch>[1]): P
 
 
 
-export const getListPlansQueryKey = () => {
+export const getListPlansQueryKey = (params?: ListPlansParams,) => {
     return [
-    `/api/plans`
+    `/api/plans`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getListPlansQueryOptions = <TData = Awaited<ReturnType<typeof listPlans>>, TError = ErrorBody>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPlans>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getListPlansQueryOptions = <TData = Awaited<ReturnType<typeof listPlans>>, TError = ErrorBody>(params?: ListPlansParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPlans>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getListPlansQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getListPlansQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listPlans>>> = ({ signal }) => listPlans({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listPlans>>> = ({ signal }) => listPlans(params, { signal, ...requestOptions });
 
 
 
@@ -3765,7 +3775,7 @@ export type ListPlansQueryError = ErrorBody
 
 
 export function useListPlans<TData = Awaited<ReturnType<typeof listPlans>>, TError = ErrorBody>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPlans>>, TError, TData>> & Pick<
+ params: undefined |  ListPlansParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPlans>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof listPlans>>,
           TError,
@@ -3775,7 +3785,7 @@ export function useListPlans<TData = Awaited<ReturnType<typeof listPlans>>, TErr
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useListPlans<TData = Awaited<ReturnType<typeof listPlans>>, TError = ErrorBody>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPlans>>, TError, TData>> & Pick<
+ params?: ListPlansParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPlans>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof listPlans>>,
           TError,
@@ -3785,16 +3795,16 @@ export function useListPlans<TData = Awaited<ReturnType<typeof listPlans>>, TErr
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useListPlans<TData = Awaited<ReturnType<typeof listPlans>>, TError = ErrorBody>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPlans>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ params?: ListPlansParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPlans>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useListPlans<TData = Awaited<ReturnType<typeof listPlans>>, TError = ErrorBody>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPlans>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ params?: ListPlansParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPlans>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getListPlansQueryOptions(options)
+  const queryOptions = getListPlansQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -3898,6 +3908,94 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getCreatePlanMutationOptions(options), queryClient);
+    }
+    export type aiDraftPlanResponse200 = {
+  data: TrainingPlan
+  status: 200
+}
+
+export type aiDraftPlanResponse401 = {
+  data: ErrorBody
+  status: 401
+}
+
+export type aiDraftPlanResponse403 = {
+  data: ErrorBody
+  status: 403
+}
+
+export type aiDraftPlanResponseSuccess = (aiDraftPlanResponse200) & {
+  headers: Headers;
+};
+export type aiDraftPlanResponseError = (aiDraftPlanResponse401 | aiDraftPlanResponse403) & {
+  headers: Headers;
+};
+
+export type aiDraftPlanResponse = (aiDraftPlanResponseSuccess | aiDraftPlanResponseError)
+
+export const getAiDraftPlanUrl = () => {
+
+
+
+
+  return `/api/plans/ai-draft`
+}
+
+export const aiDraftPlan = async (aiDraftBody: AiDraftBody, options?: Parameters<typeof customFetch>[1]): Promise<aiDraftPlanResponse> => {
+
+  return customFetch<aiDraftPlanResponse>(getAiDraftPlanUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(aiDraftBody)
+  }
+);}
+
+
+
+
+
+export const getAiDraftPlanMutationOptions = <TError = ErrorBody,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof aiDraftPlan>>, TError,{data: AiDraftBody}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof aiDraftPlan>>, TError,{data: AiDraftBody}, TContext> => {
+
+const mutationKey = ['aiDraftPlan'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof aiDraftPlan>>, {data: AiDraftBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  aiDraftPlan(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AiDraftPlanMutationResult = NonNullable<Awaited<ReturnType<typeof aiDraftPlan>>>
+    export type AiDraftPlanMutationBody = AiDraftBody
+    export type AiDraftPlanMutationError = ErrorBody
+
+    export const useAiDraftPlan = <TError = ErrorBody,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof aiDraftPlan>>, TError,{data: AiDraftBody}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof aiDraftPlan>>,
+        TError,
+        {data: AiDraftBody},
+        TContext
+      > => {
+      return useMutation(getAiDraftPlanMutationOptions(options), queryClient);
     }
     export type deletePlanResponse200 = {
   data: OkResponse
@@ -4080,6 +4178,286 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getUpdatePlanMutationOptions(options), queryClient);
+    }
+    export type saveCoachReplyResponse200 = {
+  data: TrainingPlanProgress
+  status: 200
+}
+
+export type saveCoachReplyResponse401 = {
+  data: ErrorBody
+  status: 401
+}
+
+export type saveCoachReplyResponse403 = {
+  data: ErrorBody
+  status: 403
+}
+
+export type saveCoachReplyResponse404 = {
+  data: ErrorBody
+  status: 404
+}
+
+export type saveCoachReplyResponseSuccess = (saveCoachReplyResponse200) & {
+  headers: Headers;
+};
+export type saveCoachReplyResponseError = (saveCoachReplyResponse401 | saveCoachReplyResponse403 | saveCoachReplyResponse404) & {
+  headers: Headers;
+};
+
+export type saveCoachReplyResponse = (saveCoachReplyResponseSuccess | saveCoachReplyResponseError)
+
+export const getSaveCoachReplyUrl = (id: string,) => {
+
+
+
+
+  return `/api/plans/${id}/coach-reply`
+}
+
+export const saveCoachReply = async (id: string,
+    coachReplyBody: CoachReplyBody, options?: Parameters<typeof customFetch>[1]): Promise<saveCoachReplyResponse> => {
+
+  return customFetch<saveCoachReplyResponse>(getSaveCoachReplyUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(coachReplyBody)
+  }
+);}
+
+
+
+
+
+export const getSaveCoachReplyMutationOptions = <TError = ErrorBody,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveCoachReply>>, TError,{id: string;data: CoachReplyBody}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof saveCoachReply>>, TError,{id: string;data: CoachReplyBody}, TContext> => {
+
+const mutationKey = ['saveCoachReply'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof saveCoachReply>>, {id: string;data: CoachReplyBody}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  saveCoachReply(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SaveCoachReplyMutationResult = NonNullable<Awaited<ReturnType<typeof saveCoachReply>>>
+    export type SaveCoachReplyMutationBody = CoachReplyBody
+    export type SaveCoachReplyMutationError = ErrorBody
+
+    export const useSaveCoachReply = <TError = ErrorBody,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveCoachReply>>, TError,{id: string;data: CoachReplyBody}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof saveCoachReply>>,
+        TError,
+        {id: string;data: CoachReplyBody},
+        TContext
+      > => {
+      return useMutation(getSaveCoachReplyMutationOptions(options), queryClient);
+    }
+    export type copyPlanResponse200 = {
+  data: TrainingPlan
+  status: 200
+}
+
+export type copyPlanResponse401 = {
+  data: ErrorBody
+  status: 401
+}
+
+export type copyPlanResponse403 = {
+  data: ErrorBody
+  status: 403
+}
+
+export type copyPlanResponse404 = {
+  data: ErrorBody
+  status: 404
+}
+
+export type copyPlanResponseSuccess = (copyPlanResponse200) & {
+  headers: Headers;
+};
+export type copyPlanResponseError = (copyPlanResponse401 | copyPlanResponse403 | copyPlanResponse404) & {
+  headers: Headers;
+};
+
+export type copyPlanResponse = (copyPlanResponseSuccess | copyPlanResponseError)
+
+export const getCopyPlanUrl = (id: string,) => {
+
+
+
+
+  return `/api/plans/${id}/copy`
+}
+
+export const copyPlan = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<copyPlanResponse> => {
+
+  return customFetch<copyPlanResponse>(getCopyPlanUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getCopyPlanMutationOptions = <TError = ErrorBody,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof copyPlan>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof copyPlan>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['copyPlan'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof copyPlan>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  copyPlan(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CopyPlanMutationResult = NonNullable<Awaited<ReturnType<typeof copyPlan>>>
+
+    export type CopyPlanMutationError = ErrorBody
+
+    export const useCopyPlan = <TError = ErrorBody,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof copyPlan>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof copyPlan>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+      return useMutation(getCopyPlanMutationOptions(options), queryClient);
+    }
+    export type newPlanVersionResponse200 = {
+  data: TrainingPlan
+  status: 200
+}
+
+export type newPlanVersionResponse401 = {
+  data: ErrorBody
+  status: 401
+}
+
+export type newPlanVersionResponse403 = {
+  data: ErrorBody
+  status: 403
+}
+
+export type newPlanVersionResponse404 = {
+  data: ErrorBody
+  status: 404
+}
+
+export type newPlanVersionResponseSuccess = (newPlanVersionResponse200) & {
+  headers: Headers;
+};
+export type newPlanVersionResponseError = (newPlanVersionResponse401 | newPlanVersionResponse403 | newPlanVersionResponse404) & {
+  headers: Headers;
+};
+
+export type newPlanVersionResponse = (newPlanVersionResponseSuccess | newPlanVersionResponseError)
+
+export const getNewPlanVersionUrl = (id: string,) => {
+
+
+
+
+  return `/api/plans/${id}/new-version`
+}
+
+export const newPlanVersion = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<newPlanVersionResponse> => {
+
+  return customFetch<newPlanVersionResponse>(getNewPlanVersionUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getNewPlanVersionMutationOptions = <TError = ErrorBody,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof newPlanVersion>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof newPlanVersion>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['newPlanVersion'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof newPlanVersion>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  newPlanVersion(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type NewPlanVersionMutationResult = NonNullable<Awaited<ReturnType<typeof newPlanVersion>>>
+
+    export type NewPlanVersionMutationError = ErrorBody
+
+    export const useNewPlanVersion = <TError = ErrorBody,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof newPlanVersion>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof newPlanVersion>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+      return useMutation(getNewPlanVersionMutationOptions(options), queryClient);
     }
     export type getMyProgressResponse200 = {
   data: TrainingPlanProgress
@@ -4293,7 +4671,125 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getSaveProgressMutationOptions(options), queryClient);
     }
-    export type listProfilesResponse200 = {
+    export type listPlanProgressAllResponse200 = {
+  data: TrainingPlanProgress[]
+  status: 200
+}
+
+export type listPlanProgressAllResponse401 = {
+  data: ErrorBody
+  status: 401
+}
+
+export type listPlanProgressAllResponse403 = {
+  data: ErrorBody
+  status: 403
+}
+
+export type listPlanProgressAllResponseSuccess = (listPlanProgressAllResponse200) & {
+  headers: Headers;
+};
+export type listPlanProgressAllResponseError = (listPlanProgressAllResponse401 | listPlanProgressAllResponse403) & {
+  headers: Headers;
+};
+
+export type listPlanProgressAllResponse = (listPlanProgressAllResponseSuccess | listPlanProgressAllResponseError)
+
+export const getListPlanProgressAllUrl = (id: string,) => {
+
+
+
+
+  return `/api/plans/${id}/progress/all`
+}
+
+export const listPlanProgressAll = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<listPlanProgressAllResponse> => {
+
+  return customFetch<listPlanProgressAllResponse>(getListPlanProgressAllUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListPlanProgressAllQueryKey = (id: string,) => {
+    return [
+    `/api/plans/${id}/progress/all`
+    ] as const;
+    }
+
+
+export const getListPlanProgressAllQueryOptions = <TData = Awaited<ReturnType<typeof listPlanProgressAll>>, TError = ErrorBody>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPlanProgressAll>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListPlanProgressAllQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listPlanProgressAll>>> = ({ signal }) => listPlanProgressAll(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listPlanProgressAll>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListPlanProgressAllQueryResult = NonNullable<Awaited<ReturnType<typeof listPlanProgressAll>>>
+export type ListPlanProgressAllQueryError = ErrorBody
+
+
+export function useListPlanProgressAll<TData = Awaited<ReturnType<typeof listPlanProgressAll>>, TError = ErrorBody>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPlanProgressAll>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listPlanProgressAll>>,
+          TError,
+          Awaited<ReturnType<typeof listPlanProgressAll>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListPlanProgressAll<TData = Awaited<ReturnType<typeof listPlanProgressAll>>, TError = ErrorBody>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPlanProgressAll>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listPlanProgressAll>>,
+          TError,
+          Awaited<ReturnType<typeof listPlanProgressAll>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListPlanProgressAll<TData = Awaited<ReturnType<typeof listPlanProgressAll>>, TError = ErrorBody>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPlanProgressAll>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useListPlanProgressAll<TData = Awaited<ReturnType<typeof listPlanProgressAll>>, TError = ErrorBody>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPlanProgressAll>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListPlanProgressAllQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export type listProfilesResponse200 = {
   data: AthleteProfile[]
   status: 200
 }

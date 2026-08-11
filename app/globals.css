@@ -524,6 +524,80 @@ body {
   background: transparent;
 }
 
+/* Checkbox — brand / paper / ink (witryna + panele) */
+input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  box-sizing: border-box;
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  margin: 0;
+  vertical-align: middle;
+  cursor: pointer;
+  border: 1.5px solid color-mix(in srgb, var(--paper) 38%, transparent);
+  border-radius: var(--panel-radius-sm, 0.25rem);
+  background-color: color-mix(in srgb, var(--paper) 8%, transparent);
+  accent-color: var(--brand);
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+input[type="checkbox"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 0.62em;
+  height: 0.62em;
+  transform: scale(0);
+  transition: transform 0.12s ease;
+  background-color: var(--ink);
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+
+input[type="checkbox"]:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--brand) 55%, var(--paper));
+  background-color: color-mix(in srgb, var(--brand) 14%, transparent);
+}
+
+input[type="checkbox"]:checked {
+  border-color: var(--brand);
+  background-color: var(--brand);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--brand) 35%, transparent);
+}
+
+input[type="checkbox"]:checked::before {
+  transform: scale(1);
+}
+
+input[type="checkbox"]:indeterminate {
+  border-color: var(--brand);
+  background-color: color-mix(in srgb, var(--brand) 78%, var(--brand-deep));
+}
+
+input[type="checkbox"]:indeterminate::before {
+  width: 0.55em;
+  height: 0.12em;
+  transform: scale(1);
+  clip-path: none;
+  border-radius: 999px;
+  background-color: var(--ink);
+}
+
+input[type="checkbox"]:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--brand) 72%, transparent);
+  outline-offset: 2px;
+}
+
+input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 @keyframes rise {
   from {
     opacity: 0;

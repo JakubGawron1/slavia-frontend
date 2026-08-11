@@ -3,7 +3,7 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 1.1.0.17+18
+ * OpenAPI spec version: 1.1.0.22+23
  */
 
 export interface PlanProgressEntry {
@@ -13,4 +13,9 @@ export interface PlanProgressEntry {
   athlete_note?: string | null;
   completed: boolean;
   exercise_id: string;
+  /**
+     * Wybrany zamiennik (kontuzja) — 135.
+     * @nullable
+     */
+  selected_alternative_id?: string | null;
 }

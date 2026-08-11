@@ -3,6 +3,16 @@ import type { ChangelogEntry } from "@/lib/changelog";
 
 export const GENERATED_CHANGELOG: ChangelogEntry[] = [
   {
+    "version": "1.1.0.22+23",
+    "date": "2026-08-11",
+    "category": "frontend",
+    "title": "Feature: % PR tego ćwiczenia (`PctOfLift::Exercise`)",
+    "notes": [
+      "Nowy wariant `pct_of: exercise` — np. 80% PR deadlift; bez auto-kg z profilu (zawodnik dobiera sam).",
+      "UI kadry + etykiety panel/mobile; hint przy % PR ruchu."
+    ]
+  },
+  {
     "version": "1.1.0.18+19",
     "date": "2026-08-11",
     "category": "backend",
@@ -11,6 +21,128 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
       "`FeatureFlag.client_visible` — źródło prawdy w katalogu BE (`sync_flag_catalog`).",
       "`GET /api/flags/public` filtruje po `client_visible` (bez hardkodowanej listy kluczy).",
       "DevTools nadal listuje wszystkie flagi (stable + experimental) i przełącza przez `PATCH /api/admin/flags/{key}`."
+    ]
+  },
+  {
+    "version": "1.1.0.22+23",
+    "date": "2026-08-11",
+    "category": "backend",
+    "title": "Feature: `PctOfLift::Exercise`",
+    "notes": [
+      "`%` względem PR tego ćwiczenia w planie (bez stats z profilu)."
+    ]
+  },
+  {
+    "version": "1.1.0.20+21",
+    "date": "2026-08-11",
+    "category": "backend",
+    "title": "Feature: `PlanSet` / soft-merge ćwiczeń w tygodnie",
+    "notes": [
+      "`PlanExercise.set_scheme` — rozpis serii z %1RM/kg.",
+      "`normalize()`: jeśli tygodnie są puste, a jest legacy `exercises` — scalenie do dnia 1."
+    ]
+  },
+  {
+    "version": "1.1.0.22+23",
+    "date": "2026-08-11",
+    "category": "mobile",
+    "title": "Feature: etykieta % PR ćwiczenia",
+    "notes": [
+      "Wyświetlanie `pct_of: exercise` jako „PR {nazwa}” + hint doboru kg."
+    ]
+  },
+  {
+    "version": "1.1.0.27+28",
+    "date": "2026-08-11",
+    "category": "frontend",
+    "title": "Feature: flagi planów treningowych",
+    "notes": [
+      "Stable `training_plans` (ON) — gate nav + `/klub/plany` + `/panel/plany` + kafelek sezonu / ops.",
+      "`experimental_club_assistant` → rollout **Stub** (opis: stub, Groq później).",
+      "Placeholdery Planned (OFF, nie publiczne): `experimental_plan_pdf_export`, `…_qr_checkin`, `…_day_rpe`, `…_public_share`, `…_rest_timer`."
+    ]
+  },
+  {
+    "version": "1.1.0.27+28",
+    "date": "2026-08-11",
+    "category": "backend",
+    "title": "Feature: katalog flag — plany treningowe",
+    "notes": [
+      "`training_plans` (stable/wired/ON); `experimental_club_assistant` → Stub; placeholdery Planned: PDF, QR check-in, RPE dnia, share-link, rest timer."
+    ]
+  },
+  {
+    "version": "1.1.0.21+22",
+    "date": "2026-08-11",
+    "category": "backend",
+    "title": "Feature: plan sezonu + coach reply",
+    "notes": [
+      "`is_season_active` (jeden aktywny): czyszczenie przy create/update.",
+      "`TrainingPlanProgress.coach_reply` / `coach_replied_at`; `PUT /api/plans/{id}/coach-reply` (notyfikacja); athlete save nie nadpisuje reply."
+    ]
+  },
+  {
+    "version": "1.1.0.21+22",
+    "date": "2026-08-11",
+    "category": "mobile",
+    "title": "Feature: plan sezonu + odpowiedź trenera",
+    "notes": [
+      "Pulpit: kafelek planu sezonu; plany: domyślny wybór sezonu + wyświetlanie `coach_reply`."
+    ]
+  },
+  {
+    "version": "1.1.0.21+22",
+    "date": "2026-08-11",
+    "category": "frontend",
+    "title": "Feature: plan sezonu + odpowiedź trenera na feedback",
+    "notes": [
+      "Pulpit zawodnika: kafelek aktywnego planu sezonu (`is_season_active`) z linkiem do `/panel/plany?plan=…`.",
+      "Kadra: checkbox „Plan sezonu”, lista feedbacku + `PUT …/coach-reply`.",
+      "Panel/mobile: wyświetlanie `coach_reply` / `coach_replied_at`."
+    ]
+  },
+  {
+    "version": "1.1.0.19+20",
+    "date": "2026-08-11",
+    "category": "mobile",
+    "title": "Feature: plany premium (odczyt/postęp)",
+    "notes": [
+      "Model tygodni/dni, zamienniki, warm-up, notatki trenera, feedback, badge ukończenia."
+    ]
+  },
+  {
+    "version": "1.1.0.19+20",
+    "date": "2026-08-11",
+    "category": "frontend",
+    "title": "Feature: plany treningowe premium",
+    "notes": [
+      "Edytor tygodni/dni, katalog szablonów, biblioteka ćwiczeń, grupy zawodników.",
+      "%1RM, warm-up, zamienniki (kontuzja), DnD, undo/redo, autosave, skróty, szkic AI (flaga).",
+      "Panel zawodnika: tygodnie, notatki trenera, feedback, badge ukończenia, wybór zamiennika.",
+      "Kalendarz kadry: powiązanie treningu z `plan_id` / tydzień / dzień."
+    ]
+  },
+  {
+    "version": "1.1.0.19+20",
+    "date": "2026-08-11",
+    "category": "backend",
+    "title": "Feature: plany treningowe premium (API)",
+    "notes": [
+      "Model: `weeks`/`days`, `%1RM`, warm-up, alternatives, wersje, szablony, archiwum, publish.",
+      "CRUD `/api/groups`, `/api/exercise-library`; `copy` / `new-version` / `ai-draft` / `progress/all`.",
+      "`CalendarEvent.plan_id` (+ week/day); flaga `experimental_club_assistant`; soft-migracja legacy."
+    ]
+  },
+  {
+    "version": "1.1.0.20+21",
+    "date": "2026-08-11",
+    "category": "frontend",
+    "title": "Fix/Feature: plany — ćwiczenia zawodnika, serie, biblioteka, personalne",
+    "notes": [
+      "Fix: zawodnik widzi ćwiczenia (fallback z pustych tygodni / legacy flat list).",
+      "Rozpis serii (`set_scheme`) + %1RM per seria; filtr „tylko dziś”.",
+      "Edycja/usuwanie pozycji biblioteki ćwiczeń.",
+      "Tryb przypisania: wszyscy / jeden zawodnik / grupa."
     ]
   },
   {
@@ -43,6 +175,47 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
     "notes": [
       "Usunięto legacy `klubFetch` (`lib/klub-api.ts`); wszystkie call site’y używają klienta Orval + `customFetch`.",
       "Mutator Orval: opcjonalne `viewAsUserId` (`null` = bez `X-View-As-User` dla actora / preview stop)."
+    ]
+  },
+  {
+    "version": "1.1.0.24+25",
+    "date": "2026-08-11",
+    "category": "frontend",
+    "title": "UI: checkboxy pod motywy",
+    "notes": [
+      "Globalne style `input[type=checkbox]` w `globals.css` — brand / ink / paper (witryna + `data-panel-theme`).",
+      "Checked, hover, focus-visible, indeterminate, disabled; radius z `--panel-radius-sm` gdy dostępny."
+    ]
+  },
+  {
+    "version": "1.1.0.23+24",
+    "date": "2026-08-11",
+    "category": "frontend",
+    "title": "UX: `ConfirmModal` zamiast `window.confirm`",
+    "notes": [
+      "Nowy `components/ui/ConfirmModal` (na bazie `Modal`).",
+      "Podmienione potwierdzenia usuwania: plany / biblioteka / grupy, konta, CMS, wiadomości; baza danych też przez `ConfirmModal`."
+    ]
+  },
+  {
+    "version": "1.1.0.26+27",
+    "date": "2026-08-11",
+    "category": "frontend",
+    "title": "UX: obciążenie Kg XOR %1RM w edytorze planu",
+    "notes": [
+      "Przełącznik Kg / % 1RM na ćwiczeniu i w seriach — pola wzajemnie się wykluczają.",
+      "Zapis normalizuje dane (nie wysyła obu naraz)."
+    ]
+  },
+  {
+    "version": "1.1.0.25+26",
+    "date": "2026-08-11",
+    "category": "frontend",
+    "title": "UX: polish strony planów treningowych",
+    "notes": [
+      "Kadra: taby jak w skrzynce, focus mode edytora (bez listy pod spodem), sekcje formularza, karty ćwiczeń z etykietami, sticky stopka Zapisz.",
+      "Biblioteka / grupy / lista planów — spójne panele, pusty stan, akcje jak CMS.",
+      "Panel zawodnika: eyebrow + chipy planów w tym samym stylu."
     ]
   },
   {

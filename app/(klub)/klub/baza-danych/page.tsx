@@ -9,7 +9,7 @@ import {
 } from "@/lib/api/generated/default/default";
 import type { UpsertRowBodyRow } from "@/lib/api/generated/models";
 import { useToast } from "@/components/toast/ToastProvider";
-import { Modal } from "@/components/ui/Modal";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 
 export default function BazaDanychPage() {
   const toast = useToast();
@@ -210,39 +210,24 @@ export default function BazaDanychPage() {
         </button>
       </div>
 
-      <Modal
+      <ConfirmModal
         open={deleteId !== null}
         title="Usuń rekord"
-        onClose={() => {
-          if (!deleting) setDeleteId(null);
-        }}
-      >
-        <p className="text-sm text-paper/70">
-          Na pewno usunąć rekord z tabeli{" "}
-          <span className="font-mono text-paper">{table}</span>?
-        </p>
-        <p className="mt-3 break-all font-mono text-xs text-paper/55">
-          {deleteId}
-        </p>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <button
-            type="button"
-            disabled={deleting}
-            onClick={() => void confirmDelete()}
-            className="bg-brand px-4 py-2 font-display text-xs tracking-[0.12em] text-paper uppercase disabled:opacity-50"
-          >
-            {deleting ? "Usuwanie…" : "Usuń"}
-          </button>
-          <button
-            type="button"
-            disabled={deleting}
-            onClick={() => setDeleteId(null)}
-            className="border border-paper/20 px-4 py-2 font-display text-xs tracking-[0.12em] text-paper/70 uppercase hover:border-paper/40 hover:text-paper disabled:opacity-50"
-          >
-            Anuluj
-          </button>
-        </div>
-      </Modal>
+        message={
+          <>
+            <p>
+              Na pewno usunąć rekord z tabeli{" "}
+              <span className="font-mono text-paper">{table}</span>?
+            </p>
+            <p className="mt-3 break-all font-mono text-xs text-paper/55">
+              {deleteId}
+            </p>
+          </>
+        }
+        busy={deleting}
+        onConfirm={() => void confirmDelete()}
+        onClose={() => setDeleteId(null)}
+      />
     </div>
   );
 }

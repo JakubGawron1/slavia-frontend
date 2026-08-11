@@ -13,6 +13,7 @@ import {
   updateCmsPage,
 } from "@/lib/api/generated/default/default";
 import { useToast } from "@/components/toast/ToastProvider";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 
 function newBlock(type = "paragraph"): CmsBlock {
   return {
@@ -28,6 +29,11 @@ export default function CmsAdminPage() {
   const [editing, setEditing] = useState<CmsPage | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: string;
+    title: string;
+  } | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -83,16 +89,24 @@ export default function CmsAdminPage() {
     }
   }
 
-  async function remove(id: string) {
-    if (!confirm("Usunąć stronę CMS?")) return;
+  function remove(id: string, title: string) {
+    setDeleteTarget({ id, title });
+  }
+
+  async function confirmRemove() {
+    if (!deleteTarget) return;
+    setDeleting(true);
     try {
-      await deleteCmsPage(id);
+      await deleteCmsPage(deleteTarget.id);
       toast.success("Usunięto stronę");
+      setDeleteTarget(null);
       await load();
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Usuwanie nieudane";
       setError(msg);
       toast.error("CMS", msg);
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -321,7 +335,7 @@ export default function CmsAdminPage() {
               <button
                 type="button"
                 className="text-xs text-brand underline-offset-2 hover:underline"
-                onClick={() => void remove(page.id)}
+                onClick={() => remove(page.id, page.title)}
               >
                 Usuń
               </button>
@@ -332,6 +346,15 @@ export default function CmsAdminPage() {
           <li className="px-4 py-6 text-paper/45">Brak stron CMS.</li>
         ) : null}
       </ul>
+
+      <ConfirmModal
+        open={deleteTarget !== null}
+        title="Usuń stronę CMS"
+        message={`Na pewno usunąć stronę „${deleteTarget?.title ?? ""}”?`}
+        busy={deleting}
+        onConfirm={() => void confirmRemove()}
+        onClose={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useListPublicFlags } from "@/lib/api/generated/default/default";
 import { openCookieSettings } from "@/lib/cookie-consent";
 import { isFlagEnabled } from "@/lib/public-flags";
@@ -9,7 +10,15 @@ import { ClubMark } from "./ClubMark";
 
 export function Footer() {
   const flagsQuery = useListPublicFlags({ query: { staleTime: 60_000 } });
-  const flags = flagsQuery.data?.data;
+  const [flagsReady, setFlagsReady] = useState(false);
+
+  useEffect(() => {
+    if (flagsQuery.isFetched || flagsQuery.isError) {
+      setFlagsReady(true);
+    }
+  }, [flagsQuery.isFetched, flagsQuery.isError]);
+
+  const flags = flagsReady ? flagsQuery.data?.data : undefined;
   const blogEnabled = isFlagEnabled(flags, "public_blog");
   const announcementsEnabled = isFlagEnabled(flags, "announcements_board");
   const calendarEnabled = isFlagEnabled(flags, "public_calendar");

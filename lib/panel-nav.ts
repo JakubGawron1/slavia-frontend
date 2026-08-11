@@ -42,6 +42,7 @@ export const PANEL_MODULES: PanelModule[] = [
     label: "Plany treningowe",
     description: "Podgląd planów i oznaczanie wykonanych ćwiczeń.",
     statKey: "plans_active",
+    flag: "training_plans",
   },
   {
     href: "/panel/kalendarz",

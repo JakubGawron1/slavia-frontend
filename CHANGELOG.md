@@ -12,6 +12,58 @@ Format sekcji:
 
 Opcjonalnie po dacie: `!breaking` (breaking API).
 
+## [1.1.0.27+28] - 2026-08-11
+### Feature: flagi planów treningowych
+- Stable `training_plans` (ON) — gate nav + `/klub/plany` + `/panel/plany` + kafelek sezonu / ops.
+- `experimental_club_assistant` → rollout **Stub** (opis: stub, Groq później).
+- Placeholdery Planned (OFF, nie publiczne): `experimental_plan_pdf_export`, `…_qr_checkin`, `…_day_rpe`, `…_public_share`, `…_rest_timer`.
+
+## [1.1.0.26+27] - 2026-08-11
+### UX: obciążenie Kg XOR %1RM w edytorze planu
+- Przełącznik Kg / % 1RM na ćwiczeniu i w seriach — pola wzajemnie się wykluczają.
+- Zapis normalizuje dane (nie wysyła obu naraz).
+
+## [1.1.0.25+26] - 2026-08-11
+### UX: polish strony planów treningowych
+- Kadra: taby jak w skrzynce, focus mode edytora (bez listy pod spodem), sekcje formularza, karty ćwiczeń z etykietami, sticky stopka Zapisz.
+- Biblioteka / grupy / lista planów — spójne panele, pusty stan, akcje jak CMS.
+- Panel zawodnika: eyebrow + chipy planów w tym samym stylu.
+
+## [1.1.0.24+25] - 2026-08-11
+### UI: checkboxy pod motywy
+- Globalne style `input[type=checkbox]` w `globals.css` — brand / ink / paper (witryna + `data-panel-theme`).
+- Checked, hover, focus-visible, indeterminate, disabled; radius z `--panel-radius-sm` gdy dostępny.
+
+## [1.1.0.23+24] - 2026-08-11
+### UX: `ConfirmModal` zamiast `window.confirm`
+- Nowy `components/ui/ConfirmModal` (na bazie `Modal`).
+- Podmienione potwierdzenia usuwania: plany / biblioteka / grupy, konta, CMS, wiadomości; baza danych też przez `ConfirmModal`.
+
+## [1.1.0.22+23] - 2026-08-11
+### Feature: % PR tego ćwiczenia (`PctOfLift::Exercise`)
+- Nowy wariant `pct_of: exercise` — np. 80% PR deadlift; bez auto-kg z profilu (zawodnik dobiera sam).
+- UI kadry + etykiety panel/mobile; hint przy % PR ruchu.
+
+## [1.1.0.21+22] - 2026-08-11
+### Feature: plan sezonu + odpowiedź trenera na feedback
+- Pulpit zawodnika: kafelek aktywnego planu sezonu (`is_season_active`) z linkiem do `/panel/plany?plan=…`.
+- Kadra: checkbox „Plan sezonu”, lista feedbacku + `PUT …/coach-reply`.
+- Panel/mobile: wyświetlanie `coach_reply` / `coach_replied_at`.
+
+## [1.1.0.20+21] - 2026-08-11
+### Fix/Feature: plany — ćwiczenia zawodnika, serie, biblioteka, personalne
+- Fix: zawodnik widzi ćwiczenia (fallback z pustych tygodni / legacy flat list).
+- Rozpis serii (`set_scheme`) + %1RM per seria; filtr „tylko dziś”.
+- Edycja/usuwanie pozycji biblioteki ćwiczeń.
+- Tryb przypisania: wszyscy / jeden zawodnik / grupa.
+
+## [1.1.0.19+20] - 2026-08-11
+### Feature: plany treningowe premium
+- Edytor tygodni/dni, katalog szablonów, biblioteka ćwiczeń, grupy zawodników.
+- %1RM, warm-up, zamienniki (kontuzja), DnD, undo/redo, autosave, skróty, szkic AI (flaga).
+- Panel zawodnika: tygodnie, notatki trenera, feedback, badge ukończenia, wybór zamiennika.
+- Kalendarz kadry: powiązanie treningu z `plan_id` / tydzień / dzień.
+
 ## [1.1.0.18+19] - 2026-08-11
 ### Refactor: `fetchMe` → Orval `me()`; flagi `client_visible`
 - Bootstrap sesji (`lib/auth.ts` `fetchMe`) woła Orval `me()` przez `customFetch` (`authToken` + `viewAsUserId`).
