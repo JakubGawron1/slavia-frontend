@@ -1,0 +1,21 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "app/**/{page,layout,loading,error,not-found,template,default,route}.{ts,tsx}",
+    "middleware.ts",
+    "orval.config.ts"
+  ],
+  "project": ["**/*.{ts,tsx,js,jsx,mjs}"],
+  "ignore": [
+    "lib/api/generated/**",
+    "lib/changelog.generated.ts",
+    "lib/changelog.user.generated.ts",
+    "lib/version.ts",
+    ".next/**",
+    ".next-docs/**"
+  ],
+  "ignoreDependencies": [
+    "babel-plugin-react-compiler",
+    "@tailwindcss/postcss"
+  ]
+}

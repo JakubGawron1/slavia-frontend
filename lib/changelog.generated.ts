@@ -3,6 +3,262 @@ import type { ChangelogEntry } from "@/lib/changelog";
 
 export const GENERATED_CHANGELOG: ChangelogEntry[] = [
   {
+    "version": "1.1.2.5+6",
+    "date": "2026-08-12",
+    "category": "backend",
+    "title": "DX: CI, bacon, sync OpenAPI",
+    "notes": [
+      "Workflow CI (fmt + clippy + test) na PR/`main`.",
+      "`bacon.toml` (check / clippy / test / export-openapi); README + deploy: `pnpm sync:api` z roota."
+    ]
+  },
+  {
+    "version": "1.1.2.7+8",
+    "date": "2026-08-12",
+    "category": "frontend",
+    "title": "DX: root `package.json` z wersją platformy",
+    "notes": [
+      "`sync-version` ustawia też `package.json` w rootcie workspace (jak FE)."
+    ]
+  },
+  {
+    "version": "1.1.2.7+8",
+    "date": "2026-08-12",
+    "category": "backend",
+    "title": "DX: root `package.json` z wersją platformy",
+    "notes": [
+      "`scripts/sync-version.mjs` synchronizuje też wersję meta-workspace w root `package.json`."
+    ]
+  },
+  {
+    "version": "1.1.2.6+7",
+    "date": "2026-08-12",
+    "category": "frontend",
+    "title": "DX: tooling FE (kontynuacja) + sync wersji",
+    "notes": [
+      "Lefthook w repo FE (Biome + ESLint na staged); `prepare` instaluje hooki.",
+      "Meta-workspace: root `pnpm`/`just`/`lefthook`, CI, Zod, RQ Devtools — wpis bazowy w `1.1.2.5+6`."
+    ]
+  },
+  {
+    "version": "1.1.2.5+6",
+    "date": "2026-08-12",
+    "category": "frontend",
+    "title": "DX: tooling, walidacja Zod, React Query Devtools",
+    "notes": [
+      "Skrypty: `typecheck`, `format` (Biome), `knip`, `sync:api`; CI PR (`lint` + `tsc` + `build`).",
+      "Zod: walidacja kont, profili, wydarzeń i wyników (kadra + panel).",
+      "DevTools: zakładka React Query; README pod prawdziwy workflow Orval/pnpm."
+    ]
+  },
+  {
+    "version": "1.1.2.3+4",
+    "date": "2026-08-12",
+    "category": "backend",
+    "title": "Feature: admin — wyślij reset hasła użytkownikowi",
+    "notes": [
+      "`POST /api/users/{id}/send-password-reset` (Admin+): token Reset + mail; czytelne błędy (ban, `.dev`/`.local`, flaga, wysyłka).",
+      "Wspólny helper `create_and_send_password_reset` dla forgot-password i admin."
+    ]
+  },
+  {
+    "version": "1.1.2.2+3",
+    "date": "2026-08-12",
+    "category": "backend",
+    "title": "Feature: AI — własne ćwiczenia poza biblioteką",
+    "notes": [
+      "Prompt: biblioteka zawsze jako podpowiedź; własne nazwy PL dozwolone gdy brak odpowiednika.",
+      "`resolve_name` tylko exact match (bez partial overwrite)."
+    ]
+  },
+  {
+    "version": "1.1.2.0+1",
+    "date": "2026-08-12",
+    "category": "backend",
+    "title": "Feature: DevTools — ustawienia AI (Groq)",
+    "notes": [
+      "Meta `ai_settings`: model, styl odpowiedzi, temperature, max_tokens, default_weeks, biblioteka, warmup, custom instructions.",
+      "`GET/PUT /api/admin/ai-settings`, `GET /api/admin/ai-models` (lista z Groq).",
+      "Szkic planu czyta ustawienia z meta (fallback `GROQ_MODEL`)."
+    ]
+  },
+  {
+    "version": "1.1.2.0+1",
+    "date": "2026-08-12",
+    "category": "frontend",
+    "title": "Feature: DevTools → zakładka AI",
+    "notes": [
+      "Ustawienia modelu Groq (lista z API), styl odpowiedzi, temperature / tokens / tygodnie, warmup, biblioteka, instrukcje extra."
+    ]
+  },
+  {
+    "version": "1.1.2.4+5",
+    "date": "2026-08-12",
+    "category": "frontend",
+    "title": "Feature: herb CKS Slavia jako logo",
+    "notes": [
+      "`ClubMark` używa oficjalnego herbu (`/brand/cks-slavia-herb.png`) zamiast placeholder SVG.",
+      "Favicon z herbu (`app/icon.png`); herb też w nawigacji klubu."
+    ]
+  },
+  {
+    "version": "1.1.2.1+2",
+    "date": "2026-08-12",
+    "category": "backend",
+    "title": "Feature: limity AI wg Groq Free Plan",
+    "notes": [
+      "Katalog RPM/RPD/TPM/TPD dla znanych modeli; clamp `max_tokens` do TPM.",
+      "`daily_drafts_limit` (domyślnie 100 dla 8b) + zużycie UTC w meta; egzekwowane przy `ai-draft`.",
+      "DevTools AI: podgląd free planu i limitu dziennego."
+    ]
+  },
+  {
+    "version": "1.1.2.1+2",
+    "date": "2026-08-12",
+    "category": "frontend",
+    "title": "Feature: limity Free Plan w DevTools AI",
+    "notes": [
+      "Podgląd RPM/RPD/TPM/TPD, dzienny limit szkiców + zużycie; bezpieczny `max_tokens` pod TPM."
+    ]
+  },
+  {
+    "version": "1.1.1.16+17",
+    "date": "2026-08-12",
+    "category": "frontend",
+    "title": "Feature: obciążenie „sama sztanga”",
+    "notes": [
+      "Pole `load_text` na `PlanExercise` / `PlanSet` / `PlanExerciseAlt` (XOR z kg/%).",
+      "Edytor: chip „Sztanga” obok Kg / %; przepis i postęp pokazują „sama sztanga”."
+    ]
+  },
+  {
+    "version": "1.1.1.16+17",
+    "date": "2026-08-12",
+    "category": "backend",
+    "title": "Feature: obciążenie „sama sztanga”",
+    "notes": [
+      "`load_text` na ćwiczeniu / serii / zamienniku (opcjonalne, XOR z `load_kg` / `%`).",
+      "OpenAPI zaktualizowane."
+    ]
+  },
+  {
+    "version": "1.1.1.18+19",
+    "date": "2026-08-12",
+    "category": "frontend",
+    "title": "Feature: obciążenie „zawodnik sam ustala ciężar”",
+    "notes": [
+      "Preset `load_text` obok „sama sztanga”; chip „Sam ustala” w edytorze (wspólny + serie).",
+      "Wspólny komponent `LoadModeChips`."
+    ]
+  },
+  {
+    "version": "1.1.1.16+17",
+    "date": "2026-08-12",
+    "category": "mobile",
+    "title": "Feature: obciążenie `load_text` (sama sztanga)",
+    "notes": [
+      "`PlanExercise` / `PlanExerciseAlt`: pole `loadText`; subtitle planu pokazuje tekst zamiast kg/%."
+    ]
+  },
+  {
+    "version": "1.1.2.3+4",
+    "date": "2026-08-12",
+    "category": "frontend",
+    "title": "Feature: reset hasła z listy kont + podgląd hasła dev",
+    "notes": [
+      "Przycisk „Reset hasła” na liście kont (Admin/Superadmin) → `POST /api/users/{id}/send-password-reset`.",
+      "Po utworzeniu konta `.dev` / `.local` modal z hasłem do skopiowania (+ przełącznik Pokaż w formularzu)."
+    ]
+  },
+  {
+    "version": "1.1.1.15+16",
+    "date": "2026-08-12",
+    "category": "frontend",
+    "title": "Feature: seria rozgrzewkowa w planie",
+    "notes": [
+      "W edytorze serii indywidualnych: checkbox „Rozgrzewka” (`PlanSet.is_warmup`).",
+      "`formatPrescription` i widok postępu oznaczają serie warm-up jako `W` / `Wn`."
+    ]
+  },
+  {
+    "version": "1.1.1.19+20",
+    "date": "2026-08-12",
+    "category": "frontend",
+    "title": "Feature: szkic AI planu (Groq)",
+    "notes": [
+      "Panel planów: liczba tygodni + stan „Generuję…”; backend generuje realny szkic (nie stub)."
+    ]
+  },
+  {
+    "version": "1.1.1.19+20",
+    "date": "2026-08-12",
+    "category": "backend",
+    "title": "Feature: szkic planu przez Groq",
+    "notes": [
+      "`POST /api/plans/ai-draft` woła Groq (JSON) z biblioteką ćwiczeń; wymaga `GROQ_API_KEY`.",
+      "Flaga `experimental_club_assistant` → Wired (nadal default OFF).",
+      "Serwisy `services/groq.rs` + `services/plans_ai.rs`."
+    ]
+  },
+  {
+    "version": "1.1.2.2+3",
+    "date": "2026-08-12",
+    "category": "frontend",
+    "title": "Feature: własne ćwiczenia AI → biblioteka",
+    "notes": [
+      "AI może używać nazw spoza biblioteki; w edytorze planu przycisk „Dodaj do biblioteki” dla ćwiczeń spoza listy."
+    ]
+  },
+  {
+    "version": "1.1.2.10+11",
+    "date": "2026-08-12",
+    "category": "frontend",
+    "title": "Fix: „Ruda Śląska” obok herbu w headerze",
+    "notes": [
+      "Przywrócony podpis miasta pod „CKS Slavia” w nawigacji publicznej."
+    ]
+  },
+  {
+    "version": "1.1.2.9+10",
+    "date": "2026-08-12",
+    "category": "frontend",
+    "title": "Fix: proporcje herbu",
+    "notes": [
+      "Herb z oryginalnego pliku (szersze proporcje); `ClubMark` z `width: auto`, by Next/Image nie ściskał znaku."
+    ]
+  },
+  {
+    "version": "1.1.2.6+7",
+    "date": "2026-08-12",
+    "category": "backend",
+    "title": "Improve: czytelniejsze logi backendu + AI przy starcie",
+    "notes": [
+      "Compact tracing + sekcje startowe (platforma, baza, integracje, AI/Groq, gotowe).",
+      "Startup: klucz Groq, aktywny model, styl, limity, flaga `experimental_club_assistant`, zużycie dzienne.",
+      "Więcej logów: HTTP `→`/`←`, Groq chat/modele (latency), `ai-draft`, zapis ustawień AI; audyt DevTools (`source=ai`).",
+      "DX: `lefthook.yml` (cargo fmt na staged); CI clippy bez `-D warnings` (doczyszczenie osobno)."
+    ]
+  },
+  {
+    "version": "1.1.2.8+9",
+    "date": "2026-08-12",
+    "category": "frontend",
+    "title": "Polish: herb pod UI witryny",
+    "notes": [
+      "Czystszy herb z przezroczystym tłem (elementy herbu bez zmian) + lekki drop-shadow.",
+      "Większy znak w headerze/logowaniu; mniej zdublowanego tekstu obok herbu."
+    ]
+  },
+  {
+    "version": "1.1.1.17+18",
+    "date": "2026-08-12",
+    "category": "frontend",
+    "title": "UX: dodawanie ćwiczeń pod listą",
+    "notes": [
+      "W edytorze dnia: „Szybko z biblioteki” i „+ Ćwiczenie” zawsze pod ostatnim ćwiczeniem."
+    ]
+  },
+  {
     "version": "1.1.1.14+15",
     "date": "2026-08-11",
     "category": "frontend",

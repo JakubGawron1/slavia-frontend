@@ -30,6 +30,7 @@ export function emptyExercise(partial?: Partial<PlanExercise>): PlanExercise {
     notes: null,
     load_pct: null,
     pct_of: null,
+    load_text: null,
     is_warmup: false,
     alternatives: [],
     sort_order: 0,
@@ -135,9 +136,10 @@ export function detectAssignMode(plan: TrainingPlan): AssignMode {
 }
 
 export function resolveLoadKg(
-  ex: Pick<PlanExercise | PlanSet, "load_kg" | "load_pct" | "pct_of">,
+  ex: Pick<PlanExercise | PlanSet, "load_kg" | "load_pct" | "pct_of" | "load_text">,
   bests: { snatch?: number | null; cj?: number | null; total?: number | null },
 ): number | null {
+  if (loadModeOf(ex) === "text") return null;
   if (ex.load_pct != null && ex.pct_of && ex.pct_of !== "exercise") {
     const base =
       ex.pct_of === "snatch"
@@ -151,6 +153,12 @@ export function resolveLoadKg(
   }
   return ex.load_kg ?? null;
 }
+
+/** Stałe opisy obciążenia bez kg/%. */
+export const LOAD_TEXT_BAR = "sama sztanga";
+export const LOAD_TEXT_ATHLETE = "zawodnik sam ustala ciężar";
+
+export const LOAD_TEXT_PRESETS = [LOAD_TEXT_BAR, LOAD_TEXT_ATHLETE] as const;
 
 /** Etykieta bazy % — dla `exercise` używa nazwy ćwiczenia (np. „PR deadlift”). */
 export function pctOfLabel(
@@ -168,9 +176,31 @@ export function pctOfLabel(
 }
 
 export function usesExercisePr(
-  ex: Pick<PlanExercise | PlanSet, "load_pct" | "pct_of">,
+  ex: Pick<PlanExercise | PlanSet, "load_pct" | "pct_of" | "load_text">,
 ): boolean {
+  if (loadModeOf(ex) === "text") return false;
   return ex.load_pct != null && ex.pct_of === "exercise";
+}
+
+function formatLoadBits(
+  s: Pick<PlanSet, "load_kg" | "load_pct" | "pct_of" | "load_text">,
+  exerciseName: string | null | undefined,
+  bests?: { snatch?: number | null; cj?: number | null; total?: number | null },
+  opts?: { atPct?: boolean; spacedKg?: boolean },
+): (string | null)[] {
+  if (loadModeOf(s) === "text") {
+    return [s.load_text?.trim() || LOAD_TEXT_BAR];
+  }
+  const kg = bests ? resolveLoadKg(s, bests) : (s.load_kg ?? null);
+  const spacedKg = opts?.spacedKg !== false;
+  const pct =
+    s.load_pct != null
+      ? `${s.load_pct}% ${pctOfLabel(s.pct_of, exerciseName)}`.trimEnd()
+      : null;
+  return [
+    pct != null && opts?.atPct ? `@ ${pct}` : pct,
+    kg != null ? (spacedKg ? `${kg} kg` : `${kg}kg`) : null,
+  ];
 }
 
 /** Rozwiń jednolity schemat (sets×reps@%) do listy serii albo użyj set_scheme. */
@@ -184,6 +214,7 @@ export function expandSetScheme(ex: PlanExercise): PlanSet[] {
     load_kg: ex.load_kg ?? null,
     load_pct: ex.load_pct ?? null,
     pct_of: ex.pct_of ?? null,
+    load_text: ex.load_text ?? null,
     is_warmup: Boolean(ex.is_warmup),
   }));
 }
@@ -201,30 +232,25 @@ export function formatPrescription(
         s.reps === scheme[0].reps &&
         s.load_pct === scheme[0].load_pct &&
         s.load_kg === scheme[0].load_kg &&
-        s.pct_of === scheme[0].pct_of,
+        s.pct_of === scheme[0].pct_of &&
+        (s.load_text ?? null) === (scheme[0].load_text ?? null) &&
+        Boolean(s.is_warmup) === Boolean(scheme[0].is_warmup),
     );
   if (uniform) {
     const s = scheme[0];
-    const kg = bests ? resolveLoadKg(s, bests) : (s.load_kg ?? null);
     const parts = [
+      s.is_warmup ? "W" : null,
       `${scheme.length}×${s.reps ?? "?"}`,
-      s.load_pct != null
-        ? `@ ${s.load_pct}% ${pctOfLabel(s.pct_of, ex.name)}`.trimEnd()
-        : null,
-      kg != null ? `${kg} kg` : null,
+      ...formatLoadBits(s, ex.name, bests, { atPct: true, spacedKg: true }),
     ].filter(Boolean);
     return parts.join(" · ");
   }
   return scheme
     .map((s, i) => {
-      const kg = bests ? resolveLoadKg(s, bests) : (s.load_kg ?? null);
       const bits = [
-        `S${i + 1}`,
+        s.is_warmup ? `W${i + 1}` : `S${i + 1}`,
         s.reps ?? "?",
-        s.load_pct != null
-          ? `${s.load_pct}% ${pctOfLabel(s.pct_of, ex.name)}`.trimEnd()
-          : null,
-        kg != null ? `${kg}kg` : null,
+        ...formatLoadBits(s, ex.name, bests, { spacedKg: false }),
       ].filter(Boolean);
       return bits.join(" ");
     })
@@ -254,7 +280,10 @@ export function todayIsoWeekday(): number {
 
 export function buildSetSchemeFromCount(
   count: number,
-  base: Pick<PlanExercise, "reps" | "load_kg" | "load_pct" | "pct_of" | "is_warmup">,
+  base: Pick<
+    PlanExercise,
+    "reps" | "load_kg" | "load_pct" | "pct_of" | "load_text" | "is_warmup"
+  >,
 ): PlanSet[] {
   const n = Math.max(1, Math.min(20, count));
   return Array.from({ length: n }, () => ({
@@ -262,20 +291,66 @@ export function buildSetSchemeFromCount(
     load_kg: base.load_kg ?? null,
     load_pct: base.load_pct ?? null,
     pct_of: base.pct_of ?? null,
+    load_text: base.load_text ?? null,
     is_warmup: Boolean(base.is_warmup),
   }));
 }
 
-export type LoadMode = "kg" | "pct";
+export type LoadMode = "kg" | "pct" | "text";
 
 export function loadModeOf(ex: {
   load_kg?: number | null;
   load_pct?: number | null;
   pct_of?: string | null;
+  load_text?: string | null;
 }): LoadMode {
+  if (ex.load_text != null && ex.load_text.trim() !== "") return "text";
   // pct_of trzyma tryb % także gdy load_pct jest chwilowo puste (np. backspace)
   if (ex.load_pct != null || ex.pct_of != null) return "pct";
   return "kg";
+}
+
+/** Ustaw tryb obciążenia — wzajemnie wykluczające się pola. */
+export function withLoadMode<T extends {
+  load_kg?: number | null;
+  load_pct?: number | null;
+  pct_of?: PctOfLift | null;
+  load_text?: string | null;
+}>(
+  current: T,
+  mode: LoadMode,
+  defaults?: {
+    load_pct?: number | null;
+    pct_of?: PctOfLift | null;
+    load_text?: string | null;
+  },
+): T {
+  if (mode === "text") {
+    const preset = defaults?.load_text?.trim();
+    const keep = current.load_text?.trim();
+    return {
+      ...current,
+      load_kg: null,
+      load_pct: null,
+      pct_of: null,
+      load_text: preset || keep || LOAD_TEXT_BAR,
+    };
+  }
+  if (mode === "pct") {
+    return {
+      ...current,
+      load_kg: null,
+      load_text: null,
+      load_pct: current.load_pct ?? defaults?.load_pct ?? 70,
+      pct_of: current.pct_of ?? defaults?.pct_of ?? "exercise",
+    };
+  }
+  return {
+    ...current,
+    load_pct: null,
+    pct_of: null,
+    load_text: null,
+  };
 }
 
 export function isIndividualLoad(
@@ -313,41 +388,80 @@ export function toUniformLoad(ex: PlanExercise): PlanExercise {
     load_kg: first ? (first.load_kg ?? null) : (ex.load_kg ?? null),
     load_pct: first ? (first.load_pct ?? null) : (ex.load_pct ?? null),
     pct_of: first ? (first.pct_of ?? null) : (ex.pct_of ?? null),
+    load_text: first ? (first.load_text ?? null) : (ex.load_text ?? null),
     set_scheme: [],
   };
 }
 
-/** Kg XOR %1RM — nie wysyłamy obu naraz; przy wspólnym czyści set_scheme. */
+/** Kg XOR %1RM XOR tekst — nie wysyłamy naraz; przy wspólnym czyści set_scheme. */
 export function normalizeExerciseLoad(ex: PlanExercise): PlanExercise {
   if (!isIndividualLoad(ex)) {
     const mode = loadModeOf(ex);
+    if (mode === "text") {
+      return {
+        ...ex,
+        load_kg: null,
+        load_pct: null,
+        pct_of: null,
+        load_text: ex.load_text?.trim() || LOAD_TEXT_BAR,
+        set_scheme: [],
+        individual_load: false,
+      };
+    }
     if (mode === "pct") {
-      return { ...ex, load_kg: null, set_scheme: [], individual_load: false };
+      return {
+        ...ex,
+        load_kg: null,
+        load_text: null,
+        set_scheme: [],
+        individual_load: false,
+      };
     }
     return {
       ...ex,
       load_pct: null,
       pct_of: null,
+      load_text: null,
       set_scheme: [],
       individual_load: false,
     };
   }
 
   const set_scheme = (ex.set_scheme ?? []).map((s) => {
-    if (loadModeOf(s) === "pct") {
-      return { ...s, load_kg: null };
+    const mode = loadModeOf(s);
+    if (mode === "text") {
+      return {
+        ...s,
+        load_kg: null,
+        load_pct: null,
+        pct_of: null,
+        load_text: s.load_text?.trim() || LOAD_TEXT_BAR,
+      };
     }
-    return { ...s, load_pct: null, pct_of: null };
+    if (mode === "pct") {
+      return { ...s, load_kg: null, load_text: null };
+    }
+    return { ...s, load_pct: null, pct_of: null, load_text: null };
   });
-  // przy indywidualnym obciążenie ćwiczenia jest szablonem — XOR wg 1. serii lub ćwiczenia
   const mode = loadModeOf(set_scheme[0] ?? ex);
+  if (mode === "text") {
+    return {
+      ...ex,
+      load_kg: null,
+      load_pct: null,
+      pct_of: null,
+      set_scheme,
+      individual_load: true,
+    };
+  }
   if (mode === "pct") {
-    return { ...ex, load_kg: null, set_scheme, individual_load: true };
+    return { ...ex, load_kg: null, load_text: null, set_scheme, individual_load: true };
   }
   return {
     ...ex,
     load_pct: null,
     pct_of: null,
+    load_text: null,
     set_scheme,
     individual_load: true,
   };

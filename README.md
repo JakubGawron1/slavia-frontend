@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CKS Slavia — Frontend (Next.js)
 
-## Getting Started
+Panel zawodnika (`/panel`), kadry (`/klub`) i witryna. API przez **Orval** + React Query.
 
-First, run the development server:
+## Wymagania
+
+- Node 22+
+- **tylko pnpm** (nie npm / yarn)
+- Lokalny backend: `cargo run` w `../slavia-backend` (port **8080**)
+
+## Start
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+cp .env.example .env.local
+# NEXT_PUBLIC_API_URL=http://127.0.0.1:8080
+
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Z roota workspace (zalecane):
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm fe          # ten projekt
+pnpm be          # backend
+pnpm sync:api    # OpenAPI → Orval
+pnpm sync:slavia # wersja + changelog
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Skrypty
 
-## Learn More
+| Skrypt | Opis |
+|--------|------|
+| `pnpm dev` | Next.js dev |
+| `pnpm build` / `start` | produkcja |
+| `pnpm lint` | ESLint |
+| `pnpm typecheck` | `tsc --noEmit` |
+| `pnpm format` / `format:check` | Biome |
+| `pnpm biome:ci` | Biome w CI |
+| `pnpm knip` | martwy kod (opcjonalnie) |
+| `pnpm gen:api` | Orval z `openapi/openapi.json` |
+| `pnpm sync:version` / `sync:changelog` | sync z `Slavia.toml` |
 
-To learn more about Next.js, take a look at the following resources:
+## OpenAPI / typy
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Źródło: backend (utoipa). Po zmianie API z roota:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+pnpm sync:api
+```
 
-## Deploy on Vercel
+albo ręcznie:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+cd ../slavia-backend && cargo test export_openapi -- --ignored
+cd ../slavia-frontend && pnpm gen:api
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Jedyna warstwa HTTP w UI:** `lib/api/generated/**` + `customFetch` — bez ręcznych path stringów.
+
+## Deploy
+
+Vercel — `NEXT_PUBLIC_API_URL` → URL HF Space (np. `https://koliber-cks-slavia.hf.space`). Szczegóły: `../slavia-backend/deploy.md`.
+
+## DevTools
+
+`/klub/devtools` — flagi, AI, stats, trasy, changelog, debug, **React Query**.

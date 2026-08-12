@@ -4,6 +4,7 @@ import { isDevEmail } from "@/lib/email";
 import { ROLE_LABELS } from "@/lib/klub-nav";
 import { PhotoUploadField } from "@/components/settings/PhotoUploadField";
 import { Modal } from "@/components/ui/Modal";
+import { DevPasswordInput } from "./DevPasswordInput";
 import { formGridClass, inputClass, type UserCreateFormState } from "./shared";
 
 type RoleCheckboxesProps = {
@@ -84,22 +85,11 @@ export function CreateUserModal({
           />
         </label>
         {needsAdminPassword ? (
-          <label className="flex flex-col gap-1.5 sm:col-span-2">
-            <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
-              Hasło
-            </span>
-            <input
-              className={inputClass}
-              type="password"
-              value={form.password}
-              onChange={(e) => onFormChange({ ...form, password: e.target.value })}
-              required
-              minLength={6}
-            />
-            <span className="text-xs text-paper/45">
-              Adresy .dev / .local nie wymagają weryfikacji — ustaw hasło od razu.
-            </span>
-          </label>
+          <DevPasswordInput
+            className="sm:col-span-2"
+            value={form.password}
+            onChange={(password) => onFormChange({ ...form, password })}
+          />
         ) : (
           <p className="text-xs text-paper/45 sm:col-span-2">
             Na podany e-mail wyślemy link do potwierdzenia adresu i ustawienia

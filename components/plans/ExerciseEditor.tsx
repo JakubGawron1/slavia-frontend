@@ -1,13 +1,15 @@
 "use client";
 
-import type { DragEvent } from "react";
-import type { PlanExercise } from "@/lib/api/generated/models";
+import { useState, type DragEvent } from "react";
+import type { ExerciseLibraryItem, PlanExercise } from "@/lib/api/generated/models";
+import { createLibraryItem } from "@/lib/api/generated/exercise-library/exercise-library";
 import {
   emptyExercise,
   isIndividualLoad,
   loadModeOf,
   toIndividualLoad,
   toUniformLoad,
+  withLoadMode,
 } from "@/lib/plans/helpers";
 import {
   chipActive,
@@ -18,6 +20,14 @@ import {
 } from "@/components/plans/styles";
 import { ExerciseSetSchemeEditor } from "@/components/plans/ExerciseSetSchemeEditor";
 import { ExerciseAlternativesEditor } from "@/components/plans/ExerciseAlternativesEditor";
+import { LoadModeChips, LoadTextSummary } from "@/components/plans/LoadModeChips";
+import { useToast } from "@/components/toast/ToastProvider";
+
+function nameInLibrary(name: string, library: ExerciseLibraryItem[]): boolean {
+  const n = name.trim().toLocaleLowerCase("pl");
+  if (!n) return false;
+  return library.some((i) => i.name.trim().toLocaleLowerCase("pl") === n);
+}
 
 const PCT_OF_OPTIONS = (
   <>
@@ -32,6 +42,8 @@ const PCT_OF_OPTIONS = (
 export function ExerciseEditor({
   ex,
   index,
+  library,
+  onLibraryReload,
   onPatch,
   onDuplicate,
   onRemove,
@@ -41,6 +53,8 @@ export function ExerciseEditor({
 }: {
   ex: PlanExercise;
   index: number;
+  library: ExerciseLibraryItem[];
+  onLibraryReload: () => Promise<void>;
   onPatch: (i: number, patch: Partial<PlanExercise>) => void;
   onDuplicate: (ex: PlanExercise) => void;
   onRemove: (i: number) => void;
@@ -48,8 +62,34 @@ export function ExerciseEditor({
   onDragOver: (e: DragEvent<HTMLDivElement>) => void;
   onDrop: (i: number) => void;
 }) {
+  const toast = useToast();
+  const [addingToLibrary, setAddingToLibrary] = useState(false);
   const patch = (p: Partial<PlanExercise>) => onPatch(index, p);
   const individual = isIndividualLoad(ex);
+  const canAddToLibrary =
+    Boolean(ex.name.trim()) && !nameInLibrary(ex.name, library);
+
+  async function addToLibrary() {
+    const name = ex.name.trim();
+    if (!name || addingToLibrary) return;
+    setAddingToLibrary(true);
+    try {
+      await createLibraryItem({
+        name,
+        default_sets: ex.sets ?? null,
+        default_reps: ex.reps ?? null,
+        notes: ex.notes ?? null,
+        video_url: null,
+        tags: ex.is_warmup ? ["warmup"] : [],
+      });
+      toast.success("Dodano do biblioteki");
+      await onLibraryReload();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Nie udało się dodać");
+    } finally {
+      setAddingToLibrary(false);
+    }
+  }
 
   return (
     <div
@@ -128,28 +168,12 @@ export function ExerciseEditor({
             <span className="block text-[10px] tracking-wider text-paper/40 uppercase">
               Obciążenie
             </span>
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                className={loadModeOf(ex) === "kg" ? chipActive : chipIdle}
-                onClick={() => patch({ load_pct: null, pct_of: null })}
-              >
-                Kg
-              </button>
-              <button
-                type="button"
-                className={loadModeOf(ex) === "pct" ? chipActive : chipIdle}
-                onClick={() =>
-                  patch({
-                    load_kg: null,
-                    load_pct: ex.load_pct ?? 70,
-                    pct_of: ex.pct_of ?? "exercise",
-                  })
-                }
-              >
-                % 1RM
-              </button>
-            </div>
+            <LoadModeChips
+              value={ex}
+              onChange={patch}
+              pctLabel="% 1RM"
+              pctDefaults={{ load_pct: 70, pct_of: "exercise" }}
+            />
           </div>
           {loadModeOf(ex) === "kg" ? (
             <label className="space-y-1 sm:col-span-2">
@@ -163,14 +187,19 @@ export function ExerciseEditor({
                 value={ex.load_kg ?? ""}
                 onChange={(e) =>
                   patch({
+                    ...withLoadMode(ex, "kg"),
                     load_kg: e.target.value ? Number(e.target.value) : null,
-                    load_pct: null,
-                    pct_of: null,
                   })
                 }
               />
             </label>
-          ) : (
+          ) : null}
+          {loadModeOf(ex) === "text" ? (
+            <div className="sm:col-span-2">
+              <LoadTextSummary loadText={ex.load_text} />
+            </div>
+          ) : null}
+          {loadModeOf(ex) === "pct" ? (
             <>
               <label className="space-y-1">
                 <span className="block text-[10px] tracking-wider text-paper/40 uppercase">
@@ -184,6 +213,7 @@ export function ExerciseEditor({
                     patch({
                       load_pct: e.target.value ? Number(e.target.value) : null,
                       load_kg: null,
+                      load_text: null,
                       pct_of: ex.pct_of ?? "exercise",
                     })
                   }
@@ -200,6 +230,7 @@ export function ExerciseEditor({
                     patch({
                       pct_of: (e.target.value || null) as PlanExercise["pct_of"],
                       load_kg: null,
+                      load_text: null,
                     })
                   }
                 >
@@ -207,7 +238,7 @@ export function ExerciseEditor({
                 </select>
               </label>
             </>
-          )}
+          ) : null}
         </div>
       ) : null}
 
@@ -227,6 +258,16 @@ export function ExerciseEditor({
           />
           Warm-up
         </label>
+        {canAddToLibrary ? (
+          <button
+            type="button"
+            className={linkBtn}
+            disabled={addingToLibrary}
+            onClick={() => void addToLibrary()}
+          >
+            {addingToLibrary ? "Dodawanie…" : "Dodaj do biblioteki"}
+          </button>
+        ) : null}
         <button
           type="button"
           className={linkBtn}
@@ -257,6 +298,7 @@ export function ExerciseEditor({
                 load_kg: null,
                 load_pct: null,
                 pct_of: null,
+                load_text: null,
               },
             ];
             patch({ alternatives: alts });

@@ -10,13 +10,15 @@ export function Footer() {
     <footer className="bg-chrome text-paper">
       <div className="mx-auto grid max-w-7xl gap-10 px-5 py-14 md:grid-cols-[1.3fr_1fr_1fr] md:px-8">
         <div>
-          <div className="flex items-center gap-3">
-            <ClubMark className="h-9 w-9 text-brand" />
+          <div className="flex items-center gap-3.5">
+            <ClubMark className="h-14 w-auto" />
             <div>
-              <p className="font-display text-xl tracking-[0.06em] uppercase">
+              <p className="font-display text-xl tracking-[0.08em] uppercase">
                 CKS Slavia
               </p>
-              <p className="text-xs tracking-wide text-paper/50">Ruda Śląska</p>
+              <p className="mt-0.5 text-xs tracking-wide text-paper/50">
+                Ruda Śląska · rok zał. 1919
+              </p>
             </div>
           </div>
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-paper/70">

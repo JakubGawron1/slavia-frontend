@@ -1,28 +1,48 @@
 {
   "name": "slavia-frontend",
-  "version": "1.1.1.14",
+  "version": "1.1.2.10",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "lint:fix": "eslint --fix",
+    "typecheck": "tsc --noEmit",
+    "format": "biome check --write .",
+    "format:check": "biome check .",
+    "biome:ci": "biome ci .",
+    "knip": "knip",
     "gen:api": "orval --config orval.config.ts",
     "sync:version": "node ../scripts/sync-version.mjs",
     "sync:changelog": "node ../scripts/sync-changelog.mjs",
-    "sync:slavia": "pnpm sync:version && pnpm sync:changelog"
+    "sync:slavia": "pnpm sync:version && pnpm sync:changelog",
+    "sync:api": "node ../scripts/sync-api.mjs",
+    "prepare": "lefthook install"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp",
+      "unrs-resolver",
+      "@biomejs/biome",
+      "lefthook"
+    ]
   },
   "dependencies": {
     "@tanstack/react-query": "^5.101.4",
+    "@tanstack/react-query-devtools": "^5.91.0",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "html5-qrcode": "^2.3.8",
     "next": "16.3.0",
     "qrcode": "^1.5.4",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^26.2.0",
     "@types/qrcode": "^1.5.6",
@@ -31,6 +51,8 @@
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^10.8.1",
     "eslint-config-next": "16.3.0",
+    "knip": "^5.61.3",
+    "lefthook": "^1.11.13",
     "orval": "^8.24.0",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2"

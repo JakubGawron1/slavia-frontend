@@ -7,6 +7,7 @@ import { filterNavForRole, ROLE_LABELS } from "@/lib/klub-nav";
 import { isFlagEnabled } from "@/lib/public-flags";
 import { useKlub } from "./KlubProvider";
 import { RoleSwitcher } from "./RoleSwitcher";
+import { ClubMark } from "@/components/ClubMark";
 
 function GearIcon({ className }: { className?: string }) {
   return (
@@ -55,9 +56,12 @@ function NavBody({ onNavigate }: { onNavigate?: () => void }) {
         <Link
           href="/klub"
           onClick={onNavigate}
-          className="font-display text-sm tracking-[0.2em] text-brand uppercase"
+          className="flex items-center gap-2.5"
         >
-          CKS Slavia
+          <ClubMark className="h-14 w-auto" />
+          <span className="font-display text-sm tracking-[0.2em] text-brand uppercase">
+            CKS Slavia
+          </span>
         </Link>
 
         <div className="mt-3 flex items-start gap-2">

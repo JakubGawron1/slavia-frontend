@@ -5,6 +5,8 @@ import {
   DAY_LABELS,
   expandSetScheme,
   formatPrescription,
+  LOAD_TEXT_BAR,
+  loadModeOf,
   pctOfLabel,
   resolveLoadKg,
   usesExercisePr,
@@ -38,6 +40,7 @@ export function ProgressEntryRow({
         load_kg: selectedAlt.load_kg ?? ex.load_kg,
         load_pct: selectedAlt.load_pct ?? ex.load_pct,
         pct_of: selectedAlt.pct_of ?? ex.pct_of,
+        load_text: selectedAlt.load_text ?? ex.load_text,
         set_scheme: ex.set_scheme,
       }
     : ex;
@@ -85,19 +88,29 @@ export function ProgressEntryRow({
         <ol className="mt-3 space-y-1 border-t border-paper/10 pt-3 text-sm">
           {scheme.map((s, i) => {
             const kg = resolveLoadKg(s, bests);
+            const textMode = loadModeOf(s) === "text";
             return (
               <li
                 key={`${ex.id}-set-${i}`}
                 className="flex flex-wrap gap-x-3 gap-y-0.5 text-paper/70"
               >
-                <span className="w-10 text-paper/40">{s.is_warmup ? "W" : `S${i + 1}`}</span>
+                <span className="w-10 text-paper/40">
+                  {s.is_warmup ? `W${i + 1}` : `S${i + 1}`}
+                </span>
                 <span>{s.reps ?? "—"} powt.</span>
-                {s.load_pct != null ? (
+                {textMode ? (
+                  <span className="text-paper">
+                    {s.load_text?.trim() || LOAD_TEXT_BAR}
+                  </span>
+                ) : null}
+                {!textMode && s.load_pct != null ? (
                   <span>
                     {s.load_pct}% {pctOfLabel(s.pct_of, active.name)}
                   </span>
                 ) : null}
-                {kg != null ? <span className="text-paper">{kg} kg</span> : null}
+                {!textMode && kg != null ? (
+                  <span className="text-paper">{kg} kg</span>
+                ) : null}
               </li>
             );
           })}

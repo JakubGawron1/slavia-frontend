@@ -6,9 +6,172 @@
     "license": {
       "name": ""
     },
-    "version": "1.1.1.12+13"
+    "version": "1.1.2.3+4"
   },
   "paths": {
+    "/api/admin/ai-models": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "operationId": "list_ai_models",
+        "responses": {
+          "200": {
+            "description": "Modele Groq",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroqModelsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Brak klucza / błąd Groq",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
+    "/api/admin/ai-settings": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "operationId": "get_ai_settings",
+        "responses": {
+          "200": {
+            "description": "Ustawienia AI",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiSettingsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "admin"
+        ],
+        "operationId": "put_ai_settings",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AiSettings"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Zapisano ustawienia AI",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiSettingsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Nieprawidłowe dane",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
+    },
     "/api/admin/db/tables": {
       "get": {
         "operationId": "db_list_tables",
@@ -3898,11 +4061,21 @@
         },
         "responses": {
           "200": {
-            "description": "Szkic planu (stub / AI)",
+            "description": "Szkic planu (Groq)",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/TrainingPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Błąd promptu / Groq",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
                 }
               }
             }
@@ -5333,6 +5506,82 @@
           }
         ]
       }
+    },
+    "/api/users/{id}/send-password-reset": {
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "operationId": "send_user_password_reset",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID użytkownika",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Wysłano mail z linkiem resetu",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Nieprawidłowe dane / flaga / konto dev",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Użytkownik nie istnieje",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer_auth": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -5352,6 +5601,126 @@
               "integer",
               "null"
             ],
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "AiResponseStyle": {
+        "type": "string",
+        "description": "Styl generowania szkiców planu (wpływa na system prompt).",
+        "enum": [
+          "concise",
+          "balanced",
+          "detailed",
+          "coach"
+        ]
+      },
+      "AiSettings": {
+        "type": "object",
+        "description": "Preferencje AI zapisane w meta (`ai_settings`). Bez klucza API.",
+        "properties": {
+          "custom_instructions": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "daily_drafts_limit": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Limit szkiców planu / dzień (UTC) — egzekwowany w aplikacji.",
+            "minimum": 0
+          },
+          "default_weeks": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "include_warmup": {
+            "type": "boolean"
+          },
+          "max_tokens": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Domyślnie pod free TPM (≤ ~4k); clamp do TPM modelu gdy znany.",
+            "minimum": 0
+          },
+          "model": {
+            "type": "string",
+            "description": "ID modelu Groq; puste = fallback env / free default."
+          },
+          "prefer_library_names": {
+            "type": "boolean"
+          },
+          "response_style": {
+            "$ref": "#/components/schemas/AiResponseStyle"
+          },
+          "temperature": {
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
+      "AiSettingsResponse": {
+        "type": "object",
+        "required": [
+          "settings",
+          "groq_key_configured",
+          "env_model_fallback",
+          "usage"
+        ],
+        "properties": {
+          "env_model_fallback": {
+            "type": "string"
+          },
+          "free_plan_limits": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/GroqFreePlanLimits",
+                "description": "Limity free planu dla aktywnego modelu (jeśli znane)."
+              }
+            ]
+          },
+          "groq_key_configured": {
+            "type": "boolean"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/AiSettings"
+          },
+          "usage": {
+            "$ref": "#/components/schemas/AiUsageStatus"
+          }
+        }
+      },
+      "AiUsageStatus": {
+        "type": "object",
+        "description": "Zużycie dziennego limitu szkiców (UTC).",
+        "required": [
+          "date_utc",
+          "drafts_used",
+          "drafts_limit",
+          "drafts_remaining"
+        ],
+        "properties": {
+          "date_utc": {
+            "type": "string"
+          },
+          "drafts_limit": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "drafts_remaining": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "drafts_used": {
+            "type": "integer",
             "format": "int32",
             "minimum": 0
           }
@@ -6629,6 +6998,100 @@
           }
         }
       },
+      "GroqFreePlanLimits": {
+        "type": "object",
+        "description": "Limity Groq Free Plan dla modelu (katalog lokalny).",
+        "required": [
+          "model_id",
+          "rpm",
+          "rpd",
+          "tpm",
+          "plan"
+        ],
+        "properties": {
+          "model_id": {
+            "type": "string"
+          },
+          "plan": {
+            "type": "string"
+          },
+          "rpd": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "rpm": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "tpd": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "tpm": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "GroqModelInfo": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "created": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "free_plan_limits": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/GroqFreePlanLimits"
+              }
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "owned_by": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "GroqModelsResponse": {
+        "type": "object",
+        "required": [
+          "models",
+          "groq_key_configured"
+        ],
+        "properties": {
+          "groq_key_configured": {
+            "type": "boolean"
+          },
+          "models": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GroqModelInfo"
+            }
+          }
+        }
+      },
       "GroupBody": {
         "type": "object",
         "required": [
@@ -6994,6 +7457,13 @@
             ],
             "format": "double"
           },
+          "load_text": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Tekstowe obciążenie zamiast kg/% (np. „sama sztanga”)."
+          },
           "name": {
             "type": "string"
           },
@@ -7066,6 +7536,13 @@
               "null"
             ],
             "format": "double"
+          },
+          "load_text": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Tekstowe obciążenie zamiast kg/% (np. „sama sztanga”)."
           },
           "name": {
             "type": "string"
@@ -7158,6 +7635,13 @@
               "null"
             ],
             "format": "double"
+          },
+          "load_text": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Tekstowe obciążenie zamiast kg/% (np. „sama sztanga”)."
           },
           "pct_of": {
             "oneOf": [

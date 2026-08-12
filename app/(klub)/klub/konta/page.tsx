@@ -1,5 +1,6 @@
 "use client";
 
+import { DevCredentialsModal } from "@/components/klub/konta/DevCredentialsModal";
 import { ProfileModal } from "@/components/klub/konta/ProfileModal";
 import { ProfilesTable } from "@/components/klub/konta/ProfilesTable";
 import { CreateUserModal, EditUserModal } from "@/components/klub/konta/UserModal";
@@ -43,9 +44,11 @@ export default function KontaPage() {
           loading={kp.loading}
           editingUserId={kp.editingUserId}
           canManageUsers={kp.canManageUsers}
+          resetBusyId={kp.resetBusyId}
           onAdd={kp.openCreateUser}
           onEdit={kp.openEditUser}
           onToggleBan={(u) => void kp.toggleBan(u)}
+          onSendPasswordReset={(u) => void kp.sendPasswordReset(u)}
           onRemove={kp.removeUser}
         />
       ) : null}
@@ -100,6 +103,11 @@ export default function KontaPage() {
         onFieldChange={kp.setProfileField}
         onSubmit={(e) => void kp.submitProfile(e)}
         onClose={kp.closeProfileModal}
+      />
+
+      <DevCredentialsModal
+        credentials={kp.devCredentials}
+        onClose={() => kp.setDevCredentials(null)}
       />
 
       <ConfirmModal

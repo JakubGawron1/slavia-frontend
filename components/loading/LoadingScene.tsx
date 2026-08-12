@@ -82,7 +82,7 @@ export function LoadingScene({
         }
       >
         <div className="animate-rise flex items-center gap-3">
-          <ClubMark className="h-10 w-10 text-brand" />
+          <ClubMark className="h-12 w-auto" />
           <div className="text-left">
             <p className="font-display text-sm tracking-[0.2em] text-paper uppercase">
               CKS Slavia

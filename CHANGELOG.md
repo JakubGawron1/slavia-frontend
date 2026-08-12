@@ -12,6 +12,79 @@ Format sekcji:
 
 Opcjonalnie po dacie: `!breaking` (breaking API).
 
+## [1.1.2.10+11] - 2026-08-12
+### Fix: „Ruda Śląska” obok herbu w headerze
+- Przywrócony podpis miasta pod „CKS Slavia” w nawigacji publicznej.
+
+## [1.1.2.9+10] - 2026-08-12
+### Fix: proporcje herbu
+- Herb z oryginalnego pliku (szersze proporcje); `ClubMark` z `width: auto`, by Next/Image nie ściskał znaku.
+
+## [1.1.2.8+9] - 2026-08-12
+### Polish: herb pod UI witryny
+- Czystszy herb z przezroczystym tłem (elementy herbu bez zmian) + lekki drop-shadow.
+- Większy znak w headerze/logowaniu; mniej zdublowanego tekstu obok herbu.
+
+## [1.1.2.7+8] - 2026-08-12
+### DX: root `package.json` z wersją platformy
+- `sync-version` ustawia też `package.json` w rootcie workspace (jak FE).
+
+## [1.1.2.6+7] - 2026-08-12
+### DX: tooling FE (kontynuacja) + sync wersji
+- Lefthook w repo FE (Biome + ESLint na staged); `prepare` instaluje hooki.
+- Meta-workspace: root `pnpm`/`just`/`lefthook`, CI, Zod, RQ Devtools — wpis bazowy w `1.1.2.5+6`.
+
+## [1.1.2.5+6] - 2026-08-12
+### DX: tooling, walidacja Zod, React Query Devtools
+- Skrypty: `typecheck`, `format` (Biome), `knip`, `sync:api`; CI PR (`lint` + `tsc` + `build`).
+- Zod: walidacja kont, profili, wydarzeń i wyników (kadra + panel).
+- DevTools: zakładka React Query; README pod prawdziwy workflow Orval/pnpm.
+
+## [1.1.2.4+5] - 2026-08-12
+### Feature: herb CKS Slavia jako logo
+- `ClubMark` używa oficjalnego herbu (`/brand/cks-slavia-herb.png`) zamiast placeholder SVG.
+- Favicon z herbu (`app/icon.png`); herb też w nawigacji klubu.
+
+## [1.1.2.3+4] - 2026-08-12
+### Feature: reset hasła z listy kont + podgląd hasła dev
+- Przycisk „Reset hasła” na liście kont (Admin/Superadmin) → `POST /api/users/{id}/send-password-reset`.
+- Po utworzeniu konta `.dev` / `.local` modal z hasłem do skopiowania (+ przełącznik Pokaż w formularzu).
+
+## [1.1.2.2+3] - 2026-08-12
+### Feature: własne ćwiczenia AI → biblioteka
+- AI może używać nazw spoza biblioteki; w edytorze planu przycisk „Dodaj do biblioteki” dla ćwiczeń spoza listy.
+
+## [1.1.2.1+2] - 2026-08-12
+### Feature: limity Free Plan w DevTools AI
+- Podgląd RPM/RPD/TPM/TPD, dzienny limit szkiców + zużycie; bezpieczny `max_tokens` pod TPM.
+
+## [1.1.2.0+1] - 2026-08-12
+### Feature: DevTools → zakładka AI
+- Ustawienia modelu Groq (lista z API), styl odpowiedzi, temperature / tokens / tygodnie, warmup, biblioteka, instrukcje extra.
+
+## [1.1.1.19+20] - 2026-08-12
+### Feature: szkic AI planu (Groq)
+- Panel planów: liczba tygodni + stan „Generuję…”; backend generuje realny szkic (nie stub).
+
+## [1.1.1.18+19] - 2026-08-12
+### Feature: obciążenie „zawodnik sam ustala ciężar”
+- Preset `load_text` obok „sama sztanga”; chip „Sam ustala” w edytorze (wspólny + serie).
+- Wspólny komponent `LoadModeChips`.
+
+## [1.1.1.17+18] - 2026-08-12
+### UX: dodawanie ćwiczeń pod listą
+- W edytorze dnia: „Szybko z biblioteki” i „+ Ćwiczenie” zawsze pod ostatnim ćwiczeniem.
+
+## [1.1.1.16+17] - 2026-08-12
+### Feature: obciążenie „sama sztanga”
+- Pole `load_text` na `PlanExercise` / `PlanSet` / `PlanExerciseAlt` (XOR z kg/%).
+- Edytor: chip „Sztanga” obok Kg / %; przepis i postęp pokazują „sama sztanga”.
+
+## [1.1.1.15+16] - 2026-08-12
+### Feature: seria rozgrzewkowa w planie
+- W edytorze serii indywidualnych: checkbox „Rozgrzewka” (`PlanSet.is_warmup`).
+- `formatPrescription` i widok postępu oznaczają serie warm-up jako `W` / `Wn`.
+
 ## [1.1.1.14+15] - 2026-08-11
 ### Chore: Next.js 16.3 + TypeScript 7
 - `next` / `eslint-config-next` → 16.3.0 (natywne type-check przez `tsc` CLI).

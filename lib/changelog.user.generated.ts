@@ -3,6 +3,111 @@ import type { UserChangelogEntry } from "@/lib/user-changelog";
 
 export const GENERATED_USER_CHANGELOG: UserChangelogEntry[] = [
   {
+    "version": "1.1.2.1+2",
+    "date": "2026-08-12",
+    "title": "Limity AI (Free Plan)",
+    "notes": [
+      "W DevTools widać limity Groq Free Plan dla wybranego modelu oraz dzienny limit szkiców planu."
+    ]
+  },
+  {
+    "version": "1.1.2.9+10",
+    "date": "2026-08-12",
+    "title": "Naturalniejsze proporcje herbu",
+    "notes": [
+      "Herb w nawigacji nie wygląda już na ściśnięty — wróciły oryginalne proporcje."
+    ]
+  },
+  {
+    "version": "1.1.2.10+11",
+    "date": "2026-08-12",
+    "title": "Nazwa miasta w nagłówku",
+    "notes": [
+      "Obok herbu znowu widać „Ruda Śląska” pod nazwą klubu."
+    ]
+  },
+  {
+    "version": "1.1.2.4+5",
+    "date": "2026-08-12",
+    "title": "Oficjalny herb klubu",
+    "notes": [
+      "Na stronie i w panelu widać herb CKS „Slavia” Ruda Śląska zamiast dotychczasowego znaku."
+    ]
+  },
+  {
+    "version": "1.1.2.3+4",
+    "date": "2026-08-12",
+    "title": "Reset hasła z listy kont",
+    "notes": [
+      "Admin może wysłać użytkownikowi mail z linkiem do resetu hasła z listy kont.",
+      "Przy kontach testowych (.dev / .local) po utworzeniu widać hasło do skopiowania."
+    ]
+  },
+  {
+    "version": "1.1.1.16+17",
+    "date": "2026-08-12",
+    "title": "Sama sztanga w planie",
+    "notes": [
+      "Przy obciążeniu możesz wybrać „Sztanga” zamiast kg lub % — w planie widać wtedy „sama sztanga”."
+    ]
+  },
+  {
+    "version": "1.1.1.15+16",
+    "date": "2026-08-12",
+    "title": "Serie rozgrzewkowe w planie",
+    "notes": [
+      "Przy indywidualnym rozpisie serii możesz oznaczyć wybrane serie jako rozgrzewkowe — zawodnik widzi je w planie jako W1, W2…"
+    ]
+  },
+  {
+    "version": "1.1.1.19+20",
+    "date": "2026-08-12",
+    "title": "Szkic planu z AI",
+    "notes": [
+      "W planach kadry możesz wygenerować szkic programu (po włączeniu asystenta AI w DevTools) — wybierasz liczbę tygodni i opis."
+    ]
+  },
+  {
+    "version": "1.1.1.17+18",
+    "date": "2026-08-12",
+    "title": "Szybsze dokładanie ćwiczeń w planie",
+    "notes": [
+      "W edytorze dnia przyciski z biblioteki i „+ Ćwiczenie” są pod listą ćwiczeń — bez przewijania w górę."
+    ]
+  },
+  {
+    "version": "1.1.2.0+1",
+    "date": "2026-08-12",
+    "title": "Ustawienia AI w DevTools",
+    "notes": [
+      "Superadmin może wybrać model Groq, styl szkiców planu i kilka parametrów generowania (w zakładce AI)."
+    ]
+  },
+  {
+    "version": "1.1.2.2+3",
+    "date": "2026-08-12",
+    "title": "Własne ćwiczenia w planie",
+    "notes": [
+      "Szkic AI może użyć ćwiczeń spoza biblioteki; w edytorze możesz jednym kliknięciem dodać takie ćwiczenie do biblioteki klubu."
+    ]
+  },
+  {
+    "version": "1.1.2.8+9",
+    "date": "2026-08-12",
+    "title": "Wyraźniejszy herb",
+    "notes": [
+      "Herb klubu ma przezroczyste tło i lepiej widać go na ciemnym pasku nawigacji."
+    ]
+  },
+  {
+    "version": "1.1.1.18+19",
+    "date": "2026-08-12",
+    "title": "Zawodnik sam ustala ciężar",
+    "notes": [
+      "W planie możesz oznaczyć obciążenie jako „zawodnik sam ustala ciężar” (obok opcji „sama sztanga”)."
+    ]
+  },
+  {
     "version": "1.1.0.22+23",
     "date": "2026-08-11",
     "title": "% obciążenia z PR ćwiczenia",

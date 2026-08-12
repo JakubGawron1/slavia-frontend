@@ -1,0 +1,18 @@
+pre-commit:
+  parallel: true
+  commands:
+    biome:
+      glob: "*.{js,jsx,ts,tsx,css,json}"
+      exclude:
+        - "lib/api/generated/**"
+        - "lib/changelog.generated.ts"
+        - "lib/changelog.user.generated.ts"
+        - "lib/version.ts"
+        - "openapi/**"
+      run: pnpm exec biome check --write --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
+      stage_fixed: true
+    eslint:
+      glob: "*.{js,jsx,ts,tsx}"
+      exclude:
+        - "lib/api/generated/**"
+      run: pnpm exec eslint --max-warnings 0 {staged_files}

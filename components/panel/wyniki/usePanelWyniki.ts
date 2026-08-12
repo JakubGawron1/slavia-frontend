@@ -17,6 +17,11 @@ import {
   todayIsoDate,
   type ResultEditFormValues,
 } from "@/components/results/shared";
+import { parseOrMessage } from "@/lib/validation/parse";
+import {
+  panelResultCreateSchema,
+  panelResultEditSchema,
+} from "@/lib/validation/results";
 
 export type WynikKind = "competition" | "training";
 
@@ -113,32 +118,17 @@ export function usePanelWyniki() {
     if (!editing || !editValues) return;
     setError(null);
     const isComp = isCompetitionResult(editing);
-    if (!editValues.eventDate.trim()) {
-      const msg = "Podaj datę zawodów / treningu.";
-      setError(msg);
-      toast.error("Poprawa wyniku", msg);
+    const parsed = parseOrMessage(panelResultEditSchema, {
+      isCompetition: isComp,
+      eventDate: editValues.eventDate,
+      eventName: editValues.eventName,
+      bodyweight: editValues.bodyweight,
+      profileReady,
+    });
+    if (!parsed.ok) {
+      setError(parsed.message);
+      toast.error("Poprawa wyniku", parsed.message);
       return;
-    }
-    if (isComp) {
-      if (!profileReady) {
-        const msg =
-          "Uzupełnij w profilu datę urodzenia i płeć — kategoria wylicza się automatycznie.";
-        setError(msg);
-        toast.error("Poprawa wyniku", msg);
-        return;
-      }
-      if (!editValues.eventName.trim()) {
-        const msg = "Podaj nazwę zawodów.";
-        setError(msg);
-        toast.error("Poprawa wyniku", msg);
-        return;
-      }
-      if (!Number.isFinite(editBwNum) || editBwNum <= 0) {
-        const msg = "Podaj masę ciała na zawodach (kg).";
-        setError(msg);
-        toast.error("Poprawa wyniku", msg);
-        return;
-      }
     }
     setEditSaving(true);
     try {
@@ -173,28 +163,19 @@ export function usePanelWyniki() {
   async function submit(e: FormEvent) {
     e.preventDefault();
     setError(null);
-    const resolvedName = kind === "training" ? "Trening" : eventName.trim();
-    if (!eventDate.trim()) {
-      const msg = "Podaj datę zawodów / treningu.";
-      setError(msg);
-      toast.error("Wysyłanie wyniku", msg);
+    const parsed = parseOrMessage(panelResultCreateSchema, {
+      kind,
+      eventDate,
+      eventName,
+      bodyweight,
+      profileReady,
+    });
+    if (!parsed.ok) {
+      setError(parsed.message);
+      toast.error("Wysyłanie wyniku", parsed.message);
       return;
     }
-    if (kind === "competition") {
-      if (!profileReady) {
-        const msg =
-          "Uzupełnij w profilu datę urodzenia i płeć — kategoria wylicza się automatycznie.";
-        setError(msg);
-        toast.error("Wysyłanie wyniku", msg);
-        return;
-      }
-      if (!Number.isFinite(bwNum) || bwNum <= 0) {
-        const msg = "Podaj masę ciała na zawodach (kg).";
-        setError(msg);
-        toast.error("Wysyłanie wyniku", msg);
-        return;
-      }
-    }
+    const resolvedName = kind === "training" ? "Trening" : eventName.trim();
     try {
       await createResult({
         event_name: resolvedName,

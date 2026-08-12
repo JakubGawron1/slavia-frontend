@@ -99,6 +99,8 @@ export function useStaffPlansEditor() {
   const [dayIdx, setDayIdx] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [aiPrompt, setAiPrompt] = useState("");
+  const [aiWeeks, setAiWeeks] = useState(4);
+  const [aiBusy, setAiBusy] = useState(false);
   const [groupForm, setGroupForm] = useState<AthleteGroup | null>(null);
   const [assignMode, setAssignMode] = useState<AssignMode>("all");
   const [confirmDelete, setConfirmDelete] = useState<ConfirmDeleteTarget>(null);
@@ -287,13 +289,20 @@ export function useStaffPlansEditor() {
   }
 
   async function doAiDraft() {
+    if (aiBusy) return;
+    setAiBusy(true);
     try {
-      const res = await aiDraftPlan({ prompt: aiPrompt, weeks: 4 });
+      const res = await aiDraftPlan({
+        prompt: aiPrompt,
+        weeks: Math.min(16, Math.max(1, aiWeeks || 4)),
+      });
       openEdit(res.data as TrainingPlan);
       toast.success("Szkic AI utworzony");
       await load();
     } catch (err) {
       toast.error("AI", err instanceof Error ? err.message : "Błąd");
+    } finally {
+      setAiBusy(false);
     }
   }
 
@@ -330,6 +339,9 @@ export function useStaffPlansEditor() {
     aiEnabled,
     aiPrompt,
     setAiPrompt,
+    aiWeeks,
+    setAiWeeks,
+    aiBusy,
     doAiDraft,
 
     tab,

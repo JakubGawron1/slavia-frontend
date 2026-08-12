@@ -23,7 +23,7 @@ export default function LoginPage() {
       <div className="relative mx-auto grid min-h-[100svh] max-w-7xl lg:grid-cols-2">
         <div className="flex flex-col justify-end px-5 pb-10 pt-28 md:px-8 lg:pb-24 lg:pt-32">
           <div className="animate-rise">
-            <ClubMark className="h-12 w-12 text-brand" />
+            <ClubMark priority className="h-20 w-auto md:h-24" />
             <p className="mt-8 font-display text-sm tracking-[0.28em] text-brand uppercase">
               Strefa klubowa
             </p>

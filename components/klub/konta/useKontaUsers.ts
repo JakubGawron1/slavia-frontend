@@ -6,7 +6,14 @@ import {
   createUser as createUserApi,
   updateUser,
 } from "@/lib/api/generated/default/default";
+import { sendUserPasswordReset } from "@/lib/api/send-user-password-reset";
 import type { useToast } from "@/components/toast/ToastProvider";
+import type { DevCredentials } from "./DevCredentialsModal";
+import {
+  createUserFormSchema,
+  updateUserFormSchema,
+} from "@/lib/validation/konta";
+import { parseOrMessage } from "@/lib/validation/parse";
 import {
   ALL_ROLES,
   emptyUserCreateForm,
@@ -29,6 +36,10 @@ export function useKontaUsers({ user, toast, setError, load }: UseKontaUsersArgs
   const [editPassword, setEditPassword] = useState("");
   const [editPhotoUrl, setEditPhotoUrl] = useState("");
   const [editRoles, setEditRoles] = useState<Role[]>([]);
+  const [resetBusyId, setResetBusyId] = useState<string | null>(null);
+  const [devCredentials, setDevCredentials] = useState<DevCredentials | null>(
+    null,
+  );
 
   const roleOptions = ALL_ROLES.filter(
     (r) => r !== "superadmin" || user?.roles.includes("superadmin"),
@@ -65,28 +76,35 @@ export function useKontaUsers({ user, toast, setError, load }: UseKontaUsersArgs
   async function createUser(e: FormEvent) {
     e.preventDefault();
     setError(null);
-    const email = createUserForm.email.trim();
-    if (isDevEmail(email) && createUserForm.password.length < 6) {
-      const msg = "Dla adresów .dev / .local hasło musi mieć co najmniej 6 znaków.";
-      setError(msg);
-      toast.error("Tworzenie konta", msg);
+    const parsed = parseOrMessage(createUserFormSchema, createUserForm);
+    if (!parsed.ok) {
+      setError(parsed.message);
+      toast.error("Tworzenie konta", parsed.message);
       return;
     }
+    const { email, password, name, roles, photoUrl } = parsed.data;
     try {
       await createUserApi({
         email,
-        password: isDevEmail(email) ? createUserForm.password : null,
-        display_name: createUserForm.name,
-        roles: createUserForm.roles,
-        photo_url: createUserForm.photoUrl.trim() || null,
+        password: isDevEmail(email) ? password : null,
+        display_name: name,
+        roles: roles as Role[],
+        photo_url: photoUrl.trim() || null,
       });
       toast.success(
         isDevEmail(email)
           ? "Utworzono konto"
           : "Utworzono konto — wysłano link do e-maila",
-        createUserForm.name || email,
+        name || email,
       );
       closeUserModal();
+      if (isDevEmail(email)) {
+        setDevCredentials({
+          email,
+          password,
+          displayName: name || email,
+        });
+      }
       await load();
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Nie udało się utworzyć";
@@ -99,18 +117,30 @@ export function useKontaUsers({ user, toast, setError, load }: UseKontaUsersArgs
     e.preventDefault();
     if (!editingUserId) return;
     setError(null);
+    const parsed = parseOrMessage(updateUserFormSchema, {
+      name: editName,
+      email: editEmail,
+      password: editPassword,
+      roles: editRoles,
+      photoUrl: editPhotoUrl,
+    });
+    if (!parsed.ok) {
+      setError(parsed.message);
+      toast.error("Zapis konta", parsed.message);
+      return;
+    }
     try {
       const body: Parameters<typeof updateUser>[1] = {
-        display_name: editName.trim(),
-        email: editEmail.trim(),
-        roles: editRoles,
-        photo_url: editPhotoUrl.trim() || "",
+        display_name: parsed.data.name,
+        email: parsed.data.email,
+        roles: parsed.data.roles as Role[],
+        photo_url: parsed.data.photoUrl.trim() || "",
       };
-      if (editPassword.trim()) {
-        body.password = editPassword;
+      if (parsed.data.password.trim()) {
+        body.password = parsed.data.password;
       }
       await updateUser(editingUserId, body);
-      toast.success("Zapisano konto", editName.trim() || editEmail.trim());
+      toast.success("Zapisano konto", parsed.data.name || parsed.data.email);
       closeUserModal();
       await load();
     } catch (err) {
@@ -132,6 +162,22 @@ export function useKontaUsers({ user, toast, setError, load }: UseKontaUsersArgs
       const msg = err instanceof Error ? err.message : "Błąd banowania";
       setError(msg);
       toast.error("Status konta", msg);
+    }
+  }
+
+  async function sendPasswordReset(u: PublicUser) {
+    setResetBusyId(u.id);
+    setError(null);
+    try {
+      await sendUserPasswordReset(u.id);
+      toast.success("Wysłano reset hasła", u.email);
+    } catch (err) {
+      const msg =
+        err instanceof Error ? err.message : "Nie udało się wysłać resetu";
+      setError(msg);
+      toast.error("Reset hasła", msg);
+    } finally {
+      setResetBusyId(null);
     }
   }
 
@@ -165,12 +211,16 @@ export function useKontaUsers({ user, toast, setError, load }: UseKontaUsersArgs
     setEditPhotoUrl,
     editRoles,
     roleOptions,
+    resetBusyId,
+    devCredentials,
+    setDevCredentials,
     closeUserModal,
     openCreateUser,
     openEditUser,
     createUser,
     saveUser,
     toggleBan,
+    sendPasswordReset,
     toggleCreateRole,
     toggleEditRole,
   };

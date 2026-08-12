@@ -123,11 +123,14 @@ function HeaderChrome({
       <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 md:px-8">
         <Link
           href="/"
-          className="group flex items-center gap-3 text-paper"
+          className="group flex items-center gap-3.5 text-paper"
           aria-label="CKS Slavia Ruda Śląska — strona główna"
         >
-          <ClubMark className="h-10 w-10 text-brand transition-transform duration-300 group-hover:scale-105" />
-          <span className="font-display text-lg font-semibold tracking-[0.08em] uppercase md:text-xl">
+          <ClubMark
+            priority
+            className="h-14 w-auto transition-transform duration-300 group-hover:scale-[1.04] md:h-16"
+          />
+          <span className="font-display text-lg font-semibold tracking-[0.1em] uppercase md:text-xl">
             CKS Slavia
             <span className="mt-0.5 block text-[0.65rem] font-medium tracking-[0.14em] text-paper/55 normal-case md:text-xs">
               Ruda Śląska

@@ -299,6 +299,39 @@ export function PlanEditor({ editor }: { editor: StaffPlansEditor }) {
             + Dzień
           </button>
         </div>
+      </section>
+
+      <section className="space-y-3 border-t border-paper/10 pt-4">
+        <p className={sectionLabel}>
+          Ćwiczenia ·{" "}
+          {DAY_LABELS[weeks[editor.weekIdx]?.days?.[editor.dayIdx]?.day_of_week ?? 0] ??
+            "dzień"}
+        </p>
+
+        <div className="space-y-3">
+          {currentExercises.length === 0 ? (
+            <p className="border border-dashed border-paper/15 px-4 py-8 text-center text-sm text-paper/45">
+              Brak ćwiczeń w tym dniu — dodaj poniżej z biblioteki albo ręcznie.
+            </p>
+          ) : null}
+          {currentExercises.map((ex, i) => (
+            <ExerciseEditor
+              key={ex.id}
+              ex={ex}
+              index={i}
+              library={editor.library}
+              onLibraryReload={editor.load}
+              onPatch={editor.patchExercise}
+              onDuplicate={(copy) => editor.setDayExercises([...editor.currentDayExercises(), copy])}
+              onRemove={(i2) =>
+                editor.setDayExercises(currentExercises.filter((_, j) => j !== i2))
+              }
+              onDragStart={editor.setDragEx}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={editor.onDropEx}
+            />
+          ))}
+        </div>
 
         {editor.library.length > 0 ? (
           <div className="space-y-2">
@@ -317,46 +350,14 @@ export function PlanEditor({ editor }: { editor: StaffPlansEditor }) {
             </div>
           </div>
         ) : null}
-      </section>
 
-      <section className="space-y-3 border-t border-paper/10 pt-4">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className={sectionLabel}>
-            Ćwiczenia ·{" "}
-            {DAY_LABELS[weeks[editor.weekIdx]?.days?.[editor.dayIdx]?.day_of_week ?? 0] ??
-              "dzień"}
-          </p>
-          <button
-            type="button"
-            className={btnSecondary}
-            onClick={() => editor.addExercise()}
-          >
-            + Ćwiczenie
-          </button>
-        </div>
-
-        <div className="space-y-3">
-          {currentExercises.length === 0 ? (
-            <p className="border border-dashed border-paper/15 px-4 py-8 text-center text-sm text-paper/45">
-              Brak ćwiczeń w tym dniu — dodaj z biblioteki albo ręcznie.
-            </p>
-          ) : null}
-          {currentExercises.map((ex, i) => (
-            <ExerciseEditor
-              key={ex.id}
-              ex={ex}
-              index={i}
-              onPatch={editor.patchExercise}
-              onDuplicate={(copy) => editor.setDayExercises([...editor.currentDayExercises(), copy])}
-              onRemove={(i2) =>
-                editor.setDayExercises(currentExercises.filter((_, j) => j !== i2))
-              }
-              onDragStart={editor.setDragEx}
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={editor.onDropEx}
-            />
-          ))}
-        </div>
+        <button
+          type="button"
+          className={btnSecondary}
+          onClick={() => editor.addExercise()}
+        >
+          + Ćwiczenie
+        </button>
       </section>
 
       {editing.id ? (

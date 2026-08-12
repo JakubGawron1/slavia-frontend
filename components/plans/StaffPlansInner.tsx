@@ -102,14 +102,32 @@ export function StaffPlansInner() {
               placeholder="Opisz program (np. 8 tygodni siły, 3×/tyg.)…"
               value={editor.aiPrompt}
               onChange={(e) => editor.setAiPrompt(e.target.value)}
+              disabled={editor.aiBusy}
+            />
+          </label>
+          <label className="w-24 space-y-1.5">
+            <span className={sectionLabel}>Tyg.</span>
+            <input
+              className={inputClass}
+              type="number"
+              min={1}
+              max={16}
+              value={editor.aiWeeks}
+              onChange={(e) =>
+                editor.setAiWeeks(
+                  e.target.value ? Number(e.target.value) : 4,
+                )
+              }
+              disabled={editor.aiBusy}
             />
           </label>
           <button
             type="button"
             onClick={() => void editor.doAiDraft()}
             className={btnSecondary}
+            disabled={editor.aiBusy || !editor.aiPrompt.trim()}
           >
-            Generuj szkic
+            {editor.aiBusy ? "Generuję…" : "Generuj szkic"}
           </button>
         </div>
       ) : null}

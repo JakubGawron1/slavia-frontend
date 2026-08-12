@@ -67,6 +67,7 @@ export function useKontaPage() {
     athleteUsers,
     profiles,
     usersById,
+    onDevCredentials: usersSection.setDevCredentials,
   });
 
   function removeUser(id: string, name: string) {

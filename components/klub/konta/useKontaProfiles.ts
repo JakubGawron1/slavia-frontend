@@ -8,6 +8,9 @@ import {
 import type { useToast } from "@/components/toast/ToastProvider";
 import { isDevEmail } from "@/lib/email";
 import { resolveWeightCategory } from "@/lib/weightlifting-categories";
+import { profileFormSchema } from "@/lib/validation/konta";
+import { parseOrMessage } from "@/lib/validation/parse";
+import type { DevCredentials } from "./DevCredentialsModal";
 import {
   type AccountLinkMode,
   emptyProfileForm,
@@ -22,6 +25,7 @@ type UseKontaProfilesArgs = {
   athleteUsers: PublicUser[];
   profiles: AthleteProfile[];
   usersById: Map<string, PublicUser>;
+  onDevCredentials: (creds: DevCredentials) => void;
 };
 
 export function useKontaProfiles({
@@ -31,6 +35,7 @@ export function useKontaProfiles({
   athleteUsers,
   profiles,
   usersById,
+  onDevCredentials,
 }: UseKontaProfilesArgs) {
   const [profileModal, setProfileModal] = useState<ProfileModalMode>("closed");
   const [editingProfileId, setEditingProfileId] = useState<string | null>(null);
@@ -100,58 +105,58 @@ export function useKontaProfiles({
   async function submitProfile(e: FormEvent) {
     e.preventDefault();
     setError(null);
+    const parsed = parseOrMessage(profileFormSchema, profileForm);
+    if (!parsed.ok) {
+      setError(parsed.message);
+      toast.error("Profil", parsed.message);
+      return;
+    }
+    const form = parsed.data;
     try {
       let userId = "manual";
-      const mode = profileForm.accountMode;
+      const mode = form.accountMode;
 
       if (mode === "existing") {
-        if (!profileForm.userId) {
-          setError("Wybierz konto zawodnika z listy.");
-          toast.error("Profil", "Wybierz konto zawodnika z listy.");
-          return;
-        }
-        userId = profileForm.userId;
+        userId = form.userId;
       } else if (mode === "new") {
-        const email = profileForm.accountEmail.trim();
-        if (!email) {
-          setError("Podaj e-mail dla nowego konta.");
-          toast.error("Profil", "Podaj e-mail dla nowego konta.");
-          return;
-        }
-        if (isDevEmail(email) && profileForm.accountPassword.length < 6) {
-          setError("Dla adresów .dev / .local podaj hasło (min. 6 znaków).");
-          toast.error("Profil", "Dla adresów .dev / .local podaj hasło.");
-          return;
-        }
+        const email = form.accountEmail.trim();
+        const password = form.accountPassword;
         const created = (
           await createUserApi({
             email,
-            password: isDevEmail(email) ? profileForm.accountPassword : null,
-            display_name: profileForm.name,
+            password: isDevEmail(email) ? password : null,
+            display_name: form.name,
             roles: ["zawodnik"],
-            photo_url: profileForm.photoUrl.trim() || null,
+            photo_url: form.photoUrl.trim() || null,
           })
         ).data as PublicUser;
         userId = created.id;
+        if (isDevEmail(email)) {
+          onDevCredentials({
+            email,
+            password,
+            displayName: form.name || email,
+          });
+        }
       }
 
       const body = {
         user_id: userId,
-        display_name: profileForm.name,
-        bodyweight_kg: profileForm.weight ? Number(profileForm.weight) : null,
+        display_name: form.name,
+        bodyweight_kg: form.weight ? Number(form.weight) : null,
         category: computedCategory,
-        notes: profileForm.notes.trim() || null,
-        photo_url: profileForm.photoUrl.trim() || null,
-        birth_date: profileForm.birthDate || null,
-        sex: profileForm.sex || null,
+        notes: form.notes.trim() || null,
+        photo_url: form.photoUrl.trim() || null,
+        birth_date: form.birthDate || null,
+        sex: form.sex || null,
       };
 
       if (editingProfileId) {
         await updateProfile(editingProfileId, body);
-        toast.success("Zapisano profil", profileForm.name);
+        toast.success("Zapisano profil", form.name);
       } else {
         await createProfile(body);
-        toast.success("Dodano profil", profileForm.name);
+        toast.success("Dodano profil", form.name);
       }
 
       closeProfileModal();

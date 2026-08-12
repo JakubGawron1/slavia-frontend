@@ -1,8 +1,10 @@
 "use client";
 
+import { AiSettingsTab } from "@/components/klub/devtools/AiSettingsTab";
 import { ChangelogPanel } from "@/components/klub/devtools/ChangelogPanel";
 import { DebugTab } from "@/components/klub/devtools/DebugTab";
 import { FlagsTab } from "@/components/klub/devtools/FlagsTab";
+import { ReactQueryDevtoolsTab } from "@/components/klub/devtools/ReactQueryDevtoolsTab";
 import { RoutesTab } from "@/components/klub/devtools/RoutesTab";
 import { StatsTab } from "@/components/klub/devtools/StatsTab";
 import { useDevTools } from "@/components/klub/devtools/useDevTools";
@@ -58,6 +60,8 @@ export default function DevToolsPage() {
         />
       ) : null}
 
+      {d.tab === "ai" ? <AiSettingsTab /> : null}
+
       {d.tab === "stats" && d.stats ? <StatsTab stats={d.stats} /> : null}
 
       {d.tab === "routes" ? (
@@ -65,6 +69,8 @@ export default function DevToolsPage() {
       ) : null}
 
       {d.tab === "changelog" ? <ChangelogPanel /> : null}
+
+      {d.tab === "rq" ? <ReactQueryDevtoolsTab /> : null}
 
       {d.tab === "debug" ? (
         <DebugTab

@@ -72,7 +72,7 @@ export function ErrorScene({
 
       <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center px-5 py-16 md:px-8 md:py-20">
         <div className="animate-rise flex items-center gap-3">
-          <ClubMark className="h-10 w-10 text-brand" />
+          <ClubMark className="h-12 w-auto" />
           <div>
             <p className="font-display text-sm tracking-[0.2em] text-paper uppercase">
               CKS Slavia

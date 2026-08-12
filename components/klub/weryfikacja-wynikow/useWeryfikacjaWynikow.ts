@@ -24,6 +24,11 @@ import {
   type ResultEditFormValues,
 } from "@/components/results/shared";
 import type { AthleteFilterOption } from "@/components/results/AthleteFilterSelect";
+import { parseOrMessage } from "@/lib/validation/parse";
+import {
+  staffResultCreateSchema,
+  staffResultEditSchema,
+} from "@/lib/validation/results";
 
 function findProfileForResult(
   profiles: AthleteProfile[],
@@ -149,25 +154,16 @@ export function useWeryfikacjaWynikow() {
     if (!editing || !editValues) return;
     setError(null);
     const isComp = isCompetitionResult(editing);
-    if (!editValues.eventDate.trim()) {
-      const msg = "Podaj datę.";
-      setError(msg);
-      toast.error("Edycja wyniku", msg);
+    const parsed = parseOrMessage(staffResultEditSchema, {
+      isCompetition: isComp,
+      eventDate: editValues.eventDate,
+      eventName: editValues.eventName,
+      bodyweight: editValues.bodyweight,
+    });
+    if (!parsed.ok) {
+      setError(parsed.message);
+      toast.error("Edycja wyniku", parsed.message);
       return;
-    }
-    if (isComp) {
-      if (!editValues.eventName.trim()) {
-        const msg = "Podaj nazwę zawodów.";
-        setError(msg);
-        toast.error("Edycja wyniku", msg);
-        return;
-      }
-      if (!Number.isFinite(editBwNum) || editBwNum <= 0) {
-        const msg = "Podaj masę ciała (kg).";
-        setError(msg);
-        toast.error("Edycja wyniku", msg);
-        return;
-      }
     }
     setEditSaving(true);
     try {
@@ -223,21 +219,21 @@ export function useWeryfikacjaWynikow() {
   async function createStaffResult(e: FormEvent) {
     e.preventDefault();
     setError(null);
-    if (!selectedProfile) {
-      setError("Wybierz profil zawodnika.");
-      toast.error("Wynik", "Wybierz profil zawodnika.");
+    const parsed = parseOrMessage(staffResultCreateSchema, {
+      hasProfile: Boolean(selectedProfile),
+      bodyweight,
+      eventDate,
+      eventName,
+      snatch,
+      cj,
+      venue,
+    });
+    if (!parsed.ok) {
+      setError(parsed.message);
+      toast.error("Wynik", parsed.message);
       return;
     }
-    if (!Number.isFinite(bwNum) || bwNum <= 0) {
-      setError("Podaj masę ciała (kg).");
-      toast.error("Wynik", "Podaj masę ciała (kg).");
-      return;
-    }
-    if (!eventDate.trim()) {
-      setError("Podaj datę zawodów.");
-      toast.error("Wynik", "Podaj datę zawodów.");
-      return;
-    }
+    if (!selectedProfile) return;
     setSaving(true);
     try {
       await createResult({

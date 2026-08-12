@@ -11,6 +11,59 @@ Format:
 - zdanie zrozumiałe dla zwykłego użytkownika
 ```
 
+## [1.1.2.10+11] - 2026-08-12
+### Nazwa miasta w nagłówku
+- Obok herbu znowu widać „Ruda Śląska” pod nazwą klubu.
+
+## [1.1.2.9+10] - 2026-08-12
+### Naturalniejsze proporcje herbu
+- Herb w nawigacji nie wygląda już na ściśnięty — wróciły oryginalne proporcje.
+
+## [1.1.2.8+9] - 2026-08-12
+### Wyraźniejszy herb
+- Herb klubu ma przezroczyste tło i lepiej widać go na ciemnym pasku nawigacji.
+
+## [1.1.2.4+5] - 2026-08-12
+### Oficjalny herb klubu
+- Na stronie i w panelu widać herb CKS „Slavia” Ruda Śląska zamiast dotychczasowego znaku.
+
+## [1.1.2.3+4] - 2026-08-12
+### Reset hasła z listy kont
+- Admin może wysłać użytkownikowi mail z linkiem do resetu hasła z listy kont.
+- Przy kontach testowych (.dev / .local) po utworzeniu widać hasło do skopiowania.
+
+## [1.1.2.2+3] - 2026-08-12
+### Własne ćwiczenia w planie
+- Szkic AI może użyć ćwiczeń spoza biblioteki; w edytorze możesz jednym kliknięciem dodać takie ćwiczenie do biblioteki klubu.
+
+## [1.1.2.1+2] - 2026-08-12
+### Limity AI (Free Plan)
+- W DevTools widać limity Groq Free Plan dla wybranego modelu oraz dzienny limit szkiców planu.
+
+## [1.1.2.0+1] - 2026-08-12
+### Ustawienia AI w DevTools
+- Superadmin może wybrać model Groq, styl szkiców planu i kilka parametrów generowania (w zakładce AI).
+
+## [1.1.1.19+20] - 2026-08-12
+### Szkic planu z AI
+- W planach kadry możesz wygenerować szkic programu (po włączeniu asystenta AI w DevTools) — wybierasz liczbę tygodni i opis.
+
+## [1.1.1.18+19] - 2026-08-12
+### Zawodnik sam ustala ciężar
+- W planie możesz oznaczyć obciążenie jako „zawodnik sam ustala ciężar” (obok opcji „sama sztanga”).
+
+## [1.1.1.17+18] - 2026-08-12
+### Szybsze dokładanie ćwiczeń w planie
+- W edytorze dnia przyciski z biblioteki i „+ Ćwiczenie” są pod listą ćwiczeń — bez przewijania w górę.
+
+## [1.1.1.16+17] - 2026-08-12
+### Sama sztanga w planie
+- Przy obciążeniu możesz wybrać „Sztanga” zamiast kg lub % — w planie widać wtedy „sama sztanga”.
+
+## [1.1.1.15+16] - 2026-08-12
+### Serie rozgrzewkowe w planie
+- Przy indywidualnym rozpisie serii możesz oznaczyć wybrane serie jako rozgrzewkowe — zawodnik widzi je w planie jako W1, W2…
+
 ## [1.1.1.13+14] - 2026-08-11
 ### Kopiowanie planu na wszystkie tygodnie
 - W edytorze planu jednym kliknięciem skopiujesz ćwiczenia bieżącego tygodnia na wszystkie pozostałe tygodnie.

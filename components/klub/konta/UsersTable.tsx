@@ -7,9 +7,11 @@ type UsersTableProps = {
   loading: boolean;
   editingUserId: string | null;
   canManageUsers: boolean;
+  resetBusyId: string | null;
   onAdd: () => void;
   onEdit: (u: PublicUser) => void;
   onToggleBan: (u: PublicUser) => void;
+  onSendPasswordReset: (u: PublicUser) => void;
   onRemove: (id: string, name: string) => void;
 };
 
@@ -18,9 +20,11 @@ export function UsersTable({
   loading,
   editingUserId,
   canManageUsers,
+  resetBusyId,
   onAdd,
   onEdit,
   onToggleBan,
+  onSendPasswordReset,
   onRemove,
 }: UsersTableProps) {
   return (
@@ -97,6 +101,16 @@ export function UsersTable({
                     >
                       {u.is_active ? "Banuj" : "Odbanuj"}
                     </button>
+                    {canManageUsers ? (
+                      <button
+                        type="button"
+                        className="text-xs text-paper/70 underline-offset-2 hover:underline disabled:opacity-40"
+                        disabled={resetBusyId === u.id || !u.is_active}
+                        onClick={() => onSendPasswordReset(u)}
+                      >
+                        {resetBusyId === u.id ? "Wysyłanie…" : "Reset hasła"}
+                      </button>
+                    ) : null}
                     <button
                       type="button"
                       className="text-xs text-brand underline-offset-2 hover:underline"

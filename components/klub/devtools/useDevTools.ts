@@ -23,7 +23,14 @@ import type {
 } from "@/lib/api/generated/models";
 import { SLAVIA_VERSION } from "@/lib/version";
 
-export type DevToolsTab = "flags" | "stats" | "routes" | "debug" | "changelog";
+export type DevToolsTab =
+  | "flags"
+  | "ai"
+  | "stats"
+  | "routes"
+  | "debug"
+  | "changelog"
+  | "rq";
 
 export function flagsByKind(flags: FeatureFlag[], kind: FlagKind): FeatureFlag[] {
   return flags.filter((f) => f.kind === kind);
@@ -91,9 +98,11 @@ export function useDevTools() {
 
   const tabs: { id: DevToolsTab; label: string }[] = [
     { id: "flags", label: "Flagi" },
+    { id: "ai", label: "AI" },
     { id: "stats", label: "Statystyki" },
     { id: "routes", label: "Mapa tras" },
     { id: "changelog", label: "Changelog" },
+    { id: "rq", label: "React Query" },
     { id: "debug", label: "Debug" },
   ];
 

@@ -14,6 +14,8 @@ import {
   updateSchedule,
 } from "@/lib/api/generated/default/default";
 import type { EventBody } from "@/lib/api/generated/models";
+import { eventFormSchema } from "@/lib/validation/event";
+import { parseOrMessage } from "@/lib/validation/parse";
 import type {
   CtxMenu,
   DialogState,
@@ -43,33 +45,40 @@ export function createStaffCalendarMutations(d: Deps) {
     e.preventDefault();
     if (!d.form) return;
     d.setError(null);
+    const parsed = parseOrMessage(eventFormSchema, d.form);
+    if (!parsed.ok) {
+      d.setError(parsed.message);
+      d.toast.error("Zapis nieudany", parsed.message);
+      return;
+    }
+    const form = parsed.data;
     const end =
-      d.form.event_type === "zawody" &&
-      d.form.end_date &&
-      d.form.end_date !== d.form.date
-        ? d.form.end_date
+      form.event_type === "zawody" &&
+      form.end_date &&
+      form.end_date !== form.date
+        ? form.end_date
         : null;
     const body: EventBody = {
-      title: d.form.title,
-      event_type: d.form.event_type,
-      date: d.form.date,
+      title: form.title,
+      event_type: form.event_type,
+      date: form.date,
       end_date: end,
-      time: d.form.time || null,
-      location: d.form.location || null,
-      description: d.form.description || null,
+      time: form.time || null,
+      location: form.location || null,
+      description: form.description || null,
       assigned_athlete_ids:
-        d.form.event_type === "zawody" ? d.form.assigned_athlete_ids : [],
-      plan_id: d.form.plan_id.trim() || null,
-      plan_week: d.form.plan_week ? Number(d.form.plan_week) : null,
-      plan_day: d.form.plan_day ? Number(d.form.plan_day) : null,
+        form.event_type === "zawody" ? d.form.assigned_athlete_ids : [],
+      plan_id: form.plan_id.trim() || null,
+      plan_week: form.plan_week ? Number(form.plan_week) : null,
+      plan_day: form.plan_day ? Number(form.plan_day) : null,
     };
     try {
       if (d.formMode === "create") {
         await createEvent(body);
-        d.toast.success("Dodano wydarzenie", d.form.title);
+        d.toast.success("Dodano wydarzenie", form.title);
       } else {
         await updateEvent(d.form.id, body);
-        d.toast.success("Zapisano zmiany", d.form.title);
+        d.toast.success("Zapisano zmiany", form.title);
       }
       d.setForm(null);
       await d.load();

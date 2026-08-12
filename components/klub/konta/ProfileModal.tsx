@@ -3,6 +3,7 @@ import type { PublicUser } from "@/lib/api/generated/models";
 import { isDevEmail } from "@/lib/email";
 import { PhotoUploadField } from "@/components/settings/PhotoUploadField";
 import { Modal } from "@/components/ui/Modal";
+import { DevPasswordInput } from "./DevPasswordInput";
 import {
   type AccountLinkMode,
   formGridClass,
@@ -124,19 +125,11 @@ export function ProfileModal({
               />
             </label>
             {isDevEmail(form.accountEmail) ? (
-              <label className="flex flex-col gap-1.5">
-                <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
-                  Hasło konta
-                </span>
-                <input
-                  className={inputClass}
-                  type="password"
-                  value={form.accountPassword}
-                  onChange={(e) => onFieldChange("accountPassword", e.target.value)}
-                  required
-                  minLength={6}
-                />
-              </label>
+              <DevPasswordInput
+                value={form.accountPassword}
+                onChange={(v) => onFieldChange("accountPassword", v)}
+                hint="Adres .dev / .local — hasło ustawiasz od razu; po zapisie możesz je skopiować."
+              />
             ) : (
               <p className="text-xs text-paper/45 self-end">
                 Link do ustawienia hasła pójdzie na e-mail.

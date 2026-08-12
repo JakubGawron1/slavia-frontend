@@ -1,30 +1,35 @@
+import Image from "next/image";
+
 type ClubMarkProps = {
   className?: string;
+  /** Dekoracyjny znak (domyślnie) — bez alt; inaczej dostępny opis. */
+  alt?: string;
+  priority?: boolean;
 };
 
-export function ClubMark({ className = "h-9 w-9" }: ClubMarkProps) {
+/** Naturalne proporcje oryginalnego herbu (574×801). */
+const HERB_W = 1148;
+const HERB_H = 1600;
+
+/** Oficjalny herb — przezroczyste tło + lekki cień pod ciemny chrome witryny. */
+export function ClubMark({
+  className = "h-10 w-auto",
+  alt = "",
+  priority = false,
+}: ClubMarkProps) {
   return (
-    <svg
-      className={className}
-      viewBox="0 0 64 64"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-    >
-      <rect width="64" height="64" rx="4" fill="currentColor" />
-      <path
-        d="M12 22h40v6H12V22Zm0 14h40v6H12v-6Z"
-        fill="#f7f5f2"
+    <span className="inline-flex shrink-0 [filter:drop-shadow(0_1px_1px_rgba(0,0,0,0.55))_drop-shadow(0_6px_14px_rgba(0,0,0,0.28))]">
+      <Image
+        src="/brand/cks-slavia-herb.png"
+        alt={alt}
+        width={HERB_W}
+        height={HERB_H}
+        sizes="(max-width: 768px) 56px, 72px"
+        className={`object-contain ${className}`}
+        style={{ width: "auto" }}
+        aria-hidden={alt ? undefined : true}
+        priority={priority}
       />
-      <circle cx="18" cy="25" r="5" fill="#f7f5f2" />
-      <circle cx="46" cy="25" r="5" fill="#f7f5f2" />
-      <circle cx="18" cy="39" r="5" fill="#f7f5f2" />
-      <circle cx="46" cy="39" r="5" fill="#f7f5f2" />
-      <path
-        d="M28 18h8v28h-8V18Z"
-        fill="#f7f5f2"
-        opacity="0.92"
-      />
-    </svg>
+    </span>
   );
 }

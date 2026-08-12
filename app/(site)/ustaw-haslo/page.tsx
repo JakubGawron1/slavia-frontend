@@ -16,7 +16,7 @@ export default function SetPasswordPage() {
         aria-hidden="true"
       />
       <div className="relative mx-auto flex min-h-[100svh] max-w-lg flex-col justify-center px-5 py-16 md:px-8">
-        <ClubMark className="h-10 w-10 text-brand" />
+        <ClubMark className="h-11 w-auto" />
         <p className="mt-8 font-display text-sm tracking-[0.28em] text-brand uppercase">
           Strefa klubowa
         </p>
