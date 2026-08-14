@@ -17,7 +17,6 @@ import type {
 } from "@/lib/api/generated/models";
 import type { PlanBody } from "@/lib/api/generated/models/planBody";
 import {
-  aiDraftPlan,
   copyPlan,
   createPlan,
   deletePlan,
@@ -43,6 +42,7 @@ import {
 } from "@/lib/plans/helpers";
 import { usePlanEditingActions } from "@/components/plans/usePlanEditingActions";
 import { usePlanProgressReplies } from "@/components/plans/usePlanProgressReplies";
+import { useAiPlanDraft } from "@/components/plans/useAiPlanDraft";
 
 export type StaffPlansTab = "plans" | "catalog" | "library" | "groups" | "archive";
 
@@ -98,9 +98,7 @@ export function useStaffPlansEditor() {
   const [weekIdx, setWeekIdx] = useState(0);
   const [dayIdx, setDayIdx] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [aiPrompt, setAiPrompt] = useState("");
-  const [aiWeeks, setAiWeeks] = useState(4);
-  const [aiBusy, setAiBusy] = useState(false);
+  const [listQuery, setListQuery] = useState("");
   const [groupForm, setGroupForm] = useState<AthleteGroup | null>(null);
   const [assignMode, setAssignMode] = useState<AssignMode>("all");
   const [confirmDelete, setConfirmDelete] = useState<ConfirmDeleteTarget>(null);
@@ -288,26 +286,20 @@ export function useStaffPlansEditor() {
     }
   }
 
-  async function doAiDraft() {
-    if (aiBusy) return;
-    setAiBusy(true);
+  async function setArchived(plan: TrainingPlan, archived: boolean) {
     try {
-      const res = await aiDraftPlan({
-        prompt: aiPrompt,
-        weeks: Math.min(16, Math.max(1, aiWeeks || 4)),
-      });
-      openEdit(res.data as TrainingPlan);
-      toast.success("Szkic AI utworzony");
+      await updatePlan(plan.id, { ...toBody(plan, false), archived });
+      toast.success(archived ? "Zarchiwizowano plan" : "Przywrócono plan");
+      if (editing?.id === plan.id) setEditing(null);
       await load();
     } catch (err) {
-      toast.error("AI", err instanceof Error ? err.message : "Błąd");
-    } finally {
-      setAiBusy(false);
+      toast.error("Archiwum", err instanceof Error ? err.message : "Błąd");
     }
   }
 
   const editingActions = usePlanEditingActions(editing, setEditingTracked, weekIdx, dayIdx);
   const progressReplies = usePlanProgressReplies(editing?.id, users);
+  const ai = useAiPlanDraft(aiEnabled, openEdit);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -337,15 +329,12 @@ export function useStaffPlansEditor() {
 
   return {
     aiEnabled,
-    aiPrompt,
-    setAiPrompt,
-    aiWeeks,
-    setAiWeeks,
-    aiBusy,
-    doAiDraft,
+    ai,
 
     tab,
     setTab,
+    listQuery,
+    setListQuery,
 
     plans,
     archive,
@@ -371,6 +360,7 @@ export function useStaffPlansEditor() {
     save,
     doCopy,
     doVersion,
+    setArchived,
     remove,
 
     ...editingActions,

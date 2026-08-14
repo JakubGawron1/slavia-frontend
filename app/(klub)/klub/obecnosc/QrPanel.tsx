@@ -1,5 +1,6 @@
 import { QrCodeImage } from "@/components/QrCodeImage";
 import type { AttendanceSessionLocal } from "./useStaffObecnosc";
+import { InlineStatus } from "@/components/ui/InlineStatus";
 
 type QrPanelProps = {
   session: AttendanceSessionLocal | null;
@@ -21,7 +22,7 @@ export function QrPanel({ session, qrPayload, onRefresh }: QrPanelProps) {
           className="mx-auto mt-4 h-56 w-56 bg-surface p-2"
         />
       ) : (
-        <p className="mt-4 text-sm text-paper/45">Ładowanie sesji QR…</p>
+        <InlineStatus kind="loading">Ładowanie sesji QR…</InlineStatus>
       )}
       <p className="mt-3 break-all font-mono text-[10px] text-paper/40">
         {session?.token}

@@ -1,6 +1,8 @@
 import type { PublicUser } from "@/lib/api/generated/models";
 import type { CalendarEventFull } from "@/lib/events";
 import type { AttendanceRecordLocal } from "./useStaffObecnosc";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { FilterChip } from "@/components/ui/FilterChip";
 
 type AttendanceListViewProps = {
   trainings: CalendarEventFull[];
@@ -58,28 +60,16 @@ export function AttendanceListView({
       </div>
 
       <div className="flex flex-wrap gap-2 print:hidden">
-        <button
-          type="button"
+        <FilterChip
+          active={view === "agenda"}
           onClick={() => onViewChange("agenda")}
-          className={
-            view === "agenda"
-              ? "border border-brand bg-brand/20 px-3 py-1.5 text-xs uppercase"
-              : "border border-paper/20 px-3 py-1.5 text-xs uppercase text-paper/50"
-          }
-        >
-          Agenda
-        </button>
-        <button
-          type="button"
+          label="Agenda"
+        />
+        <FilterChip
+          active={view === "day"}
           onClick={() => onViewChange("day")}
-          className={
-            view === "day"
-              ? "border border-brand bg-brand/20 px-3 py-1.5 text-xs uppercase"
-              : "border border-paper/20 px-3 py-1.5 text-xs uppercase text-paper/50"
-          }
-        >
-          Lista
-        </button>
+          label="Lista"
+        />
         <select
           className="border border-paper/20 bg-chrome/40 px-2 py-1.5 text-sm"
           value={filterUser}
@@ -130,7 +120,12 @@ export function AttendanceListView({
             </li>
           ))}
           {byDay.length === 0 ? (
-            <li className="text-paper/45">Brak obecności w filtrze.</li>
+            <li>
+              <EmptyState
+                title="Brak obecności w filtrze"
+                description="Zmień trening, zawodnika albo odśwież listę."
+              />
+            </li>
           ) : null}
         </ul>
       ) : (
@@ -144,7 +139,12 @@ export function AttendanceListView({
             </li>
           ))}
           {filtered.length === 0 ? (
-            <li className="px-3 py-4 text-paper/45">Brak wpisów.</li>
+            <li>
+              <EmptyState
+                title="Brak wpisów"
+                description="W wybranym filtrze nie ma zapisanych obecności."
+              />
+            </li>
           ) : null}
         </ul>
       )}

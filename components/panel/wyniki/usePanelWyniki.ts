@@ -32,6 +32,7 @@ export function usePanelWyniki() {
   const [results, setResults] = useState<CompetitionResult[]>([]);
   const [profile, setProfile] = useState<AthleteProfile | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const [kind, setKind] = useState<WynikKind>("competition");
   const [eventName, setEventName] = useState("");
   const [eventDate, setEventDate] = useState(todayIsoDate);
@@ -45,6 +46,8 @@ export function usePanelWyniki() {
   const [editSaving, setEditSaving] = useState(false);
 
   const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
     try {
       const [mineRes, profilesRes] = await Promise.all([
         listResults({ mine: true }),
@@ -57,6 +60,8 @@ export function usePanelWyniki() {
       setProfile(uid ? profiles.find((p) => p.user_id === uid) ?? null : null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Błąd ładowania");
+    } finally {
+      setLoading(false);
     }
   }, [user?.id, viewAs?.userId]);
 
@@ -208,6 +213,7 @@ export function usePanelWyniki() {
   return {
     results,
     error,
+    loading,
     kind,
     setKind,
     eventName,

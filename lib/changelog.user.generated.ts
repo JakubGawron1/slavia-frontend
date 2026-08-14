@@ -3,6 +3,63 @@ import type { UserChangelogEntry } from "@/lib/user-changelog";
 
 export const GENERATED_USER_CHANGELOG: UserChangelogEntry[] = [
   {
+    "version": "1.1.2.12+13",
+    "date": "2026-08-14",
+    "title": "Czyszczenie skrzynki powiadomień",
+    "notes": [
+      "Przy dzwonku można usunąć wszystkie powiadomienia naraz.",
+      "Wpisy starsze niż 2 tygodnie znikają same."
+    ]
+  },
+  {
+    "version": "1.1.3.1+2",
+    "date": "2026-08-14",
+    "title": "Czytelniejsze panele",
+    "notes": [
+      "Puste listy mówią, co zrobić dalej — nie wyglądają już jak błąd ładowania.",
+      "Jeśli coś się nie wczyta (obecność, wyniki, plany), zobaczysz komunikat zamiast ciszy.",
+      "Na telefonie konta i profile kadry są kartami, nie szeroką tabelą.",
+      "Kalendarz pokazuje „Zawody” / „Trening” zamiast surowych nazw."
+    ]
+  },
+  {
+    "version": "1.2.0.0+1",
+    "date": "2026-08-14",
+    "title": "Gotowe plany w katalogu",
+    "notes": [
+      "Trener może skopiować gotowy program 12 tygodni (poniedziałek, środa, piątek): rwanie, podrzut, przysiady albo kulturystyka — osobno dla początkujących i średniozaawansowanych.",
+      "Obciążenie rośnie z tygodnia na tydzień, a co czwarty tydzień jest lżejszy (zrzut)."
+    ]
+  },
+  {
+    "version": "1.1.3.0+1",
+    "date": "2026-08-14",
+    "title": "Lepsze szkice planu z AI",
+    "notes": [
+      "Długie programy (np. 10–16 tygodni) mają te same dni treningowe w każdym tygodniu — nie zostaje sam poniedziałek na końcu.",
+      "Szkic może zawierać rozpis serii na rwanie, podrzut i przysiad oraz zamienniki ćwiczeń."
+    ]
+  },
+  {
+    "version": "1.1.3.2+3",
+    "date": "2026-08-14",
+    "title": "Plany: szkic AI, archiwum i postęp",
+    "notes": [
+      "Trener opisuje program, wybiera dni i opcjonalnie zawodnika albo grupę — szkic trafia do edytora, zapisujesz gdy jest OK.",
+      "Aktywne plany można zarchiwizować i przywrócić; nad listą jest wyszukiwarka.",
+      "Na chipie planu widać, ile procent ćwiczeń jest odhaczone; trener widzi postęp wszystkich przypisanych."
+    ]
+  },
+  {
+    "version": "1.1.2.11+12",
+    "date": "2026-08-14",
+    "title": "Skanowanie obecności w godzinach treningu",
+    "notes": [
+      "Kod QR działa w czasie polskim — obecność zapisze się też między 14 a 19.",
+      "Po zeskanowaniu kodu obecność zapisuje się sama, bez dodatkowego przycisku."
+    ]
+  },
+  {
     "version": "1.1.2.1+2",
     "date": "2026-08-12",
     "title": "Limity AI (Free Plan)",

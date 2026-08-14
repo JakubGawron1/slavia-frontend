@@ -97,6 +97,10 @@ export const EVENT_TYPE_LABELS: Record<EventType, string> = {
   inne: "Inne",
 };
 
+export function eventTypeLabel(type: string): string {
+  return EVENT_TYPE_LABELS[mapPublicType(type)];
+}
+
 export type EventsQuery = {
   from?: string;
   to?: string;

@@ -11,6 +11,39 @@ Format:
 - zdanie zrozumiałe dla zwykłego użytkownika
 ```
 
+## [1.2.0.0+1] - 2026-08-14
+### Gotowe plany w katalogu
+- Trener może skopiować gotowy program 12 tygodni (poniedziałek, środa, piątek): rwanie, podrzut, przysiady albo kulturystyka — osobno dla początkujących i średniozaawansowanych.
+- Obciążenie rośnie z tygodnia na tydzień, a co czwarty tydzień jest lżejszy (zrzut).
+
+## [1.1.3.2+3] - 2026-08-14
+### Plany: szkic AI, archiwum i postęp
+- Trener opisuje program, wybiera dni i opcjonalnie zawodnika albo grupę — szkic trafia do edytora, zapisujesz gdy jest OK.
+- Aktywne plany można zarchiwizować i przywrócić; nad listą jest wyszukiwarka.
+- Na chipie planu widać, ile procent ćwiczeń jest odhaczone; trener widzi postęp wszystkich przypisanych.
+
+## [1.1.3.1+2] - 2026-08-14
+### Czytelniejsze panele
+- Puste listy mówią, co zrobić dalej — nie wyglądają już jak błąd ładowania.
+- Jeśli coś się nie wczyta (obecność, wyniki, plany), zobaczysz komunikat zamiast ciszy.
+- Na telefonie konta i profile kadry są kartami, nie szeroką tabelą.
+- Kalendarz pokazuje „Zawody” / „Trening” zamiast surowych nazw.
+
+## [1.1.3.0+1] - 2026-08-14
+### Lepsze szkice planu z AI
+- Długie programy (np. 10–16 tygodni) mają te same dni treningowe w każdym tygodniu — nie zostaje sam poniedziałek na końcu.
+- Szkic może zawierać rozpis serii na rwanie, podrzut i przysiad oraz zamienniki ćwiczeń.
+
+## [1.1.2.12+13] - 2026-08-14
+### Czyszczenie skrzynki powiadomień
+- Przy dzwonku można usunąć wszystkie powiadomienia naraz.
+- Wpisy starsze niż 2 tygodnie znikają same.
+
+## [1.1.2.11+12] - 2026-08-14
+### Skanowanie obecności w godzinach treningu
+- Kod QR działa w czasie polskim — obecność zapisze się też między 14 a 19.
+- Po zeskanowaniu kodu obecność zapisuje się sama, bez dodatkowego przycisku.
+
 ## [1.1.2.10+11] - 2026-08-12
 ### Nazwa miasta w nagłówku
 - Obok herbu znowu widać „Ruda Śląska” pod nazwą klubu.

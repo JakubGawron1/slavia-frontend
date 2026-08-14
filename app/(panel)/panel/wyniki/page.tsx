@@ -4,27 +4,21 @@ import { usePanelWyniki } from "@/components/panel/wyniki/usePanelWyniki";
 import { WynikEditModal } from "@/components/panel/wyniki/WynikEditModal";
 import { WynikForm } from "@/components/panel/wyniki/WynikForm";
 import { WynikiResultsList } from "@/components/panel/wyniki/WynikiResultsList";
+import { InlineStatus } from "@/components/ui/InlineStatus";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export default function WynikiPage() {
   const w = usePanelWyniki();
 
   return (
-    <div className="animate-rise max-w-3xl space-y-8">
-      <div>
-        <h1 className="font-display text-3xl font-semibold uppercase">
-          Wyniki i rekordy
-        </h1>
-        <p className="mt-2 text-sm text-paper/55">
-          Zgłoś wynik z zawodów lub rekord treningowy — trafi do weryfikacji
-          trenera.
-        </p>
-      </div>
+    <div className="animate-rise space-y-8">
+      <PageHeader
+        eyebrow="Sport"
+        title="Wyniki i rekordy"
+        description="Zgłoś wynik z zawodów lub rekord treningowy — trafi do weryfikacji trenera."
+      />
 
-      {w.error ? (
-        <p className="border-l-2 border-brand bg-brand/10 px-4 py-3 text-sm" role="alert">
-          {w.error}
-        </p>
-      ) : null}
+      {w.error ? <InlineStatus kind="error">{w.error}</InlineStatus> : null}
 
       <WynikForm
         kind={w.kind}
@@ -46,7 +40,17 @@ export default function WynikiPage() {
         onSubmit={w.submit}
       />
 
-      <WynikiResultsList results={w.results} onEdit={w.openEdit} />
+      <WynikiResultsList
+        results={w.results}
+        loading={w.loading}
+        onEdit={w.openEdit}
+        onEmptyAction={() =>
+          document.getElementById("wynik-form")?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          })
+        }
+      />
 
       <WynikEditModal
         editing={w.editing}

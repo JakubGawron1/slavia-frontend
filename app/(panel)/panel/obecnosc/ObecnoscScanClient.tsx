@@ -14,6 +14,12 @@ import {
 } from "@/lib/attendance-ui";
 import { useToast } from "@/components/toast/ToastProvider";
 import { usePanel } from "@/components/panel/PanelProvider";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { InlineStatus } from "@/components/ui/InlineStatus";
+import { PageHeader } from "@/components/ui/PageHeader";
+
+/** Blokada tego samego tokenu między remountami (React Strict Mode). */
+const checkInLocks = new Set<string>();
 
 function extractToken(raw: string): string {
   try {
@@ -35,83 +41,72 @@ export default function ObecnoscScanClient() {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [mine, setMine] = useState<AttendanceRecord[]>([]);
+  const [listLoading, setListLoading] = useState(true);
+  const [listError, setListError] = useState<string | null>(null);
   const [scanning, setScanning] = useState(false);
+  const [saving, setSaving] = useState(false);
   const scannerRef = useRef<Html5Qrcode | null>(null);
+  const handledScanRef = useRef(false);
+  const listRef = useRef<HTMLUListElement>(null);
 
   const load = useCallback(async () => {
+    setListError(null);
     try {
       const res = await listAttendance();
       setMine((res.data as AttendanceRecord[]) ?? []);
-    } catch {
-      /* ignore */
+    } catch (err) {
+      setListError(
+        err instanceof Error ? err.message : "Nie udało się wczytać obecności.",
+      );
+    } finally {
+      setListLoading(false);
     }
   }, []);
+
+  const submitCheckIn = useCallback(
+    async (rawToken: string) => {
+      const t = rawToken.trim();
+      if (!t || checkInLocks.has(t)) return;
+      checkInLocks.add(t);
+      setToken(t);
+      setError(null);
+      setMessage(null);
+      setSaving(true);
+      try {
+        await checkInApi({ token: t });
+        setMessage("Obecność zapisana.");
+        toast.success("Obecność zapisana");
+        await load();
+        requestAnimationFrame(() => {
+          listRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest",
+          });
+        });
+      } catch (err) {
+        checkInLocks.delete(t);
+        const msg = err instanceof Error ? err.message : "Check-in nieudany";
+        if (msg.toLowerCase().includes("nie ma treningu")) {
+          setMessage(msg);
+          toast.info("Brak treningu", msg);
+        } else {
+          setError(msg);
+          toast.error("Check-in nieudany", msg);
+        }
+      } finally {
+        setSaving(false);
+      }
+    },
+    [load, toast],
+  );
 
   useEffect(() => {
     const fromUrl = search.get("code") || search.get("token");
-    if (fromUrl) setToken(fromUrl);
+    if (fromUrl) {
+      void submitCheckIn(fromUrl);
+    }
     void load();
-  }, [search, load, scopeKey]);
-
-  useEffect(() => {
-    return () => {
-      void stopScan();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  async function checkIn(e?: FormEvent) {
-    e?.preventDefault();
-    setError(null);
-    setMessage(null);
-    try {
-      await checkInApi({ token: token.trim() });
-      setMessage("Obecność zapisana.");
-      toast.success("Obecność zapisana");
-      await load();
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Check-in nieudany";
-      // Komunikat „brak treningu” — bez wzmianki o powiadomieniu kadry
-      if (msg.toLowerCase().includes("nie ma treningu")) {
-        setMessage(msg);
-        toast.info("Brak treningu", msg);
-      } else {
-        setError(msg);
-        toast.error("Check-in nieudany", msg);
-      }
-    }
-  }
-
-  async function startScan() {
-    setError(null);
-    setMessage(null);
-    setScanning(true);
-
-    // Poczekaj na montaż kontenera DOM
-    await new Promise((r) => requestAnimationFrame(() => r(null)));
-
-    try {
-      const scanner = new Html5Qrcode(scannerRegionId);
-      scannerRef.current = scanner;
-      await scanner.start(
-        { facingMode: "environment" },
-        { fps: 8, qrbox: { width: 220, height: 220 } },
-        (decoded) => {
-          const extracted = extractToken(decoded);
-          setToken(extracted);
-          setMessage("Kod odczytany — potwierdź zapis.");
-          void stopScan();
-        },
-        () => {
-          /* ignore frame errors */
-        },
-      );
-    } catch {
-      setScanning(false);
-      scannerRef.current = null;
-      setError("Brak dostępu do kamery lub skaner niedostępny — wklej kod ręcznie.");
-    }
-  }
+  }, [search, load, scopeKey, submitCheckIn]);
 
   async function stopScan() {
     const scanner = scannerRef.current;
@@ -128,29 +123,68 @@ export default function ObecnoscScanClient() {
     }
   }
 
+  useEffect(() => {
+    return () => {
+      void stopScan();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function onSubmit(e: FormEvent) {
+    e.preventDefault();
+    void submitCheckIn(token);
+  }
+
+  async function startScan() {
+    setError(null);
+    setMessage(null);
+    setScanning(true);
+    handledScanRef.current = false;
+
+    await new Promise((r) => requestAnimationFrame(() => r(null)));
+
+    try {
+      const scanner = new Html5Qrcode(scannerRegionId);
+      scannerRef.current = scanner;
+      await scanner.start(
+        { facingMode: "environment" },
+        { fps: 8, qrbox: { width: 220, height: 220 } },
+        (decoded) => {
+          if (handledScanRef.current) return;
+          handledScanRef.current = true;
+          const extracted = extractToken(decoded);
+          void (async () => {
+            await stopScan();
+            await submitCheckIn(extracted);
+          })();
+        },
+        () => {
+          /* ignore frame errors */
+        },
+      );
+    } catch {
+      setScanning(false);
+      scannerRef.current = null;
+      setError("Brak dostępu do kamery lub skaner niedostępny — wklej kod ręcznie.");
+    }
+  }
+
   return (
     <div className="animate-rise max-w-xl space-y-6">
-      <div>
-        <h1 className="font-display text-3xl font-semibold uppercase">
-          Obecność
-        </h1>
-        <p className="mt-2 text-sm text-paper/55">
-          Zeskanuj stały kod QR u trenera albo wklej token sesji.
-        </p>
-      </div>
+      <PageHeader
+        eyebrow="Trening"
+        title="Obecność"
+        description="Zeskanuj stały kod QR u trenera — obecność zapisze się od razu. Gdy kamera nie działa, wklej token poniżej."
+      />
 
-      {error ? (
-        <p className="border-l-2 border-brand bg-brand/10 px-4 py-3 text-sm" role="alert">
-          {error}
-        </p>
-      ) : null}
+      {error ? <InlineStatus kind="error">{error}</InlineStatus> : null}
       {message ? (
         <p className="border-l-2 border-paper/30 bg-paper/5 px-4 py-3 text-sm">
           {message}
         </p>
       ) : null}
 
-      <form onSubmit={checkIn} className="space-y-3 border border-paper/10 p-4">
+      <form onSubmit={onSubmit} className="space-y-3 border border-paper/10 p-4">
         <label className="flex flex-col gap-1.5">
           <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
             Token z QR
@@ -165,15 +199,17 @@ export default function ObecnoscScanClient() {
         <div className="flex flex-wrap gap-2">
           <button
             type="submit"
-            className="bg-brand px-4 py-2 font-display text-xs tracking-[0.12em] uppercase"
+            disabled={saving}
+            className="bg-brand px-4 py-2 font-display text-xs tracking-[0.12em] uppercase disabled:opacity-50"
           >
-            Zapisz obecność
+            {saving ? "Zapisuję…" : "Zapisz obecność"}
           </button>
           {!scanning ? (
             <button
               type="button"
+              disabled={saving}
               onClick={() => void startScan()}
-              className="border border-paper/25 px-4 py-2 font-display text-xs tracking-[0.12em] uppercase"
+              className="border border-paper/25 px-4 py-2 font-display text-xs tracking-[0.12em] uppercase disabled:opacity-50"
             >
               Skanuj kamerą
             </button>
@@ -195,13 +231,37 @@ export default function ObecnoscScanClient() {
               : "hidden"
           }
         />
+        {scanning ? (
+          <p className="text-xs text-paper/45">
+            Skieruj kamerę na kod QR. Po odczycie obecność zapisze się sama.
+          </p>
+        ) : (
+          <p className="text-xs text-paper/45">
+            Jeśli skaner nie wystartuje, wklej token z kodu i zapisz ręcznie.
+          </p>
+        )}
       </form>
 
       <div>
         <h2 className="font-display text-xs tracking-[0.14em] text-paper/45 uppercase">
           Twoje obecności (okno roku)
         </h2>
-        <ul className="mt-3 divide-y divide-paper/10 border border-paper/10">
+        {listError ? (
+          <div className="mt-3">
+            <InlineStatus kind="error">{listError}</InlineStatus>
+          </div>
+        ) : null}
+        {listLoading ? (
+          <InlineStatus kind="loading">Ładowanie obecności…</InlineStatus>
+        ) : mine.length === 0 && !listError ? (
+          <div className="mt-3">
+            <EmptyState
+              title="Brak zapisów"
+              description="Zeskanuj kod QR na treningu, aby zapisać pierwszą obecność."
+            />
+          </div>
+        ) : (
+        <ul ref={listRef} className="mt-3 divide-y divide-paper/10 border border-paper/10">
           {mine.map((r) => {
             const style = attendanceRecordStyle(r.status);
             const { date, time } = formatAttendanceCheckedAt(r.checked_at);
@@ -227,10 +287,8 @@ export default function ObecnoscScanClient() {
               </li>
             );
           })}
-          {mine.length === 0 ? (
-            <li className="px-3 py-4 text-paper/45">Brak zapisów.</li>
-          ) : null}
         </ul>
+        )}
       </div>
     </div>
   );

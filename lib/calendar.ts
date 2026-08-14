@@ -1,5 +1,20 @@
 const WEEKDAY_LABELS = ["Pn", "Wt", "Śr", "Cz", "Pt", "So", "Nd"] as const;
 
+/** ISO 1=Pn … 7=Nd — jeden zestaw skrótów w kalendarzu i planach. */
+export const ISO_WEEKDAY_SHORT: Record<number, string> = {
+  1: "Pn",
+  2: "Wt",
+  3: "Śr",
+  4: "Cz",
+  5: "Pt",
+  6: "So",
+  7: "Nd",
+};
+
+export function isoWeekdayLabel(day: number): string {
+  return ISO_WEEKDAY_SHORT[day] ?? String(day);
+}
+
 const MONTH_LABELS = [
   "Styczeń",
   "Luty",

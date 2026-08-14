@@ -2,6 +2,7 @@
 
 import type { TrainingPlan } from "@/lib/api/generated/models";
 import { ensureWeeks, planAssignmentKind } from "@/lib/plans/helpers";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { linkBtn, linkDanger } from "@/components/plans/styles";
 
 export function PlanList({
@@ -10,12 +11,20 @@ export function PlanList({
   onRemove,
   onCopy,
   onVersion,
+  onArchive,
+  onRestore,
+  emptyTitle = "Brak planów w tej sekcji",
+  emptyDescription = "Dodaj nowy plan albo skopiuj szablon z katalogu.",
 }: {
   plans: TrainingPlan[];
   onEdit: (p: TrainingPlan) => void;
   onRemove: (id: string) => void;
   onCopy: (id: string) => void;
   onVersion?: (id: string) => void;
+  onArchive?: (p: TrainingPlan) => void;
+  onRestore?: (p: TrainingPlan) => void;
+  emptyTitle?: string;
+  emptyDescription?: string;
 }) {
   return (
     <ul className="divide-y divide-paper/10 border border-paper/10">
@@ -61,6 +70,16 @@ export function PlanList({
                   Nowa wersja
                 </button>
               ) : null}
+              {onArchive ? (
+                <button type="button" className={linkBtn} onClick={() => onArchive(p)}>
+                  Archiwizuj
+                </button>
+              ) : null}
+              {onRestore ? (
+                <button type="button" className={linkBtn} onClick={() => onRestore(p)}>
+                  Przywróć
+                </button>
+              ) : null}
               <button type="button" className={linkDanger} onClick={() => onRemove(p.id)}>
                 Usuń
               </button>
@@ -69,8 +88,8 @@ export function PlanList({
         );
       })}
       {plans.length === 0 ? (
-        <li className="px-4 py-8 text-center text-paper/45">
-          Brak planów w tej sekcji.
+        <li>
+          <EmptyState title={emptyTitle} description={emptyDescription} />
         </li>
       ) : null}
     </ul>

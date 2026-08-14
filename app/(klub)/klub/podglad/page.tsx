@@ -11,7 +11,9 @@ import { ROLE_LABELS } from "@/lib/klub-nav";
 import type { Role } from "@/lib/auth";
 import { useKlub } from "@/components/klub/KlubProvider";
 import { useToast } from "@/components/toast/ToastProvider";
-import { BackLink } from "@/components/ui/BackLink";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { InlineStatus } from "@/components/ui/InlineStatus";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 const FILTER_ROLES: Array<Role | "all"> = [
   "all",
@@ -104,20 +106,13 @@ export default function PodgladPage() {
   }
 
   return (
-    <div className="animate-rise max-w-4xl space-y-6">
-      <div>
-        <BackLink fallbackHref="/klub" />
-        <p className="mt-3 font-display text-sm tracking-[0.22em] text-brand uppercase">
-          Narzędzia
-        </p>
-        <h1 className="mt-2 font-display text-3xl font-semibold uppercase">
-          Podgląd kont / ról
-        </h1>
-        <p className="mt-2 text-sm text-paper/55">
-          Wejdź w perspektywę innego konta bez logowania — navbar, panel i dane
-          „moje” przełączają się na podglądany widok (tylko odczyt).
-        </p>
-      </div>
+    <div className="animate-rise space-y-6">
+      <PageHeader
+        eyebrow="Narzędzia"
+        title="Podgląd kont / ról"
+        description="Wejdź w perspektywę innego konta bez logowania — navbar, panel i dane „moje” przełączają się na podglądany widok (tylko odczyt)."
+        backHref="/klub"
+      />
 
       {viewAs ? (
         <div className="flex flex-wrap items-center justify-between gap-3 border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm">
@@ -134,11 +129,7 @@ export default function PodgladPage() {
         </div>
       ) : null}
 
-      {error ? (
-        <p className="border-l-2 border-brand bg-brand/10 px-4 py-3 text-sm" role="alert">
-          {error}
-        </p>
-      ) : null}
+      {error ? <InlineStatus kind="error">{error}</InlineStatus> : null}
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
         <label className="min-w-0 flex-1 space-y-1.5 text-sm">
@@ -171,10 +162,15 @@ export default function PodgladPage() {
         </label>
       </div>
 
-      {loading ? <p className="text-paper/50">Ładowanie…</p> : null}
+      {loading ? (
+        <InlineStatus kind="loading">Ładowanie kont…</InlineStatus>
+      ) : null}
 
       {!loading && filtered.length === 0 ? (
-        <p className="text-sm text-paper/50">Brak kont pasujących do filtra.</p>
+        <EmptyState
+          title="Brak kont pasujących do filtra"
+          description="Zmień wyszukiwanie albo filtr roli."
+        />
       ) : null}
 
       <ul className="divide-y divide-paper/10 border border-paper/10">

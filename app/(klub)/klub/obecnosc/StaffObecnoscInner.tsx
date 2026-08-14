@@ -4,32 +4,21 @@ import { AttendanceListView } from "./AttendanceListView";
 import { PendingScansSection } from "./PendingScansSection";
 import { QrPanel } from "./QrPanel";
 import { useStaffObecnosc } from "./useStaffObecnosc";
+import { InlineStatus } from "@/components/ui/InlineStatus";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export default function StaffObecnoscInner() {
   const o = useStaffObecnosc();
 
   return (
-    <div className="animate-rise max-w-5xl space-y-8">
-      <div>
-        <p className="font-display text-sm tracking-[0.22em] text-brand uppercase">
-          Trening
-        </p>
-        <h1 className="mt-2 font-display text-3xl font-semibold uppercase">
-          Obecność
-        </h1>
-        <p className="mt-2 text-sm text-paper/55">
-          Stały kod QR klubu — działa na kolejne treningi, aż go odświeżysz.
-        </p>
-      </div>
+    <div className="animate-rise space-y-8">
+      <PageHeader
+        eyebrow="Trening"
+        title="Obecność"
+        description="Stały kod QR klubu — działa na kolejne treningi, aż go odświeżysz."
+      />
 
-      {o.error ? (
-        <p
-          className="border-l-2 border-brand bg-brand/10 px-4 py-3 text-sm"
-          role="alert"
-        >
-          {o.error}
-        </p>
-      ) : null}
+      {o.error ? <InlineStatus kind="error">{o.error}</InlineStatus> : null}
 
       <section className="grid gap-6 lg:grid-cols-[280px_1fr]">
         <QrPanel

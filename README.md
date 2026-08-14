@@ -38,7 +38,7 @@ pnpm sync:slavia # wersja + changelog
 | `pnpm format` / `format:check` | Biome |
 | `pnpm biome:ci` | Biome w CI |
 | `pnpm knip` | martwy kod (opcjonalnie) |
-| `pnpm gen:api` | Orval z `openapi/openapi.json` |
+| `pnpm gen:api` | Orval z lokalnego `openapi/openapi.json` (gitignore; najpierw `pnpm sync:api`) |
 | `pnpm sync:version` / `sync:changelog` | sync z `Slavia.toml` |
 
 ## OpenAPI / typy
@@ -56,7 +56,7 @@ cd ../slavia-backend && cargo test export_openapi -- --ignored
 cd ../slavia-frontend && pnpm gen:api
 ```
 
-**Jedyna warstwa HTTP w UI:** `lib/api/generated/**` + `customFetch` — bez ręcznych path stringów.
+**Jedyna warstwa HTTP w UI:** `lib/api/generated/**` + `customFetch` — bez ręcznych path stringów. Spec `openapi/openapi.json` jest lokalnym artefaktem (`pnpm sync:api`), nie commitowanym kontraktem.
 
 ## Deploy
 

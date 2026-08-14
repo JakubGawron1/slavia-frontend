@@ -1,11 +1,7 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
-import type {
-  CmsBlock,
-  CmsPage,
-  CmsStatus,
-} from "@/lib/api/generated/models";
+import type { CmsPage } from "@/lib/api/generated/models";
 import {
   createCmsPage,
   deleteCmsPage,
@@ -14,14 +10,10 @@ import {
 } from "@/lib/api/generated/default/default";
 import { useToast } from "@/components/toast/ToastProvider";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
-
-function newBlock(type = "paragraph"): CmsBlock {
-  return {
-    id: crypto.randomUUID(),
-    type,
-    content: "",
-  };
-}
+import { InlineStatus } from "@/components/ui/InlineStatus";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { CmsForm, newBlock } from "@/components/klub/cms/CmsForm";
+import { CmsPageList } from "@/components/klub/cms/CmsPageList";
 
 export default function CmsAdminPage() {
   const toast = useToast();
@@ -89,10 +81,6 @@ export default function CmsAdminPage() {
     }
   }
 
-  function remove(id: string, title: string) {
-    setDeleteTarget({ id, title });
-  }
-
   async function confirmRemove() {
     if (!deleteTarget) return;
     setDeleting(true);
@@ -111,19 +99,13 @@ export default function CmsAdminPage() {
   }
 
   return (
-    <div className="animate-rise max-w-5xl space-y-6">
+    <div className="animate-rise space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="font-display text-sm tracking-[0.22em] text-brand uppercase">
-            Treść
-          </p>
-          <h1 className="mt-2 font-display text-3xl font-semibold uppercase">
-            CMS
-          </h1>
-          <p className="mt-2 text-sm text-paper/55">
-            Edytuj zawartość stron bez ingerencji w kod — strony, bloki, publikacja.
-          </p>
-        </div>
+        <PageHeader
+          eyebrow="Treść"
+          title="CMS"
+          description="Edytuj zawartość stron bez ingerencji w kod — strony, bloki, publikacja."
+        />
         <button
           type="button"
           onClick={startNew}
@@ -133,239 +115,27 @@ export default function CmsAdminPage() {
         </button>
       </div>
 
-      {error ? (
-        <p className="border-l-2 border-brand bg-brand/10 px-4 py-3 text-sm" role="alert">
-          {error}
-        </p>
-      ) : null}
+      {error ? <InlineStatus kind="error">{error}</InlineStatus> : null}
 
       {editing ? (
-        <form
-          onSubmit={save}
-          className="space-y-4 border border-paper/10 bg-paper/[0.03] p-4 md:p-6"
-        >
-          <div className="grid gap-3 sm:grid-cols-2">
-            <label className="flex flex-col gap-1.5">
-              <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
-                Tytuł
-              </span>
-              <input
-                className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
-                value={editing.title}
-                onChange={(e) =>
-                  setEditing({ ...editing, title: e.target.value })
-                }
-                required
-              />
-            </label>
-            <label className="flex flex-col gap-1.5">
-              <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
-                Slug
-              </span>
-              <input
-                className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
-                placeholder="np. o-klubie"
-                value={editing.slug}
-                onChange={(e) =>
-                  setEditing({ ...editing, slug: e.target.value })
-                }
-                required
-              />
-            </label>
-            <label className="flex flex-col gap-1.5">
-              <span className="font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase">
-                Status
-              </span>
-              <select
-                className="border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
-                value={editing.status}
-                onChange={(e) =>
-                  setEditing({
-                    ...editing,
-                    status: e.target.value as CmsStatus,
-                  })
-                }
-              >
-                <option value="draft">Szkic</option>
-                <option value="published">Opublikowana</option>
-              </select>
-            </label>
-          </div>
-
-          <div className="space-y-3">
-            <p className="font-display text-[11px] tracking-[0.14em] text-paper/45 uppercase">
-              Bloki treści
-            </p>
-            {editing.blocks.map((block, index) => (
-              <div
-                key={block.id}
-                className="border border-paper/10 bg-chrome/30 p-3"
-              >
-                <div className="mb-2 flex flex-wrap gap-2">
-                  <label className="flex flex-col gap-1">
-                    <span className="font-display text-[10px] tracking-[0.12em] text-paper/45 uppercase">
-                      Typ bloku
-                    </span>
-                    <select
-                      className="border border-paper/20 bg-chrome/40 px-2 py-1 text-xs"
-                      value={block.type}
-                      onChange={(e) => {
-                        const blocks = [...editing.blocks];
-                        blocks[index] = { ...block, type: e.target.value };
-                        setEditing({ ...editing, blocks });
-                      }}
-                    >
-                      <option value="heading">Nagłówek</option>
-                      <option value="paragraph">Akapit</option>
-                      <option value="image">Obraz (URL)</option>
-                      <option value="html">HTML</option>
-                    </select>
-                  </label>
-                  <button
-                    type="button"
-                    className="self-end text-xs text-brand"
-                    onClick={() => {
-                      const blocks = editing.blocks.filter((_, i) => i !== index);
-                      setEditing({ ...editing, blocks });
-                    }}
-                  >
-                    Usuń blok
-                  </button>
-                </div>
-                <label className="flex flex-col gap-1.5">
-                  <span className="font-display text-[10px] tracking-[0.12em] text-paper/45 uppercase">
-                    {block.type === "image" ? "URL obrazu" : "Treść bloku"}
-                  </span>
-                  <textarea
-                    className="w-full border border-paper/20 bg-chrome/40 px-3 py-2 text-sm outline-none focus:border-brand"
-                    rows={block.type === "paragraph" || block.type === "html" ? 4 : 2}
-                    value={block.content}
-                    onChange={(e) => {
-                      const blocks = [...editing.blocks];
-                      blocks[index] = { ...block, content: e.target.value };
-                      setEditing({ ...editing, blocks });
-                    }}
-                    placeholder={block.type === "image" ? "https://…" : undefined}
-                  />
-                </label>
-              </div>
-            ))}
-            <button
-              type="button"
-              className="border border-paper/20 px-3 py-1.5 font-display text-[11px] tracking-[0.12em] uppercase"
-              onClick={() =>
-                setEditing({
-                  ...editing,
-                  blocks: [...editing.blocks, newBlock()],
-                })
-              }
-            >
-              + Blok
-            </button>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="submit"
-              className="bg-brand px-4 py-2 font-display text-xs tracking-[0.12em] uppercase"
-            >
-              Zapisz
-            </button>
-            <button
-              type="button"
-              className="border border-paper/25 px-4 py-2 font-display text-xs tracking-[0.12em] uppercase"
-              onClick={() => setEditing(null)}
-            >
-              Anuluj
-            </button>
-          </div>
-
-          {editing.blocks.length > 0 ? (
-            <aside className="border-t border-paper/10 pt-4">
-              <p className="font-display text-[11px] tracking-[0.14em] text-paper/45 uppercase">
-                Podgląd
-              </p>
-              <div className="mt-3 space-y-3 bg-surface px-5 py-6 text-ink">
-                {editing.blocks.map((b) => {
-                  if (b.type === "heading") {
-                    return (
-                      <h3 key={b.id} className="font-display text-2xl uppercase">
-                        {b.content || "…"}
-                      </h3>
-                    );
-                  }
-                  if (b.type === "image") {
-                    return b.content ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        key={b.id}
-                        src={b.content}
-                        alt=""
-                        className="max-h-48 w-auto"
-                      />
-                    ) : (
-                      <p key={b.id} className="text-sm text-steel-soft">
-                        [brak URL obrazu]
-                      </p>
-                    );
-                  }
-                  if (b.type === "html") {
-                    return (
-                      <div
-                        key={b.id}
-                        className="prose prose-sm"
-                        dangerouslySetInnerHTML={{ __html: b.content }}
-                      />
-                    );
-                  }
-                  return (
-                    <p key={b.id} className="text-sm leading-relaxed">
-                      {b.content || "…"}
-                    </p>
-                  );
-                })}
-              </div>
-            </aside>
-          ) : null}
-        </form>
+        <CmsForm
+          editing={editing}
+          onChange={setEditing}
+          onSubmit={(e) => void save(e)}
+          onCancel={() => setEditing(null)}
+        />
       ) : null}
 
-      {loading ? <p className="text-paper/50">Ładowanie…</p> : null}
-
-      <ul className="divide-y divide-paper/10 border border-paper/10">
-        {pages.map((page) => (
-          <li
-            key={page.id}
-            className="flex flex-wrap items-center justify-between gap-3 px-4 py-3"
-          >
-            <div>
-              <p className="font-medium">{page.title}</p>
-              <p className="text-xs text-paper/50">
-                /{page.slug} · {page.status}
-              </p>
-            </div>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                className="text-xs underline-offset-2 hover:underline"
-                onClick={() => setEditing(page)}
-              >
-                Edytuj
-              </button>
-              <button
-                type="button"
-                className="text-xs text-brand underline-offset-2 hover:underline"
-                onClick={() => remove(page.id, page.title)}
-              >
-                Usuń
-              </button>
-            </div>
-          </li>
-        ))}
-        {!loading && pages.length === 0 ? (
-          <li className="px-4 py-6 text-paper/45">Brak stron CMS.</li>
-        ) : null}
-      </ul>
+      {loading ? (
+        <InlineStatus kind="loading">Ładowanie stron CMS…</InlineStatus>
+      ) : (
+        <CmsPageList
+          pages={pages}
+          onEdit={setEditing}
+          onRemove={(id, title) => setDeleteTarget({ id, title })}
+          onCreate={startNew}
+        />
+      )}
 
       <ConfirmModal
         open={deleteTarget !== null}

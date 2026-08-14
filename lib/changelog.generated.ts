@@ -3,6 +3,152 @@ import type { ChangelogEntry } from "@/lib/changelog";
 
 export const GENERATED_CHANGELOG: ChangelogEntry[] = [
   {
+    "version": "1.1.3.2+3",
+    "date": "2026-08-14",
+    "category": "backend",
+    "title": "DX: eksport OpenAPI bez commita specu",
+    "notes": [
+      "`export_openapi` nadal pisze snapshot offline pod Orval; plik w FE jest gitignore — commitowany jest tylko wygenerowany klient."
+    ]
+  },
+  {
+    "version": "1.1.3.2+3",
+    "date": "2026-08-14",
+    "category": "frontend",
+    "title": "DX: OpenAPI json tylko lokalnie",
+    "notes": [
+      "`openapi/openapi.json` jest artefaktem `pnpm sync:api` (gitignore); commitowany klient to `lib/api/generated/**`."
+    ]
+  },
+  {
+    "version": "1.1.2.12+13",
+    "date": "2026-08-14",
+    "category": "frontend",
+    "title": "Feature: dzwonek — usuń wszystkie powiadomienia",
+    "notes": [
+      "W skrzynce przycisk „Usuń wszystkie” (z potwierdzeniem); klient OpenAPI: `DELETE /api/notifications`."
+    ]
+  },
+  {
+    "version": "1.1.3.2+3",
+    "date": "2026-08-14",
+    "category": "backend",
+    "title": "Feature: GET planu po id + liczniki ukończenia",
+    "notes": [
+      "`GET /api/plans/{id}` — trener dowolny plan, zawodnik tylko z dostępem (po `/ai-draft` i `/ai-usage`).",
+      "`TrainingPlanProgress.completed_count` / `total_count` przy zapisie i odczycie postępu."
+    ]
+  },
+  {
+    "version": "1.2.0.0+1",
+    "date": "2026-08-14",
+    "category": "frontend",
+    "title": "Feature: gotowe programy w katalogu",
+    "notes": [
+      "Katalog planów ma 7 szablonów 12-tyg. (Pn / Śr / Pt): rwanie, podrzut, przysiady, kulturystyka — początkujący i średniozaawansowany."
+    ]
+  },
+  {
+    "version": "1.2.0.0+1",
+    "date": "2026-08-14",
+    "category": "backend",
+    "title": "Feature: katalog gotowych planów 12-tyg.",
+    "notes": [
+      "Seed 7 szablonów (Pn / Śr / Pt): rwanie, podrzut, przysiady, kulturystyka — początkujący i średniozaawansowany.",
+      "6–8 ćwiczeń na sesję, 6 serii na ruchy robocze, progresja % i zrzut co 4. tydzień; wstawiane po stabilnym id (bez nadpisu istniejących)."
+    ]
+  },
+  {
+    "version": "1.1.3.2+3",
+    "date": "2026-08-14",
+    "category": "frontend",
+    "title": "Feature: panel szkicu AI, archiwum, wyszukiwarka, % ukończenia",
+    "notes": [
+      "`AiDraftPanel` + `useAiPlanDraft`: textarea (max 4000), dni Pn–Nd, kontekst zawodnik/grupa, dzienny limit; szkic otwiera edytor bez zapisu.",
+      "Regeneracja niespisanego szkicu i „Dopracuj AI” (nowy szkic, bez nadpisu UUID zapisanego planu).",
+      "Archiwizuj / Przywróć na listach; wyszukiwarka po tytule/opisie (Aktywne / Katalog / Archiwum).",
+      "Badge % ukończenia u zawodnika; w panelu kadry postęp wszystkich, nie tylko z feedbackiem."
+    ]
+  },
+  {
+    "version": "1.1.3.0+1",
+    "date": "2026-08-14",
+    "category": "backend",
+    "title": "Feature: szkic AI — wzorzec mikrocyklu i stały kalendarz dni",
+    "notes": [
+      "Groq zwraca `template_days` + opcjonalne `week_overrides`; backend rozciąga mikrocykl na T1..TN (naprawa T10 = tylko poniedziałek).",
+      "Mapowanie `set_scheme` / `alternatives`; biblioteka z priorytetem olympic/snatch/clean_jerk; nazwy case-insensitive + polskie znaki.",
+      "Split `services/plans_ai` (mod / prompt / map / json / exercise)."
+    ]
+  },
+  {
+    "version": "1.1.2.12+13",
+    "date": "2026-08-14",
+    "category": "backend",
+    "title": "Feature: usuwanie wszystkich powiadomień + retencja 14 dni",
+    "notes": [
+      "`DELETE /api/notifications` — właściciel czyści całą skrzynkę.",
+      "Przy starcie, liście, tworzeniu oraz co 6 h usuwane są wpisy starsze niż 14 dni."
+    ]
+  },
+  {
+    "version": "1.1.3.2+3",
+    "date": "2026-08-14",
+    "category": "backend",
+    "title": "Fix: `.env` przy `pnpm be` z roota",
+    "notes": [
+      "Backend ładuje `slavia-backend/.env` względem crate (`CARGO_MANIFEST_DIR`), nie CWD — Groq / Brevo / ImageKit działają z `pnpm be`."
+    ]
+  },
+  {
+    "version": "1.1.3.3+4",
+    "date": "2026-08-14",
+    "category": "backend",
+    "title": "Fix: `GET /api/health` — ping bazy",
+    "notes": [
+      "`ping()` czyta `SELECT 1` przez `query` zamiast `execute` (libsql: „Execute returned rows”)."
+    ]
+  },
+  {
+    "version": "1.1.2.11+12",
+    "date": "2026-08-14",
+    "category": "backend",
+    "title": "Fix: okno skanowania QR w czasie polskim",
+    "notes": [
+      "Check-in obecności i auto-nieobecności liczą „dziś” oraz godziny treningu w `Europe/Warsaw`, nie w TZ procesu (HF Space = UTC)."
+    ]
+  },
+  {
+    "version": "1.1.2.11+12",
+    "date": "2026-08-14",
+    "category": "frontend",
+    "title": "Fix: skan QR od razu zapisuje obecność",
+    "notes": [
+      "Po odczycie kodu kamerą (albo wejściu z `?code=`) check-in idzie automatycznie, bez osobnego „Zapisz obecność”."
+    ]
+  },
+  {
+    "version": "1.1.3.0+1",
+    "date": "2026-08-14",
+    "category": "frontend",
+    "title": "Improve: szkic AI z API ma stały kalendarz dni",
+    "notes": [
+      "Długie szkice Groq nie gubią środy/piątku w późniejszych tygodniach (naprawa po stronie backendu)."
+    ]
+  },
+  {
+    "version": "1.1.3.1+2",
+    "date": "2026-08-14",
+    "category": "frontend",
+    "title": "UX: spójne stany i chrome paneli",
+    "notes": [
+      "Kit UI: `PageHeader`, `EmptyState`, `InlineStatus`, `FilterChip`; unikalne `aria-labelledby` i focus trap w `Modal`.",
+      "Listy w `/panel` i `/klub` odróżniają ładowanie od pustki; obecność zawodnika nie połyka błędów listy.",
+      "BackLink tylko na widokach zagnieżdżonych; pulpit kadry ma opisy kafelków; karty kont/profili na telefonie.",
+      "`error.tsx` w obu panelach; `RequirePublicFlag` bez flasha treści; split layoutów `PanelShell`."
+    ]
+  },
+  {
     "version": "1.1.2.5+6",
     "date": "2026-08-12",
     "category": "backend",

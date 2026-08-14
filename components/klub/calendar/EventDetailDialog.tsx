@@ -1,7 +1,8 @@
 import { Modal } from "@/components/ui/Modal";
-import type {
-  CalendarEventFull,
-  WithdrawalStatus,
+import {
+  eventTypeLabel,
+  type CalendarEventFull,
+  type WithdrawalStatus,
 } from "@/lib/events";
 import type { AthleteProfile } from "@/lib/api/generated/models";
 import { AttendanceSection } from "@/components/klub/calendar/AttendanceSection";
@@ -42,7 +43,7 @@ export function EventDetailDialog({
       {detail ? (
         <div className="space-y-4">
           <p className="text-sm text-paper/55">
-            {detail.event_type}
+            {eventTypeLabel(detail.event_type)}
             {detail.status === "cancelled" ? " · odwołane" : ""} ·{" "}
             {detail.end_date && detail.end_date !== detail.date
               ? `${detail.date} – ${detail.end_date}`

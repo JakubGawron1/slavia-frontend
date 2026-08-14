@@ -8,22 +8,18 @@ import { ReactQueryDevtoolsTab } from "@/components/klub/devtools/ReactQueryDevt
 import { RoutesTab } from "@/components/klub/devtools/RoutesTab";
 import { StatsTab } from "@/components/klub/devtools/StatsTab";
 import { useDevTools } from "@/components/klub/devtools/useDevTools";
-import { BackLink } from "@/components/ui/BackLink";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export default function DevToolsPage() {
   const d = useDevTools();
 
   return (
-    <div className="animate-rise max-w-5xl space-y-6">
-      <div>
-        <BackLink fallbackHref="/klub" />
-        <p className="mt-3 font-display text-sm tracking-[0.22em] text-brand uppercase">
-          Narzędzia
-        </p>
-        <h1 className="mt-2 font-display text-3xl font-semibold uppercase">
-          DevTools
-        </h1>
-      </div>
+    <div className="animate-rise space-y-6">
+      <PageHeader
+        eyebrow="Narzędzia"
+        title="DevTools"
+        backHref="/klub"
+      />
 
       <div className="flex flex-wrap gap-2">
         {d.tabs.map((t) => (

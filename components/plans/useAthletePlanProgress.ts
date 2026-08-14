@@ -34,10 +34,16 @@ export function useAthletePlanProgress(planFromUrl: string | null, scopeKey: str
   const [bests, setBests] = useState<AthleteBests>({});
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [progressByPlan, setProgressByPlan] = useState<
+    Record<string, TrainingPlanProgress>
+  >({});
   const [weekIdx, setWeekIdx] = useState(0);
   const [onlyToday, setOnlyToday] = useState(false);
 
   const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
     try {
       const [res, statsRes] = await Promise.all([
         listPlans({ mine: true }),
@@ -45,6 +51,21 @@ export function useAthletePlanProgress(planFromUrl: string | null, scopeKey: str
       ]);
       const list = (res.data as TrainingPlan[]) ?? [];
       setPlans(list);
+      const progPairs = await Promise.all(
+        list.map(async (p) => {
+          try {
+            const pr = await getMyProgress(p.id);
+            return [p.id, pr.data as TrainingPlanProgress] as const;
+          } catch {
+            return [p.id, null] as const;
+          }
+        }),
+      );
+      const byPlan: Record<string, TrainingPlanProgress> = {};
+      for (const [id, row] of progPairs) {
+        if (row) byPlan[id] = row;
+      }
+      setProgressByPlan(byPlan);
       setActiveId((prev) => {
         if (planFromUrl && list.some((p) => p.id === planFromUrl)) {
           return planFromUrl;
@@ -64,6 +85,8 @@ export function useAthletePlanProgress(planFromUrl: string | null, scopeKey: str
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Błąd planów");
+    } finally {
+      setLoading(false);
     }
   }, [planFromUrl]);
 
@@ -130,6 +153,7 @@ export function useAthletePlanProgress(planFromUrl: string | null, scopeKey: str
       });
       const p = res.data as TrainingPlanProgress;
       setCompletedAt(p.completed_at ?? null);
+      setProgressByPlan((prev) => ({ ...prev, [activeId]: p }));
       setSaved(true);
       toast.success("Zapisano postęp treningu");
     } catch (err) {
@@ -184,6 +208,7 @@ export function useAthletePlanProgress(planFromUrl: string | null, scopeKey: str
     patchEntry,
     bests,
     error,
+    loading,
     saved,
     feedback,
     updateFeedback,
@@ -191,6 +216,7 @@ export function useAthletePlanProgress(planFromUrl: string | null, scopeKey: str
     coachRepliedAt,
     completedAt,
     save,
+    progressByPlan,
   };
 }
 

@@ -12,6 +12,38 @@ Format sekcji:
 
 Opcjonalnie po dacie: `!breaking` (breaking API).
 
+## [1.2.0.0+1] - 2026-08-14
+### Feature: gotowe programy w katalogu
+- Katalog planów ma 7 szablonów 12-tyg. (Pn / Śr / Pt): rwanie, podrzut, przysiady, kulturystyka — początkujący i średniozaawansowany.
+
+## [1.1.3.2+3] - 2026-08-14
+### Feature: panel szkicu AI, archiwum, wyszukiwarka, % ukończenia
+- `AiDraftPanel` + `useAiPlanDraft`: textarea (max 4000), dni Pn–Nd, kontekst zawodnik/grupa, dzienny limit; szkic otwiera edytor bez zapisu.
+- Regeneracja niespisanego szkicu i „Dopracuj AI” (nowy szkic, bez nadpisu UUID zapisanego planu).
+- Archiwizuj / Przywróć na listach; wyszukiwarka po tytule/opisie (Aktywne / Katalog / Archiwum).
+- Badge % ukończenia u zawodnika; w panelu kadry postęp wszystkich, nie tylko z feedbackiem.
+### DX: OpenAPI json tylko lokalnie
+- `openapi/openapi.json` jest artefaktem `pnpm sync:api` (gitignore); commitowany klient to `lib/api/generated/**`.
+
+## [1.1.3.1+2] - 2026-08-14
+### UX: spójne stany i chrome paneli
+- Kit UI: `PageHeader`, `EmptyState`, `InlineStatus`, `FilterChip`; unikalne `aria-labelledby` i focus trap w `Modal`.
+- Listy w `/panel` i `/klub` odróżniają ładowanie od pustki; obecność zawodnika nie połyka błędów listy.
+- BackLink tylko na widokach zagnieżdżonych; pulpit kadry ma opisy kafelków; karty kont/profili na telefonie.
+- `error.tsx` w obu panelach; `RequirePublicFlag` bez flasha treści; split layoutów `PanelShell`.
+
+## [1.1.3.0+1] - 2026-08-14
+### Improve: szkic AI z API ma stały kalendarz dni
+- Długie szkice Groq nie gubią środy/piątku w późniejszych tygodniach (naprawa po stronie backendu).
+
+## [1.1.2.12+13] - 2026-08-14
+### Feature: dzwonek — usuń wszystkie powiadomienia
+- W skrzynce przycisk „Usuń wszystkie” (z potwierdzeniem); klient OpenAPI: `DELETE /api/notifications`.
+
+## [1.1.2.11+12] - 2026-08-14
+### Fix: skan QR od razu zapisuje obecność
+- Po odczycie kodu kamerą (albo wejściu z `?code=`) check-in idzie automatycznie, bez osobnego „Zapisz obecność”.
+
 ## [1.1.2.10+11] - 2026-08-12
 ### Fix: „Ruda Śląska” obok herbu w headerze
 - Przywrócony podpis miasta pod „CKS Slavia” w nawigacji publicznej.

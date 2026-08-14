@@ -3,7 +3,7 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 1.1.2.1+2
+ * OpenAPI spec version: 1.1.3.0+1
  */
 import type { PlanProgressEntry } from './planProgressEntry';
 
@@ -25,9 +25,19 @@ export interface TrainingPlanProgress {
      * @nullable
      */
   completed_at?: string | null;
+  /**
+     * Odhaczone ćwiczenia (wyliczane przy zapisie / odczycie).
+     * @minimum 0
+     */
+  completed_count?: number;
   entries?: PlanProgressEntry[];
   id: string;
   plan_id: string;
+  /**
+     * Wszystkie ćwiczenia w planie.
+     * @minimum 0
+     */
+  total_count?: number;
   updated_at: string;
   user_id: string;
 }

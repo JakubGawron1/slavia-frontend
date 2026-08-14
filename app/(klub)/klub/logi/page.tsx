@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { useListLogs } from "@/lib/api/generated/default/default";
 import type { SystemLog } from "@/lib/api/generated/models";
-import { BackLink } from "@/components/ui/BackLink";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { InlineStatus } from "@/components/ui/InlineStatus";
 
 export default function LogiPage() {
   const [source, setSource] = useState("");
@@ -24,19 +26,13 @@ export default function LogiPage() {
     logsQuery.error instanceof Error ? logsQuery.error.message : null;
 
   return (
-    <div className="animate-rise max-w-5xl space-y-6">
-      <div>
-        <BackLink fallbackHref="/klub" />
-        <p className="mt-3 font-display text-sm tracking-[0.22em] text-brand uppercase">
-          System
-        </p>
-        <h1 className="mt-2 font-display text-3xl font-semibold uppercase">
-          Logi systemowe
-        </h1>
-        <p className="mt-2 text-sm text-paper/50">
-          Przechowywane przez 7 dni.
-        </p>
-      </div>
+    <div className="animate-rise space-y-6">
+      <PageHeader
+        eyebrow="System"
+        title="Logi systemowe"
+        description="Przechowywane przez 7 dni."
+        backHref="/klub"
+      />
 
       <div className="flex flex-wrap items-end gap-3">
         <label className="flex flex-col gap-1.5">
@@ -74,13 +70,11 @@ export default function LogiPage() {
         </button>
       </div>
 
-      {error ? (
-        <p className="border-l-2 border-brand bg-brand/10 px-4 py-3 text-sm" role="alert">
-          {error}
-        </p>
-      ) : null}
+      {error ? <InlineStatus kind="error">{error}</InlineStatus> : null}
 
-      {loading ? <p className="text-paper/50">Ładowanie…</p> : null}
+      {loading ? (
+        <InlineStatus kind="loading">Ładowanie logów…</InlineStatus>
+      ) : null}
 
       <ul className="divide-y divide-paper/10 border border-paper/10">
         {logs.map((log) => (
@@ -94,7 +88,12 @@ export default function LogiPage() {
           </li>
         ))}
         {!loading && logs.length === 0 ? (
-          <li className="px-4 py-6 text-paper/45">Brak logów.</li>
+          <li>
+            <EmptyState
+              title="Brak logów"
+              description="W wybranym filtrze nie ma wpisów z ostatnich 7 dni."
+            />
+          </li>
         ) : null}
       </ul>
     </div>

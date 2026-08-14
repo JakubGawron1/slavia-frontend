@@ -2,6 +2,8 @@ import type { CompetitionResult } from "@/lib/api/generated/models";
 import { ResultStatusBadge } from "@/components/results/ResultStatusBadge";
 import { canEditResultStatus } from "@/components/results/shared";
 import { formatResultDate } from "@/lib/athletes";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { InlineStatus } from "@/components/ui/InlineStatus";
 
 type PendingResultsListProps = {
   results: CompetitionResult[];
@@ -25,6 +27,14 @@ export function PendingResultsList({
       <h2 className="font-display text-sm tracking-[0.14em] uppercase">
         Do weryfikacji ({results.length})
       </h2>
+      {loading ? (
+        <InlineStatus kind="loading">Ładowanie zgłoszeń…</InlineStatus>
+      ) : results.length === 0 ? (
+        <EmptyState
+          title="Brak wyników oczekujących"
+          description="Gdy zawodnik zgłosi wynik, pojawi się tutaj do akceptacji, odrzucenia albo odesłania do edycji."
+        />
+      ) : (
       <ul className="space-y-4">
         {results.map((r) => (
           <li
@@ -101,10 +111,8 @@ export function PendingResultsList({
             </div>
           </li>
         ))}
-        {!loading && results.length === 0 ? (
-          <li className="text-paper/45">Brak wyników oczekujących.</li>
-        ) : null}
       </ul>
+      )}
     </section>
   );
 }

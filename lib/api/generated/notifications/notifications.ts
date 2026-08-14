@@ -3,7 +3,7 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 1.1.2.1+2
+ * OpenAPI spec version: 1.1.3.0+1
  */
 import {
   useMutation,
@@ -167,7 +167,90 @@ export function useListNotifications<TData = Awaited<ReturnType<typeof listNotif
 
 
 
-export type markAllReadResponse200 = {
+export type deleteAllNotificationsResponse200 = {
+  data: OkResponse
+  status: 200
+}
+
+export type deleteAllNotificationsResponse401 = {
+  data: ErrorBody
+  status: 401
+}
+
+export type deleteAllNotificationsResponseSuccess = (deleteAllNotificationsResponse200) & {
+  headers: Headers;
+};
+export type deleteAllNotificationsResponseError = (deleteAllNotificationsResponse401) & {
+  headers: Headers;
+};
+
+export type deleteAllNotificationsResponse = (deleteAllNotificationsResponseSuccess | deleteAllNotificationsResponseError)
+
+export const getDeleteAllNotificationsUrl = () => {
+
+
+
+
+  return `/api/notifications`
+}
+
+export const deleteAllNotifications = async ( options?: Parameters<typeof customFetch>[1]): Promise<deleteAllNotificationsResponse> => {
+
+  return customFetch<deleteAllNotificationsResponse>(getDeleteAllNotificationsUrl(),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteAllNotificationsMutationOptions = <TError = ErrorBody,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAllNotifications>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteAllNotifications>>, TError,void, TContext> => {
+
+const mutationKey = ['deleteAllNotifications'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteAllNotifications>>, void> = () => {
+
+
+          return  deleteAllNotifications(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteAllNotificationsMutationResult = NonNullable<Awaited<ReturnType<typeof deleteAllNotifications>>>
+
+    export type DeleteAllNotificationsMutationError = ErrorBody
+
+    export const useDeleteAllNotifications = <TError = ErrorBody,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAllNotifications>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteAllNotifications>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getDeleteAllNotificationsMutationOptions(options), queryClient);
+    }
+    export type markAllReadResponse200 = {
   data: OkResponse
   status: 200
 }

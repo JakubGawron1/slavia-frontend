@@ -6,7 +6,8 @@ import {
   type UserChangelogEntry,
 } from "@/lib/user-changelog";
 import { SLAVIA_VERSION } from "@/lib/version";
-import { BackLink } from "@/components/ui/BackLink";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 function EntryCard({ entry }: { entry: UserChangelogEntry }) {
   return (
@@ -43,29 +44,31 @@ export function UserChangelogView({ homeHref }: UserChangelogViewProps) {
   const entries = sortedUserChangelog();
 
   return (
-    <div className="animate-rise mx-auto max-w-3xl space-y-6">
-      <div>
-        <BackLink fallbackHref={homeHref} />
-        <p className="mt-3 font-display text-sm tracking-[0.22em] text-brand uppercase">
-          Aktualizacje
-        </p>
-        <h1 className="mt-2 font-display text-3xl font-semibold uppercase">
-          Co nowego
-        </h1>
-        <p className="mt-2 max-w-2xl text-sm text-paper/55">
-          Krótko i po ludzku — co zmieniło się w platformie. Aktualna wersja:{" "}
-          <span className="font-mono text-paper/80">v{SLAVIA_VERSION}</span>.
-        </p>
-      </div>
+    <div className="animate-rise space-y-6">
+      <PageHeader
+        eyebrow="Aktualizacje"
+        title="Co nowego"
+        description={
+          <>
+            Krótko i po ludzku — co zmieniło się w platformie. Aktualna wersja:{" "}
+            <span className="font-mono text-paper/80">v{SLAVIA_VERSION}</span>.
+          </>
+        }
+      />
 
       {entries.length === 0 ? (
-        <p className="text-sm text-paper/50">
-          Brak opublikowanych zmian. Wróć do{" "}
-          <Link href={homeHref} className="text-brand hover:underline">
-            pulpitu
-          </Link>
-          .
-        </p>
+        <EmptyState
+          title="Brak opublikowanych zmian"
+          description={
+            <>
+              Wróć do{" "}
+              <Link href={homeHref} className="text-brand hover:underline">
+                pulpitu
+              </Link>
+              .
+            </>
+          }
+        />
       ) : (
         <div className="space-y-3">
           {entries.map((entry) => (

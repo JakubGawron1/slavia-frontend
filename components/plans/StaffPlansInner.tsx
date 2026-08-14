@@ -8,11 +8,14 @@ import { CatalogTab } from "@/components/plans/CatalogTab";
 import { ArchiveTab } from "@/components/plans/ArchiveTab";
 import { ExerciseLibraryTab } from "@/components/plans/ExerciseLibraryTab";
 import { AthleteGroupsTab } from "@/components/plans/AthleteGroupsTab";
+import { AiDraftPanel } from "@/components/plans/AiDraftPanel";
+import { AiRefineBar } from "@/components/plans/AiRefineBar";
+import { filterPlansByQuery } from "@/lib/plans/completion";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { InlineStatus } from "@/components/ui/InlineStatus";
 import {
   btnPrimary,
-  btnSecondary,
   inputClass,
-  sectionLabel,
   tabActive,
   tabIdle,
 } from "@/components/plans/styles";
@@ -20,22 +23,26 @@ import {
 export function StaffPlansInner() {
   const editor = useStaffPlansEditor();
   const editingPlans = Boolean(editor.editing && editor.tab === "plans");
+  const filteredPlans = filterPlansByQuery(editor.plans, editor.listQuery);
+  const filteredArchive = filterPlansByQuery(editor.archive, editor.listQuery);
+  const filteredCatalog = filterPlansByQuery(editor.templates, editor.listQuery);
+  const showSearch =
+    !editingPlans &&
+    (editor.tab === "plans" || editor.tab === "catalog" || editor.tab === "archive");
+  const searchEmpty = Boolean(editor.listQuery.trim());
+  const searchEmptyCopy = {
+    title: "Brak wyników",
+    description: "Zmień frazę albo wyczyść wyszukiwanie.",
+  } as const;
 
   return (
-    <div className="animate-rise max-w-5xl space-y-8">
+    <div className="animate-rise space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="font-display text-sm tracking-[0.22em] text-brand uppercase">
-            Trening
-          </p>
-          <h1 className="mt-2 font-display text-3xl font-semibold uppercase">
-            Plany treningowe
-          </h1>
-          <p className="mt-2 max-w-xl text-sm text-paper/55">
-            Tygodnie, dni, biblioteka ćwiczeń, katalog programów i grupy
-            zawodników.
-          </p>
-        </div>
+        <PageHeader
+          eyebrow="Trening"
+          title="Plany treningowe"
+          description="Tygodnie, dni, biblioteka ćwiczeń, katalog programów i grupy zawodników."
+        />
         {editor.tab === "plans" && !editingPlans ? (
           <button type="button" onClick={editor.startNew} className={btnPrimary}>
             Nowy plan
@@ -78,7 +85,7 @@ export function StaffPlansInner() {
               role="tab"
               aria-selected={editor.tab === k}
               onClick={() => editor.setTab(k)}
-              className={editor.tab === k ? tabActive : tabIdle}
+              className={`${editor.tab === k ? tabActive : tabIdle} text-[10px] sm:text-[11px]`}
             >
               {label}
               <span className="ml-1.5 tabular-nums opacity-70">{count}</span>
@@ -88,72 +95,67 @@ export function StaffPlansInner() {
       ) : null}
 
       {editor.error ? (
-        <p className="border-l-2 border-brand bg-brand/10 px-4 py-3 text-sm" role="alert">
-          {editor.error}
-        </p>
+        <InlineStatus kind="error">{editor.error}</InlineStatus>
       ) : null}
 
       {editor.aiEnabled && editor.tab === "plans" && !editingPlans ? (
-        <div className="flex flex-wrap items-end gap-3 border border-paper/10 bg-paper/[0.03] p-4">
-          <label className="min-w-[200px] flex-1 space-y-1.5">
-            <span className={sectionLabel}>Szkic AI</span>
-            <input
-              className={inputClass}
-              placeholder="Opisz program (np. 8 tygodni siły, 3×/tyg.)…"
-              value={editor.aiPrompt}
-              onChange={(e) => editor.setAiPrompt(e.target.value)}
-              disabled={editor.aiBusy}
-            />
-          </label>
-          <label className="w-24 space-y-1.5">
-            <span className={sectionLabel}>Tyg.</span>
-            <input
-              className={inputClass}
-              type="number"
-              min={1}
-              max={16}
-              value={editor.aiWeeks}
-              onChange={(e) =>
-                editor.setAiWeeks(
-                  e.target.value ? Number(e.target.value) : 4,
-                )
-              }
-              disabled={editor.aiBusy}
-            />
-          </label>
-          <button
-            type="button"
-            onClick={() => void editor.doAiDraft()}
-            className={btnSecondary}
-            disabled={editor.aiBusy || !editor.aiPrompt.trim()}
-          >
-            {editor.aiBusy ? "Generuję…" : "Generuj szkic"}
-          </button>
-        </div>
+        <AiDraftPanel ai={editor.ai} users={editor.users} groups={editor.groups} />
+      ) : null}
+
+      {showSearch ? (
+        <label className="block max-w-md">
+          <span className="sr-only">Szukaj planu</span>
+          <input
+            type="search"
+            className={inputClass}
+            placeholder="Szukaj po tytule lub opisie…"
+            value={editor.listQuery}
+            onChange={(e) => editor.setListQuery(e.target.value)}
+          />
+        </label>
+      ) : null}
+
+      {editor.editing && editor.tab === "plans" && editor.aiEnabled ? (
+        <AiRefineBar ai={editor.ai} editing={editor.editing} />
       ) : null}
 
       {editor.editing && editor.tab === "plans" ? <PlanEditor editor={editor} /> : null}
 
       {editor.tab === "plans" && !editingPlans ? (
         <PlanList
-          plans={editor.plans}
+          plans={filteredPlans}
           onEdit={editor.openEdit}
           onRemove={(id) => editor.remove(id)}
           onCopy={(id) => void editor.doCopy(id)}
           onVersion={(id) => void editor.doVersion(id)}
+          onArchive={(p) => void editor.setArchived(p, true)}
+          emptyTitle={searchEmpty ? searchEmptyCopy.title : "Brak aktywnych planów"}
+          emptyDescription={
+            searchEmpty
+              ? searchEmptyCopy.description
+              : "Dodaj nowy plan albo skopiuj szablon z katalogu."
+          }
         />
       ) : null}
 
       {editor.tab === "catalog" ? (
-        <CatalogTab templates={editor.templates} onCopy={(id) => void editor.doCopy(id)} />
+        <CatalogTab
+          templates={filteredCatalog}
+          onCopy={(id) => void editor.doCopy(id)}
+          emptyTitle={searchEmpty ? searchEmptyCopy.title : undefined}
+          emptyDescription={searchEmpty ? searchEmptyCopy.description : undefined}
+        />
       ) : null}
 
       {editor.tab === "archive" ? (
         <ArchiveTab
-          archive={editor.archive}
+          archive={filteredArchive}
           onEdit={editor.openEdit}
           onRemove={(id) => editor.remove(id)}
           onCopy={(id) => void editor.doCopy(id)}
+          onRestore={(p) => void editor.setArchived(p, false)}
+          emptyTitle={searchEmpty ? searchEmptyCopy.title : undefined}
+          emptyDescription={searchEmpty ? searchEmptyCopy.description : undefined}
         />
       ) : null}
 

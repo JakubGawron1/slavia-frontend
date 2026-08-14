@@ -2,6 +2,7 @@ import { defineConfig } from "orval";
 
 export default defineConfig({
   slavia: {
+    // Lokalny snapshot z `pnpm sync:api` (gitignore). Źródło prawdy: utoipa w BE.
     input: "./openapi/openapi.json",
     output: {
       mode: "tags-split",

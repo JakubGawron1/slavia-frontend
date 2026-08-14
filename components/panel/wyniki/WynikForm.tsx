@@ -52,6 +52,7 @@ export function WynikForm({
 
   return (
     <form
+      id="wynik-form"
       onSubmit={onSubmit}
       className="grid gap-3 border border-paper/10 bg-paper/[0.03] p-4 sm:grid-cols-2"
     >

@@ -3,7 +3,7 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 1.1.2.1+2
+ * OpenAPI spec version: 1.1.3.0+1
  */
 import {
   useMutation,
@@ -26,6 +26,7 @@ import type {
 
 import type {
   AiDraftBody,
+  AiUsageStatus,
   ApproveAttendanceBody,
   AthleteCalendarEvent,
   AthleteProfile,
@@ -4002,7 +4003,248 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAiDraftPlanMutationOptions(options), queryClient);
     }
-    export type deletePlanResponse200 = {
+    export type getAiUsageResponse200 = {
+  data: AiUsageStatus
+  status: 200
+}
+
+export type getAiUsageResponse401 = {
+  data: ErrorBody
+  status: 401
+}
+
+export type getAiUsageResponse403 = {
+  data: ErrorBody
+  status: 403
+}
+
+export type getAiUsageResponseSuccess = (getAiUsageResponse200) & {
+  headers: Headers;
+};
+export type getAiUsageResponseError = (getAiUsageResponse401 | getAiUsageResponse403) & {
+  headers: Headers;
+};
+
+export type getAiUsageResponse = (getAiUsageResponseSuccess | getAiUsageResponseError)
+
+export const getGetAiUsageUrl = () => {
+
+
+
+
+  return `/api/plans/ai-usage`
+}
+
+export const getAiUsage = async ( options?: Parameters<typeof customFetch>[1]): Promise<getAiUsageResponse> => {
+
+  return customFetch<getAiUsageResponse>(getGetAiUsageUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAiUsageQueryKey = () => {
+    return [
+    `/api/plans/ai-usage`
+    ] as const;
+    }
+
+
+export const getGetAiUsageQueryOptions = <TData = Awaited<ReturnType<typeof getAiUsage>>, TError = ErrorBody>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAiUsage>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAiUsageQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAiUsage>>> = ({ signal }) => getAiUsage({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAiUsage>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAiUsageQueryResult = NonNullable<Awaited<ReturnType<typeof getAiUsage>>>
+export type GetAiUsageQueryError = ErrorBody
+
+
+export function useGetAiUsage<TData = Awaited<ReturnType<typeof getAiUsage>>, TError = ErrorBody>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAiUsage>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAiUsage>>,
+          TError,
+          Awaited<ReturnType<typeof getAiUsage>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAiUsage<TData = Awaited<ReturnType<typeof getAiUsage>>, TError = ErrorBody>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAiUsage>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAiUsage>>,
+          TError,
+          Awaited<ReturnType<typeof getAiUsage>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAiUsage<TData = Awaited<ReturnType<typeof getAiUsage>>, TError = ErrorBody>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAiUsage>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetAiUsage<TData = Awaited<ReturnType<typeof getAiUsage>>, TError = ErrorBody>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAiUsage>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAiUsageQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export type getPlanResponse200 = {
+  data: TrainingPlan
+  status: 200
+}
+
+export type getPlanResponse401 = {
+  data: ErrorBody
+  status: 401
+}
+
+export type getPlanResponse403 = {
+  data: ErrorBody
+  status: 403
+}
+
+export type getPlanResponse404 = {
+  data: ErrorBody
+  status: 404
+}
+
+export type getPlanResponseSuccess = (getPlanResponse200) & {
+  headers: Headers;
+};
+export type getPlanResponseError = (getPlanResponse401 | getPlanResponse403 | getPlanResponse404) & {
+  headers: Headers;
+};
+
+export type getPlanResponse = (getPlanResponseSuccess | getPlanResponseError)
+
+export const getGetPlanUrl = (id: string,) => {
+
+
+
+
+  return `/api/plans/${id}`
+}
+
+export const getPlan = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getPlanResponse> => {
+
+  return customFetch<getPlanResponse>(getGetPlanUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPlanQueryKey = (id: string,) => {
+    return [
+    `/api/plans/${id}`
+    ] as const;
+    }
+
+
+export const getGetPlanQueryOptions = <TData = Awaited<ReturnType<typeof getPlan>>, TError = ErrorBody>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlan>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPlanQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPlan>>> = ({ signal }) => getPlan(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPlan>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetPlanQueryResult = NonNullable<Awaited<ReturnType<typeof getPlan>>>
+export type GetPlanQueryError = ErrorBody
+
+
+export function useGetPlan<TData = Awaited<ReturnType<typeof getPlan>>, TError = ErrorBody>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlan>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPlan>>,
+          TError,
+          Awaited<ReturnType<typeof getPlan>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPlan<TData = Awaited<ReturnType<typeof getPlan>>, TError = ErrorBody>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlan>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPlan>>,
+          TError,
+          Awaited<ReturnType<typeof getPlan>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPlan<TData = Awaited<ReturnType<typeof getPlan>>, TError = ErrorBody>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlan>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetPlan<TData = Awaited<ReturnType<typeof getPlan>>, TError = ErrorBody>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlan>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetPlanQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export type deletePlanResponse200 = {
   data: OkResponse
   status: 200
 }

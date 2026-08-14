@@ -19,6 +19,7 @@ import {
   sectionLabel,
 } from "@/components/plans/styles";
 import { BackLink } from "@/components/ui/BackLink";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 export function PlanEditor({ editor }: { editor: StaffPlansEditor }) {
   const { editing } = editor;
@@ -310,9 +311,10 @@ export function PlanEditor({ editor }: { editor: StaffPlansEditor }) {
 
         <div className="space-y-3">
           {currentExercises.length === 0 ? (
-            <p className="border border-dashed border-paper/15 px-4 py-8 text-center text-sm text-paper/45">
-              Brak ćwiczeń w tym dniu — dodaj poniżej z biblioteki albo ręcznie.
-            </p>
+            <EmptyState
+              title="Brak ćwiczeń w tym dniu"
+              description="Dodaj poniżej z biblioteki albo ręcznie."
+            />
           ) : null}
           {currentExercises.map((ex, i) => (
             <ExerciseEditor
@@ -362,6 +364,7 @@ export function PlanEditor({ editor }: { editor: StaffPlansEditor }) {
 
       {editing.id ? (
         <PlanProgressPanel
+          plan={editing}
           progressAll={editor.progressAll}
           users={editor.users}
           replyDrafts={editor.replyDrafts}

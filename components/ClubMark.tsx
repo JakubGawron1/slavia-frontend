@@ -4,6 +4,7 @@ type ClubMarkProps = {
   className?: string;
   /** Dekoracyjny znak (domyślnie) — bez alt; inaczej dostępny opis. */
   alt?: string;
+  /** Above-the-fold / LCP: `loading="eager"` + `fetchPriority="high"` (Next 16). */
   priority?: boolean;
 };
 
@@ -28,7 +29,8 @@ export function ClubMark({
         className={`object-contain ${className}`}
         style={{ width: "auto" }}
         aria-hidden={alt ? undefined : true}
-        priority={priority}
+        loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : "auto"}
       />
     </span>
   );

@@ -1,20 +1,13 @@
 "use client";
 
+import { ISO_WEEKDAY_SHORT } from "@/lib/calendar";
 import { CalendarMonthGrid } from "@/components/calendar/CalendarMonthGrid";
 import { Modal } from "@/components/ui/Modal";
+import { InlineStatus } from "@/components/ui/InlineStatus";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { EventDetailDialog } from "@/components/klub/calendar/EventDetailDialog";
 import { EventFormDialog } from "@/components/klub/calendar/EventFormDialog";
 import { useStaffCalendar } from "@/components/klub/calendar/useStaffCalendar";
-
-const WEEKDAY_LABELS: Record<number, string> = {
-  1: "Pon",
-  2: "Wt",
-  3: "Śr",
-  4: "Czw",
-  5: "Pt",
-  6: "Sob",
-  7: "Niedz",
-};
 
 const fieldClass =
   "mt-1 w-full border border-paper/20 bg-chrome/60 px-3 py-2 text-sm text-paper outline-none focus:border-brand";
@@ -62,17 +55,11 @@ export function StaffCalendar() {
   return (
     <div className="space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="font-display text-sm tracking-[0.22em] text-brand uppercase">
-            Kadra
-          </p>
-          <h1 className="mt-2 font-display text-3xl font-semibold uppercase">
-            Kalendarz zawodów
-          </h1>
-          <p className="mt-2 text-sm text-paper/55">
-            Kliknij dzień, aby dodać wydarzenie. Kliknij wydarzenie — menu Edytuj / Usuń.
-          </p>
-        </div>
+        <PageHeader
+          eyebrow="Kadra"
+          title="Kalendarz zawodów"
+          description="Kliknij dzień, aby dodać wydarzenie. Kliknij wydarzenie — menu Edytuj / Usuń."
+        />
         <button
           type="button"
           onClick={() => openCreate()}
@@ -82,11 +69,7 @@ export function StaffCalendar() {
         </button>
       </div>
 
-      {error ? (
-        <p className="border-l-2 border-brand bg-brand/10 px-4 py-3 text-sm" role="alert">
-          {error}
-        </p>
-      ) : null}
+      {error ? <InlineStatus kind="error">{error}</InlineStatus> : null}
 
       {schedule ? (
         <form
@@ -117,7 +100,7 @@ export function StaffCalendar() {
                       : "border border-paper/20 text-paper/60"
                   }`}
                 >
-                  {WEEKDAY_LABELS[d]}
+                  {ISO_WEEKDAY_SHORT[d]}
                 </button>
               );
             })}

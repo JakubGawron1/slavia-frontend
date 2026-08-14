@@ -10,8 +10,10 @@ type NotificationPanelListProps = {
   loading: boolean;
   unread: number;
   markAllPending: boolean;
+  deleteAllPending: boolean;
   deletingId: string | null;
   onMarkAll: () => void;
+  onDeleteAll: () => void;
   onMarkRead: (n: Notification) => void;
   onDelete: (n: Notification) => void;
   onNavigate: () => void;
@@ -24,8 +26,10 @@ export function NotificationPanelList({
   loading,
   unread,
   markAllPending,
+  deleteAllPending,
   deletingId,
   onMarkAll,
+  onDeleteAll,
   onMarkRead,
   onDelete,
   onNavigate,
@@ -45,20 +49,32 @@ export function NotificationPanelList({
       }}
       className="flex flex-col border border-paper/15 bg-chrome shadow-[0_16px_48px_rgba(0,0,0,0.45)]"
     >
-      <div className="flex shrink-0 items-center justify-between gap-2 border-b border-paper/10 px-3 py-2.5">
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-paper/10 px-3 py-2.5">
         <p className="font-display text-[11px] tracking-[0.14em] text-paper uppercase">
           Powiadomienia
         </p>
-        {unread > 0 ? (
-          <button
-            type="button"
-            onClick={onMarkAll}
-            disabled={markAllPending}
-            className="font-display text-[10px] tracking-[0.1em] text-brand uppercase transition-colors hover:text-paper disabled:opacity-50"
-          >
-            Oznacz wszystkie
-          </button>
-        ) : null}
+        <div className="flex items-center gap-3">
+          {unread > 0 ? (
+            <button
+              type="button"
+              onClick={onMarkAll}
+              disabled={markAllPending}
+              className="font-display text-[10px] tracking-[0.1em] text-brand uppercase transition-colors hover:text-paper disabled:opacity-50"
+            >
+              Oznacz wszystkie
+            </button>
+          ) : null}
+          {items.length > 0 && !loading ? (
+            <button
+              type="button"
+              onClick={onDeleteAll}
+              disabled={deleteAllPending}
+              className="font-display text-[10px] tracking-[0.1em] text-paper/45 uppercase transition-colors hover:text-paper disabled:opacity-50"
+            >
+              Usuń wszystkie
+            </button>
+          ) : null}
+        </div>
       </div>
 
       <ul className="min-h-0 flex-1 overflow-y-auto overscroll-contain">

@@ -3,12 +3,27 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 1.1.2.1+2
+ * OpenAPI spec version: 1.1.3.0+1
  */
 
 export interface AiDraftBody {
+  /** @nullable */
+  assigned_group_id?: string | null;
+  /** @nullable */
+  assigned_user_id?: string | null;
+  /**
+     * Dni treningowe 1=pon … 7=nd (stały kalendarz we wszystkich tygodniach).
+     * @nullable
+     * @items.minimum 0
+     */
+  days_of_week?: number[] | null;
   /** Opis / prompt (np. „8 tygodni peaking, 3 sesje/tyg”) */
   prompt: string;
+  /**
+     * Dopracowanie istniejącego planu (wynik = nowy niespisany szkic).
+     * @nullable
+     */
+  source_plan_id?: string | null;
   /**
      * @minimum 0
      * @nullable

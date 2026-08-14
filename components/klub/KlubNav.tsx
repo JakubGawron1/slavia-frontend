@@ -58,7 +58,7 @@ function NavBody({ onNavigate }: { onNavigate?: () => void }) {
           onClick={onNavigate}
           className="flex items-center gap-2.5"
         >
-          <ClubMark className="h-14 w-auto" />
+          <ClubMark priority className="h-14 w-auto" />
           <span className="font-display text-sm tracking-[0.2em] text-brand uppercase">
             CKS Slavia
           </span>

@@ -2,13 +2,46 @@ import type { CompetitionResult } from "@/lib/api/generated/models";
 import { ResultStatusBadge } from "@/components/results/ResultStatusBadge";
 import { canEditResultStatus } from "@/components/results/shared";
 import { formatResultDate } from "@/lib/athletes";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { InlineStatus } from "@/components/ui/InlineStatus";
 
 type WynikiResultsListProps = {
   results: CompetitionResult[];
+  loading?: boolean;
   onEdit: (r: CompetitionResult) => void;
+  onEmptyAction?: () => void;
 };
 
-export function WynikiResultsList({ results, onEdit }: WynikiResultsListProps) {
+export function WynikiResultsList({
+  results,
+  loading,
+  onEdit,
+  onEmptyAction,
+}: WynikiResultsListProps) {
+  if (loading) {
+    return <InlineStatus kind="loading">Ładowanie zgłoszeń…</InlineStatus>;
+  }
+
+  if (results.length === 0) {
+    return (
+      <EmptyState
+        title="Brak zgłoszeń"
+        description="Zgłoś pierwszy wynik z zawodów albo rekord treningowy — trafi do weryfikacji trenera."
+        action={
+          onEmptyAction ? (
+            <button
+              type="button"
+              onClick={onEmptyAction}
+              className="border border-brand/50 bg-brand/15 px-3 py-2 font-display text-[11px] tracking-[0.12em] text-paper uppercase hover:border-brand hover:bg-brand/25"
+            >
+              Zgłoś pierwszy wynik
+            </button>
+          ) : null
+        }
+      />
+    );
+  }
+
   return (
     <ul className="space-y-3">
       {results.map((r) => (
@@ -52,9 +85,6 @@ export function WynikiResultsList({ results, onEdit }: WynikiResultsListProps) {
           </div>
         </li>
       ))}
-      {results.length === 0 ? (
-        <li className="text-paper/45">Brak zgłoszeń.</li>
-      ) : null}
     </ul>
   );
 }

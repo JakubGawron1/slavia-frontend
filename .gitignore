@@ -46,3 +46,7 @@ next-env.d.ts
 
 .vercel
 .env*
+
+# Snapshot utoipa — lokalny artefakt `pnpm sync:api`, nie commituj.
+# Klient HTTP: lib/api/generated/**
+/openapi/openapi.json

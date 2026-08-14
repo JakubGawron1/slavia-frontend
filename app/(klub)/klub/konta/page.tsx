@@ -7,36 +7,31 @@ import { CreateUserModal, EditUserModal } from "@/components/klub/konta/UserModa
 import { UsersTable } from "@/components/klub/konta/UsersTable";
 import { useKontaPage } from "@/components/klub/konta/useKontaPage";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { InlineStatus } from "@/components/ui/InlineStatus";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export default function KontaPage() {
   const kp = useKontaPage();
 
   return (
-    <div className="animate-rise max-w-5xl space-y-10">
-      <div>
-        <p className="font-display text-sm tracking-[0.22em] text-brand uppercase">
-          Ludzie
-        </p>
-        <h1 className="mt-2 font-display text-3xl font-semibold uppercase">
-          Konta i profile
-        </h1>
-        <p className="mt-2 text-sm text-paper/55">
-          {kp.showUsersSection
+    <div className="animate-rise space-y-10">
+      <PageHeader
+        eyebrow="Ludzie"
+        title="Konta i profile"
+        description={
+          kp.showUsersSection
             ? "Zarządzanie kontami użytkowników oraz profilami zawodników."
-            : "Zarządzanie profilami zawodników (bez tworzenia kont staff)."}
-        </p>
-      </div>
+            : "Zarządzanie profilami zawodników (bez tworzenia kont staff)."
+        }
+      />
 
       {kp.error && kp.userModal === "closed" && kp.profileModal === "closed" ? (
-        <p
-          className="border-l-2 border-brand bg-brand/10 px-4 py-3 text-sm"
-          role="alert"
-        >
-          {kp.error}
-        </p>
+        <InlineStatus kind="error">{kp.error}</InlineStatus>
       ) : null}
 
-      {kp.loading ? <p className="text-paper/50">Ładowanie…</p> : null}
+      {kp.loading ? (
+        <InlineStatus kind="loading">Ładowanie kont i profili…</InlineStatus>
+      ) : null}
 
       {kp.showUsersSection ? (
         <UsersTable

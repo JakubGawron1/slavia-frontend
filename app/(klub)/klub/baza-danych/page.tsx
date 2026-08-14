@@ -10,7 +10,9 @@ import {
 import type { UpsertRowBodyRow } from "@/lib/api/generated/models";
 import { useToast } from "@/components/toast/ToastProvider";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
-import { BackLink } from "@/components/ui/BackLink";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { InlineStatus } from "@/components/ui/InlineStatus";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 export default function BazaDanychPage() {
   const toast = useToast();
@@ -98,26 +100,15 @@ export default function BazaDanychPage() {
   }
 
   return (
-    <div className="animate-rise max-w-6xl space-y-6">
-      <div>
-        <BackLink fallbackHref="/klub" />
-        <p className="mt-3 font-display text-sm tracking-[0.22em] text-brand uppercase">
-          Narzędzia
-        </p>
-        <h1 className="mt-2 font-display text-3xl font-semibold uppercase">
-          Baza danych
-        </h1>
-        <p className="mt-2 text-sm text-paper/55">
-          Podgląd i edycja tabel managed (redb). Edycja users/logów — przez
-          dedykowane API.
-        </p>
-      </div>
+    <div className="animate-rise space-y-6">
+      <PageHeader
+        eyebrow="Narzędzia"
+        title="Baza danych"
+        description="Podgląd i edycja tabel managed (redb). Edycja users/logów — przez dedykowane API."
+        backHref="/klub"
+      />
 
-      {error ? (
-        <p className="border-l-2 border-brand bg-brand/10 px-4 py-3 text-sm" role="alert">
-          {error}
-        </p>
-      ) : null}
+      {error ? <InlineStatus kind="error">{error}</InlineStatus> : null}
       {message ? (
         <p className="border-l-2 border-paper/30 bg-paper/5 px-4 py-3 text-sm">
           {message}
@@ -184,8 +175,11 @@ export default function BazaDanychPage() {
             })}
             {rows.length === 0 ? (
               <tr>
-                <td colSpan={2} className="px-3 py-6 text-paper/45">
-                  Brak wierszy.
+                <td colSpan={2} className="p-0">
+                  <EmptyState
+                    title="Brak wierszy"
+                    description="Ta tabela jest pusta."
+                  />
                 </td>
               </tr>
             ) : null}

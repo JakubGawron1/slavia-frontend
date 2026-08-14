@@ -23,6 +23,8 @@ import {
 import { isFlagEnabled, TRAINING_PLANS_FLAG } from "@/lib/public-flags";
 import { ProgressChart } from "@/components/zawodnicy/ProgressChart";
 import { usePanel } from "@/components/panel/PanelProvider";
+import { InlineStatus } from "@/components/ui/InlineStatus";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 const LIFT_CARDS: {
   key: string;
@@ -149,7 +151,12 @@ export default function PanelHomePage() {
       ? statsQuery.error.message
       : statsQuery.isError
         ? "Błąd statystyk"
-        : null;
+        : resultsQuery.isError
+          ? "Nie udało się wczytać wyników."
+          : plansQuery.isError
+            ? "Nie udało się wczytać planów."
+            : null;
+  const statsLoading = statsQuery.isPending;
 
   const chartResults = useMemo(() => {
     const all = (resultsQuery.data?.data as CompetitionResult[] | undefined) ?? [];
@@ -173,28 +180,21 @@ export default function PanelHomePage() {
 
   return (
     <div className="animate-rise space-y-8">
-      <div>
-        <p className="font-display text-sm tracking-[0.22em] text-brand uppercase">
-          Pulpit
-        </p>
-        <h1 className="mt-2 font-display text-3xl font-semibold uppercase md:text-4xl">
-          Cześć, {user.display_name}
-        </h1>
-        <p className="mt-2 text-sm text-paper/55">
-          {stats?.category
-            ? `Kategoria ${stats.category}`
-            : "Twój profil zawodnika"}
-          {stats?.bodyweight_kg != null
-            ? ` · ${stats.bodyweight_kg} kg`
-            : ""}
-        </p>
-      </div>
+      <PageHeader
+        eyebrow="Pulpit"
+        title={`Cześć, ${user.display_name}`}
+        titleSize="hero"
+        description={
+          <>
+            {stats?.category
+              ? `Kategoria ${stats.category}`
+              : "Twój profil zawodnika"}
+            {stats?.bodyweight_kg != null ? ` · ${stats.bodyweight_kg} kg` : ""}
+          </>
+        }
+      />
 
-      {error ? (
-        <p className="border-l-2 border-brand bg-brand/10 px-4 py-3 text-sm" role="alert">
-          {error}
-        </p>
-      ) : null}
+      {error ? <InlineStatus kind="error">{error}</InlineStatus> : null}
 
       {seasonPlan ? (
         <section aria-label="Plan sezonu">
@@ -236,7 +236,11 @@ export default function PanelHomePage() {
                   {card.label}
                 </p>
                 <p className="mt-2 font-display text-2xl group-hover:text-brand sm:text-3xl">
-                  {value}
+                  {statsLoading ? (
+                    <span className="inline-block h-8 w-16 animate-pulse bg-paper/10" />
+                  ) : (
+                    value
+                  )}
                 </p>
               </Link>
             );
@@ -262,7 +266,7 @@ export default function PanelHomePage() {
               tone="panel"
             />
           ) : (
-            <p className="py-6 text-center text-sm text-paper/55">Ładowanie…</p>
+            <InlineStatus kind="loading">Ładowanie progresu…</InlineStatus>
           )}
         </div>
       </section>
@@ -282,7 +286,11 @@ export default function PanelHomePage() {
                   {card.label}
                 </p>
                 <p className="mt-2 font-display text-3xl group-hover:text-brand">
-                  {value}
+                  {statsLoading ? (
+                    <span className="inline-block h-8 w-12 animate-pulse bg-paper/10" />
+                  ) : (
+                    value
+                  )}
                 </p>
               </Link>
             );

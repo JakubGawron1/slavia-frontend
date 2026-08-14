@@ -11,6 +11,7 @@ import { createPortal } from "react-dom";
 import {
   getListNotificationsQueryKey,
   getUnreadCountQueryKey,
+  useDeleteAllNotifications,
   useDeleteNotification,
   useListNotifications,
   useMarkAllRead,
@@ -20,6 +21,7 @@ import {
 import type { Notification } from "@/lib/api/generated/models";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/toast/ToastProvider";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { BellIcon } from "./BellIcon";
 import { computePanelCoords, type PanelCoords } from "./notificationBellUtils";
 import { NotificationPanelList } from "./NotificationPanelList";
@@ -32,6 +34,7 @@ type NotificationBellProps = {
 export function NotificationBell({ variant = "default" }: NotificationBellProps) {
   const toast = useToast();
   const [open, setOpen] = useState(false);
+  const [confirmClear, setConfirmClear] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [coords, setCoords] = useState<PanelCoords | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -59,6 +62,7 @@ export function NotificationBell({ variant = "default" }: NotificationBellProps)
   const updateMutation = useUpdateNotification();
   const markAllMutation = useMarkAllRead();
   const deleteMutation = useDeleteNotification();
+  const deleteAllMutation = useDeleteAllNotifications();
 
   async function invalidate() {
     await Promise.all([
@@ -94,12 +98,14 @@ export function NotificationBell({ variant = "default" }: NotificationBellProps)
   useEffect(() => {
     if (!open) return;
     function onPointerDown(event: MouseEvent) {
+      if (confirmClear) return;
       const target = event.target as Node;
       if (rootRef.current?.contains(target)) return;
       if (panelRef.current?.contains(target)) return;
       setOpen(false);
     }
     function onKey(event: KeyboardEvent) {
+      if (confirmClear) return;
       if (event.key === "Escape") setOpen(false);
     }
     document.addEventListener("mousedown", onPointerDown);
@@ -108,7 +114,7 @@ export function NotificationBell({ variant = "default" }: NotificationBellProps)
       document.removeEventListener("mousedown", onPointerDown);
       document.removeEventListener("keydown", onKey);
     };
-  }, [open]);
+  }, [open, confirmClear]);
 
   async function markRead(notification: Notification) {
     if (notification.read) return;
@@ -151,6 +157,20 @@ export function NotificationBell({ variant = "default" }: NotificationBellProps)
     }
   }
 
+  async function removeAll() {
+    try {
+      await deleteAllMutation.mutateAsync();
+      await invalidate();
+      setConfirmClear(false);
+      toast.success("Usunięto wszystkie powiadomienia");
+    } catch (err) {
+      toast.error(
+        "Powiadomienia",
+        err instanceof Error ? err.message : "Nie udało się usunąć",
+      );
+    }
+  }
+
   const borderClass =
     variant === "onBrand"
       ? open
@@ -163,19 +183,32 @@ export function NotificationBell({ variant = "default" }: NotificationBellProps)
   const panel =
     open && coords && mounted
       ? createPortal(
-          <NotificationPanelList
-            panelRef={panelRef}
-            coords={coords}
-            items={items}
-            loading={listQuery.isLoading}
-            unread={unread}
-            markAllPending={markAllMutation.isPending}
-            deletingId={deletingId}
-            onMarkAll={() => void markAll()}
-            onMarkRead={(n) => void markRead(n)}
-            onDelete={(n) => void removeNotification(n)}
-            onNavigate={() => setOpen(false)}
-          />,
+          <>
+            <NotificationPanelList
+              panelRef={panelRef}
+              coords={coords}
+              items={items}
+              loading={listQuery.isLoading}
+              unread={unread}
+              markAllPending={markAllMutation.isPending}
+              deleteAllPending={deleteAllMutation.isPending}
+              deletingId={deletingId}
+              onMarkAll={() => void markAll()}
+              onDeleteAll={() => setConfirmClear(true)}
+              onMarkRead={(n) => void markRead(n)}
+              onDelete={(n) => void removeNotification(n)}
+              onNavigate={() => setOpen(false)}
+            />
+            <ConfirmModal
+              open={confirmClear}
+              title="Usunąć wszystkie powiadomienia?"
+              message="Skrzynka zostanie wyczyszczona. Tej operacji nie można cofnąć."
+              confirmLabel="Usuń wszystkie"
+              busy={deleteAllMutation.isPending}
+              onClose={() => setConfirmClear(false)}
+              onConfirm={() => void removeAll()}
+            />
+          </>,
           document.body,
         )
       : null;
@@ -192,7 +225,10 @@ export function NotificationBell({ variant = "default" }: NotificationBellProps)
         aria-expanded={open}
         aria-haspopup="dialog"
         title="Powiadomienia"
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => {
+          if (confirmClear) return;
+          setOpen((v) => !v);
+        }}
         className={`relative inline-flex h-9 w-9 shrink-0 items-center justify-center border transition-colors ${borderClass}`}
       >
         <BellIcon className="h-4 w-4" />

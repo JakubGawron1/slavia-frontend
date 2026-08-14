@@ -10,6 +10,7 @@ import {
 } from "@/lib/panel-themes";
 import { isFlagEnabled } from "@/lib/public-flags";
 import { LoadingScene } from "@/components/loading/LoadingScene";
+import { SessionMissing } from "@/components/ui/SessionMissing";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useKlub } from "./KlubProvider";
 import { KlubNav } from "./KlubNav";
@@ -44,11 +45,7 @@ export function KlubShell({ children }: { children: ReactNode }) {
   }
 
   if (!user) {
-    return (
-      <div className="flex min-h-[100svh] items-center justify-center bg-chrome text-paper/60">
-        {error ?? "Brak sesji."}
-      </div>
-    );
+    return <SessionMissing message={error ?? "Zaloguj się, aby otworzyć panel klubowy."} />;
   }
 
   return (

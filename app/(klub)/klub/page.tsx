@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { filterNavForRole, ROLE_LABELS } from "@/lib/klub-nav";
 import { useKlub } from "@/components/klub/KlubProvider";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export default function KlubHomePage() {
   const { user, activeRole } = useKlub();
@@ -12,16 +13,13 @@ export default function KlubHomePage() {
   const links = categories.flatMap((c) => c.items);
 
   return (
-    <div className="animate-rise max-w-4xl">
-      <p className="font-display text-sm tracking-[0.22em] text-brand uppercase">
-        Pulpit
-      </p>
-      <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight uppercase md:text-4xl">
-        Cześć, {user.display_name}
-      </h1>
-      <p className="mt-3 text-paper/60">
-        Widok: {ROLE_LABELS[activeRole]} · {user.email}
-      </p>
+    <div className="animate-rise">
+      <PageHeader
+        eyebrow="Pulpit"
+        title={`Cześć, ${user.display_name}`}
+        titleSize="hero"
+        description={`Widok: ${ROLE_LABELS[activeRole]} · ${user.email}`}
+      />
 
       <ul className="mt-10 grid gap-3 sm:grid-cols-2">
         {user.roles.includes("superadmin") ? (
@@ -48,6 +46,11 @@ export default function KlubHomePage() {
               <span className="font-display text-sm tracking-[0.12em] uppercase">
                 {item.label}
               </span>
+              {item.description ? (
+                <span className="mt-1 block text-xs text-paper/55">
+                  {item.description}
+                </span>
+              ) : null}
             </Link>
           </li>
         ))}

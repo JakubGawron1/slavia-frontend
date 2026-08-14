@@ -5,7 +5,11 @@ import type { TrainingPlan } from "@/lib/api/generated/models";
 import { usePanel } from "@/components/panel/PanelProvider";
 import { useAthletePlanProgress } from "@/components/plans/useAthletePlanProgress";
 import { AthletePlanDay } from "@/components/plans/AthletePlanDay";
+import { completionFromPlan } from "@/lib/plans/completion";
 import { tabActive, tabIdle } from "@/components/plans/styles";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { InlineStatus } from "@/components/ui/InlineStatus";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export function AthletePlansInner() {
   const searchParams = useSearchParams();
@@ -16,42 +20,47 @@ export function AthletePlansInner() {
   const progress = useAthletePlanProgress(planFromUrl, scopeKey);
 
   return (
-    <div className="animate-rise max-w-3xl space-y-8">
-      <div>
-        <p className="font-display text-sm tracking-[0.22em] text-brand uppercase">
-          Trening
-        </p>
-        <h1 className="mt-2 font-display text-3xl font-semibold uppercase">
-          Plany treningowe
-        </h1>
-        <p className="mt-2 text-sm text-paper/55">
-          Serie, obciążenie %1RM, zamienniki i odhaczanie postępu.
-        </p>
-      </div>
+    <div className="animate-rise space-y-8">
+      <PageHeader
+        eyebrow="Trening"
+        title="Plany treningowe"
+        description="Serie, obciążenie %1RM, zamienniki i odhaczanie postępu."
+      />
 
       {progress.error ? (
-        <p className="border-l-2 border-brand bg-brand/10 px-4 py-3 text-sm" role="alert">
-          {progress.error}
-        </p>
+        <InlineStatus kind="error">{progress.error}</InlineStatus>
       ) : null}
 
-      <div className="flex flex-wrap gap-2">
-        {progress.plans.map((p) => (
-          <button
-            key={p.id}
-            type="button"
-            onClick={() => progress.setActiveId(p.id)}
-            className={progress.activeId === p.id ? tabActive : tabIdle}
-          >
-            {p.title}
-            {p.is_season_active ? <span className="ml-1.5 opacity-80">· sezon</span> : null}
-            {planAssignmentBadge(p)}
-          </button>
-        ))}
-        {progress.plans.length === 0 ? (
-          <p className="text-sm text-paper/45">Brak przypisanych planów.</p>
-        ) : null}
-      </div>
+      {progress.loading ? (
+        <InlineStatus kind="loading">Ładowanie planów…</InlineStatus>
+      ) : (
+        <div className="flex flex-wrap gap-2">
+          {progress.plans.map((p) => (
+            <button
+              key={p.id}
+              type="button"
+              onClick={() => progress.setActiveId(p.id)}
+              className={progress.activeId === p.id ? tabActive : tabIdle}
+              aria-pressed={progress.activeId === p.id}
+            >
+              {p.title}
+              {p.is_season_active ? (
+                <span className="ml-1.5 opacity-80">· sezon</span>
+              ) : null}
+              {planAssignmentBadge(p)}
+              <span className="ml-1.5 tabular-nums opacity-70">
+                {completionFromPlan(p, progress.progressByPlan[p.id]).pct}%
+              </span>
+            </button>
+          ))}
+          {progress.plans.length === 0 ? (
+            <EmptyState
+              title="Brak przypisanych planów"
+              description="Trener przypisze plan do Ciebie, Twojej grupy albo do wszystkich zawodników."
+            />
+          ) : null}
+        </div>
+      )}
 
       {progress.plan ? (
         <AthletePlanDay

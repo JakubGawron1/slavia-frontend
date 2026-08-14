@@ -9,6 +9,10 @@ import {
 import type { ContactMessage } from "@/lib/api/generated/models";
 import { useToast } from "@/components/toast/ToastProvider";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { FilterChip } from "@/components/ui/FilterChip";
+import { InlineStatus } from "@/components/ui/InlineStatus";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 function formatDate(iso: string): string {
   try {
@@ -112,19 +116,12 @@ export default function WiadomosciPage() {
   }
 
   return (
-    <div className="animate-rise max-w-5xl space-y-6">
-      <div>
-        <p className="font-display text-sm tracking-[0.22em] text-brand uppercase">
-          Ludzie
-        </p>
-        <h1 className="mt-2 font-display text-3xl font-semibold uppercase">
-          Skrzynka kontaktowa
-        </h1>
-        <p className="mt-2 text-sm text-paper/55">
-          Wiadomości z formularza na stronie publicznej. Nieprzeczytane:{" "}
-          {unreadCount}.
-        </p>
-      </div>
+    <div className="animate-rise space-y-6">
+      <PageHeader
+        eyebrow="Ludzie"
+        title="Skrzynka kontaktowa"
+        description={`Wiadomości z formularza na stronie publicznej. Nieprzeczytane: ${unreadCount}.`}
+      />
 
       <div className="flex flex-wrap gap-3">
         {(
@@ -134,18 +131,12 @@ export default function WiadomosciPage() {
             ["read", "Przeczytane"],
           ] as const
         ).map(([value, label]) => (
-          <button
+          <FilterChip
             key={value}
-            type="button"
+            active={filter === value}
             onClick={() => setFilter(value)}
-            className={
-              filter === value
-                ? "border border-brand bg-brand px-4 py-2 font-display text-[11px] tracking-[0.12em] text-paper uppercase"
-                : "border border-paper/25 px-4 py-2 font-display text-[11px] tracking-[0.12em] uppercase"
-            }
-          >
-            {label}
-          </button>
+            label={label}
+          />
         ))}
         <button
           type="button"
@@ -156,25 +147,13 @@ export default function WiadomosciPage() {
         </button>
       </div>
 
-      {error ? (
-        <p
-          className="border-l-2 border-brand bg-brand/10 px-4 py-3 text-sm"
-          role="alert"
-        >
-          {error}
-        </p>
-      ) : null}
+      {error ? <InlineStatus kind="error">{error}</InlineStatus> : null}
 
-      {actionError ? (
-        <p
-          className="border-l-2 border-brand bg-brand/10 px-4 py-3 text-sm"
-          role="alert"
-        >
-          {actionError}
-        </p>
-      ) : null}
+      {actionError ? <InlineStatus kind="error">{actionError}</InlineStatus> : null}
 
-      {loading ? <p className="text-paper/50">Ładowanie…</p> : null}
+      {loading ? (
+        <InlineStatus kind="loading">Ładowanie wiadomości…</InlineStatus>
+      ) : null}
 
       <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr]">
         <ul className="divide-y divide-paper/10 border border-paper/10">
@@ -204,7 +183,12 @@ export default function WiadomosciPage() {
             );
           })}
           {!loading && filtered.length === 0 ? (
-            <li className="px-4 py-6 text-paper/45">Brak wiadomości.</li>
+            <li>
+              <EmptyState
+                title="Brak wiadomości"
+                description="W tym filtrze nie ma nic do odczytania."
+              />
+            </li>
           ) : null}
         </ul>
 

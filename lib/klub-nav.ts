@@ -3,6 +3,7 @@ import type { Role } from "@/lib/auth";
 export type KlubNavItem = {
   href: string;
   label: string;
+  description?: string;
   /** Role, które widzą pozycję w nawigacji (superadmin omija przy prawdziwych uprawnieniach). */
   roles: Role[];
   /** Wymaga prawdziwej roli superadmin (nawet przy podglądzie roli). */
@@ -28,21 +29,25 @@ export const KLUB_NAV: KlubNavCategory[] = [
       {
         href: "/klub/konta",
         label: "Konta i profile",
+        description: "Konta użytkowników, role i profile zawodników.",
         roles: ["trener", "admin", "superadmin"],
       },
       {
         href: "/klub/wiadomosci",
         label: "Skrzynka kontaktowa",
+        description: "Wiadomości z formularza na stronie klubu.",
         roles: ["trener", "admin", "superadmin"],
       },
       {
         href: "/klub/weryfikacja-wynikow",
         label: "Weryfikacja wyników",
+        description: "Akceptuj zgłoszenia albo wpisz wynik samodzielnie.",
         roles: ["trener", "admin", "superadmin"],
       },
       {
         href: "/klub/obecnosc",
         label: "Obecność (QR)",
+        description: "Kod QR treningu, skany i lista obecności.",
         roles: ["trener", "admin", "superadmin"],
       },
     ],
@@ -54,18 +59,21 @@ export const KLUB_NAV: KlubNavCategory[] = [
       {
         href: "/klub/plany",
         label: "Plany treningowe",
+        description: "Tygodnie, biblioteka ćwiczeń, katalog i grupy.",
         roles: ["trener", "superadmin"],
         flag: "training_plans",
       },
       {
         href: "/klub/kalendarz",
         label: "Kalendarz zawodów",
+        description: "Treningi, zawody, skład i rezygnacje.",
         roles: ["trener", "admin", "superadmin"],
         flag: "club_calendar",
       },
       {
         href: "/klub/kalkulator-sinclair",
         label: "Kalkulator Sinclair",
+        description: "Przelicz dwubój na punkty Sinclair (2025–2028).",
         roles: ["trener", "admin", "superadmin"],
       },
     ],
@@ -77,6 +85,7 @@ export const KLUB_NAV: KlubNavCategory[] = [
       {
         href: "/klub/cms",
         label: "CMS",
+        description: "Strony, bloki treści i publikacja.",
         roles: ["admin", "superadmin"],
       },
     ],
@@ -88,12 +97,14 @@ export const KLUB_NAV: KlubNavCategory[] = [
       {
         href: "/klub/co-nowego",
         label: "Co nowego",
+        description: "Nowości w panelu — krótko i zrozumiale.",
         roles: ["trener", "admin"],
         hideForSuperadminView: true,
       },
       {
         href: "/klub/logi",
         label: "Logi systemowe",
+        description: "Zdarzenia aplikacji z ostatnich 7 dni.",
         roles: ["admin", "superadmin"],
       },
     ],
@@ -105,18 +116,21 @@ export const KLUB_NAV: KlubNavCategory[] = [
       {
         href: "/klub/devtools",
         label: "DevTools",
+        description: "Flagi, changelog, AI i diagnostyka.",
         roles: ["superadmin"],
         requireSuperadmin: true,
       },
       {
         href: "/klub/baza-danych",
         label: "Baza danych",
+        description: "Podgląd i edycja tabel (superadmin).",
         roles: ["superadmin"],
         requireSuperadmin: true,
       },
       {
         href: "/klub/podglad",
         label: "Podgląd kont / ról",
+        description: "Wejdź w widok innego użytkownika.",
         roles: ["superadmin"],
         requireSuperadmin: true,
       },

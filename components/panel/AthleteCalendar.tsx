@@ -3,6 +3,10 @@
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { CalendarMonthGrid } from "@/components/calendar/CalendarMonthGrid";
 import { Modal } from "@/components/ui/Modal";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { InlineStatus } from "@/components/ui/InlineStatus";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { FilterChip } from "@/components/ui/FilterChip";
 import { useToast } from "@/components/toast/ToastProvider";
 import {
   ATTENDANCE_STYLES,
@@ -10,6 +14,7 @@ import {
 } from "@/lib/attendance-ui";
 import { toDateKey } from "@/lib/calendar";
 import {
+  eventTypeLabel,
   publicApiToClubEvent,
   type AthleteCalendarEvent,
   type ClubEvent,
@@ -133,31 +138,26 @@ export function AthleteCalendar() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="font-display text-sm tracking-[0.22em] text-brand uppercase">
-          Panel
-        </p>
-        <h1 className="mt-2 font-display text-3xl font-semibold uppercase">
-          Kalendarz
-        </h1>
-        <p className="mt-2 text-sm text-paper/55">
-          Kliknij wydarzenie, aby zobaczyć szczegóły i dostępne akcje.
-        </p>
-      </div>
+      <PageHeader
+        eyebrow="Panel"
+        title="Kalendarz"
+        description="Kliknij wydarzenie, aby zobaczyć szczegóły i dostępne akcje."
+      />
 
-      {error ? (
-        <p
-          className="border-l-2 border-brand bg-brand/10 px-4 py-3 text-sm"
-          role="alert"
-        >
-          {error}
-        </p>
-      ) : null}
+      {error ? <InlineStatus kind="error">{error}</InlineStatus> : null}
 
       {loading && events.length === 0 ? (
-        <p className="text-sm text-paper/50">Ładowanie wydarzeń…</p>
+        <InlineStatus kind="loading">Ładowanie wydarzeń…</InlineStatus>
       ) : null}
 
+      {!loading && events.length === 0 ? (
+        <EmptyState
+          title="Brak wydarzeń"
+          description="W najbliższych miesiącach nie ma jeszcze treningów ani zawodów w kalendarzu."
+        />
+      ) : null}
+
+      {events.length > 0 ? (
       <div className="flex w-full min-w-0 min-h-[min(48rem,calc(100svh-10.5rem))] flex-col rounded border border-paper/10">
         <div className="min-h-0 flex-1">
           <CalendarMonthGrid
@@ -171,21 +171,16 @@ export function AthleteCalendar() {
             layout="wide"
             tone="panel"
             extraFilters={
-              <button
-                type="button"
+              <FilterChip
+                active={mineOnly}
                 onClick={() => setMineOnly((v) => !v)}
-                className={`px-3 py-2 font-display text-xs tracking-[0.1em] uppercase ${
-                  mineOnly
-                    ? "bg-brand text-paper"
-                    : "border border-paper/20 text-paper/60 hover:border-paper/40"
-                }`}
-              >
-                Moje starty
-              </button>
+                label="Moje starty"
+              />
             }
           />
         </div>
       </div>
+      ) : null}
 
       <Modal
         open={!!selected}
@@ -196,7 +191,7 @@ export function AthleteCalendar() {
         {selected ? (
           <div className="space-y-4">
             <p className="text-sm text-paper/55">
-              {selected.event_type}
+              {eventTypeLabel(selected.event_type)}
               {selected.status === "cancelled" ? " · odwołane" : ""} ·{" "}
               {selected.end_date && selected.end_date !== selected.date
                 ? `${selected.date} – ${selected.end_date}`

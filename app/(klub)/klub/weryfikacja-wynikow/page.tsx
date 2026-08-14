@@ -6,34 +6,21 @@ import { PendingResultsList } from "@/components/klub/weryfikacja-wynikow/Pendin
 import { StaffResultForm } from "@/components/klub/weryfikacja-wynikow/StaffResultForm";
 import { useWeryfikacjaWynikow } from "@/components/klub/weryfikacja-wynikow/useWeryfikacjaWynikow";
 import { WeryfikacjaEditModal } from "@/components/klub/weryfikacja-wynikow/WeryfikacjaEditModal";
+import { InlineStatus } from "@/components/ui/InlineStatus";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export default function WeryfikacjaPage() {
   const w = useWeryfikacjaWynikow();
 
   return (
-    <div className="animate-rise max-w-4xl space-y-8">
-      <div>
-        <p className="font-display text-sm tracking-[0.22em] text-brand uppercase">
-          Ludzie
-        </p>
-        <h1 className="mt-2 font-display text-3xl font-semibold uppercase">
-          Weryfikacja wyników
-        </h1>
-        <p className="mt-2 text-sm text-paper/55">
-          Akceptuj zgłoszenia zawodników albo wpisz wynik samodzielnie — wtedy
-          od razu trafia jako zaakceptowany. Kategoria wagowa wylicza się z
-          profilu (wiek, płeć) i masy ciała.
-        </p>
-      </div>
+    <div className="animate-rise space-y-8">
+      <PageHeader
+        eyebrow="Ludzie"
+        title="Weryfikacja wyników"
+        description="Akceptuj zgłoszenia zawodników albo wpisz wynik samodzielnie — wtedy od razu trafia jako zaakceptowany. Kategoria wagowa wylicza się z profilu (wiek, płeć) i masy ciała."
+      />
 
-      {w.error ? (
-        <p
-          className="border-l-2 border-brand bg-brand/10 px-4 py-3 text-sm"
-          role="alert"
-        >
-          {w.error}
-        </p>
-      ) : null}
+      {w.error ? <InlineStatus kind="error">{w.error}</InlineStatus> : null}
 
       <StaffResultForm
         profiles={w.profiles}
@@ -57,7 +44,9 @@ export default function WeryfikacjaPage() {
         onSubmit={(e) => void w.createStaffResult(e)}
       />
 
-      {w.loading ? <p className="text-paper/50">Ładowanie…</p> : null}
+      {w.loading ? (
+        <InlineStatus kind="loading">Ładowanie wyników…</InlineStatus>
+      ) : null}
 
       <AthleteFilterSelect
         options={w.athleteFilterOptions}

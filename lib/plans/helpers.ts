@@ -7,15 +7,17 @@ import type {
 import type { PctOfLift } from "@/lib/api/generated/models/pctOfLift";
 import type { PlanSet } from "@/lib/api/generated/models/planSet";
 
+import { ISO_WEEKDAY_SHORT } from "@/lib/calendar";
+
 export const DAY_LABELS = [
   "",
-  "Pon",
-  "Wt",
-  "Śr",
-  "Czw",
-  "Pt",
-  "Sob",
-  "Nd",
+  ISO_WEEKDAY_SHORT[1],
+  ISO_WEEKDAY_SHORT[2],
+  ISO_WEEKDAY_SHORT[3],
+  ISO_WEEKDAY_SHORT[4],
+  ISO_WEEKDAY_SHORT[5],
+  ISO_WEEKDAY_SHORT[6],
+  ISO_WEEKDAY_SHORT[7],
 ] as const;
 
 export type AssignMode = "all" | "group" | "personal";
