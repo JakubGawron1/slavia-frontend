@@ -1,6 +1,6 @@
 import { GENERATED_CHANGELOG } from "@/lib/changelog.generated";
 
-export type ChangelogCategory = "frontend" | "backend" | "mobile";
+export type ChangelogCategory = "frontend" | "backend";
 
 export type ChangelogEntry = {
   /** Wspólna wersja platformy (Slavia.toml) — bez breaking API. */
@@ -31,12 +31,6 @@ export const CHANGELOG_CATEGORIES: {
     label: "Backend",
     hint: "Rust/Axum — API, DB, flagi, OpenAPI.",
     source: "slavia-backend/CHANGELOG.md",
-  },
-  {
-    id: "mobile",
-    label: "Mobile",
-    hint: "Flutter — aplikacja mobilna.",
-    source: "slavia-mobile/CHANGELOG.md",
   },
 ];
 

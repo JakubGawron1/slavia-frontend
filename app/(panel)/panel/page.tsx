@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useMemo } from "react";
 import {
   useAthleteStats,
-  useListPlans,
   useListPublicFlags,
   useListResults,
 } from "@/lib/api/generated/default/default";
@@ -13,14 +12,13 @@ import type {
   AthleteProfile,
   AthleteStats,
   CompetitionResult,
-  TrainingPlan,
 } from "@/lib/api/generated/models";
 import { formatKg, resultEventInstant } from "@/lib/athletes";
 import {
   ATHLETE_STAT_LINKS,
   PANEL_MODULES,
 } from "@/lib/panel-nav";
-import { isFlagEnabled, TRAINING_PLANS_FLAG } from "@/lib/public-flags";
+import { isFlagEnabled } from "@/lib/public-flags";
 import { ProgressChart } from "@/components/zawodnicy/ProgressChart";
 import { usePanel } from "@/components/panel/PanelProvider";
 import { InlineStatus } from "@/components/ui/InlineStatus";
@@ -79,11 +77,6 @@ const OPS_CARDS: {
     label: "Obecności (miesiąc)",
     get: (s) => s.attendance_month,
   },
-  {
-    key: "plans_active",
-    label: "Aktywne plany",
-    get: (s) => s.plans_active,
-  },
 ];
 
 function buildChartProfile(
@@ -123,29 +116,11 @@ export default function PanelHomePage() {
   const profilesQuery = useListPublicProfiles({ query: { staleTime: 60_000 } });
   const flagsQuery = useListPublicFlags({ query: { staleTime: 60_000 } });
   const flags = flagsQuery.data?.data;
-  const plansEnabled = isFlagEnabled(flags, TRAINING_PLANS_FLAG);
-  const plansQuery = useListPlans(
-    { mine: true },
-    {
-      query: {
-        queryKey: ["/api/plans", { mine: true }, scopeKey],
-        staleTime: 30_000,
-        enabled: plansEnabled,
-      },
-    },
-  );
   const modules = PANEL_MODULES.filter(
     (mod) => !mod.flag || isFlagEnabled(flags, mod.flag),
   );
-  const opsCards = OPS_CARDS.filter(
-    (card) => card.key !== "plans_active" || plansEnabled,
-  );
+  const opsCards = OPS_CARDS;
   const stats = (statsQuery.data?.data as AthleteStats | undefined) ?? null;
-  const seasonPlan = useMemo(() => {
-    if (!plansEnabled) return null;
-    const list = (plansQuery.data?.data as TrainingPlan[] | undefined) ?? [];
-    return list.find((p) => p.is_season_active) ?? null;
-  }, [plansEnabled, plansQuery.data]);
   const error =
     statsQuery.error instanceof Error
       ? statsQuery.error.message
@@ -153,9 +128,7 @@ export default function PanelHomePage() {
         ? "Błąd statystyk"
         : resultsQuery.isError
           ? "Nie udało się wczytać wyników."
-          : plansQuery.isError
-            ? "Nie udało się wczytać planów."
-            : null;
+          : null;
   const statsLoading = statsQuery.isPending;
 
   const chartResults = useMemo(() => {
@@ -195,32 +168,6 @@ export default function PanelHomePage() {
       />
 
       {error ? <InlineStatus kind="error">{error}</InlineStatus> : null}
-
-      {seasonPlan ? (
-        <section aria-label="Plan sezonu">
-          <Link
-            href={`/panel/plany?plan=${encodeURIComponent(seasonPlan.id)}`}
-            className="group block border border-brand/40 bg-brand/[0.08] px-4 py-5 transition-colors hover:border-brand hover:bg-brand/15 sm:px-5"
-          >
-            <p className="font-display text-[11px] tracking-[0.18em] text-brand uppercase">
-              Plan sezonu
-            </p>
-            <p className="mt-2 font-display text-xl uppercase group-hover:text-brand sm:text-2xl">
-              {seasonPlan.title}
-            </p>
-            {seasonPlan.week_label || seasonPlan.description ? (
-              <p className="mt-1 text-sm text-paper/55">
-                {seasonPlan.week_label ||
-                  (seasonPlan.description?.slice(0, 120) ?? "")}
-              </p>
-            ) : (
-              <p className="mt-1 text-sm text-paper/55">
-                Otwórz aktywny plan treningowy
-              </p>
-            )}
-          </Link>
-        </section>
-      ) : null}
 
       <section aria-label="Wyniki sportowe">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
@@ -272,7 +219,7 @@ export default function PanelHomePage() {
       </section>
 
       <section aria-label="Statystyki panelu">
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2">
           {opsCards.map((card) => {
             const href = ATHLETE_STAT_LINKS[card.key];
             const value = stats ? card.get(stats) : "—";

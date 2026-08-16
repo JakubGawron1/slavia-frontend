@@ -3,10 +3,9 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 1.1.3.0+1
+ * OpenAPI spec version: 2.0.0.0+1
  */
 
-export interface CoachReplyBody {
-  coach_reply: string;
-  user_id: string;
+export interface AiGenerateBody {
+  prompt: string;
 }

@@ -3,18 +3,18 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 1.1.3.0+1
+ * OpenAPI spec version: 2.0.0.0+1
  */
 
 /**
- * Zużycie dziennego limitu szkiców (UTC).
+ * Zużycie dziennego limitu generowań (UTC).
  */
 export interface AiUsageStatus {
   date_utc: string;
   /** @minimum 0 */
-  drafts_limit: number;
+  generations_limit: number;
   /** @minimum 0 */
-  drafts_remaining: number;
+  generations_remaining: number;
   /** @minimum 0 */
-  drafts_used: number;
+  generations_used: number;
 }

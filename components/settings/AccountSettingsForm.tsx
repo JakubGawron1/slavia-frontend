@@ -54,21 +54,18 @@ export function AccountSettingsForm(props: AccountSettingsFormProps) {
             onSubmitPassword={s.savePassword}
           />
 
-          {s.allowNotificationEmails ? (
-            <NotificationsSection
-              prefs={s.prefs}
-              saving={s.saving}
-              isStaff={s.isStaff}
-              onSavePrefs={(next) => void s.savePrefs(next)}
-            />
-          ) : null}
+          <NotificationsSection
+            prefs={s.prefs}
+            saving={s.saving}
+            isStaff={s.isStaff}
+            onSavePrefs={(next) => void s.savePrefs(next)}
+          />
         </div>
 
         <div className="space-y-3">
           <AppearanceSection
-            stableThemes={s.stableThemes}
-            experimentalThemes={s.experimentalThemes}
-            allowExperimental={s.allowExperimental}
+            colorThemes={s.colorThemes}
+            layoutThemes={s.layoutThemes}
             uiTheme={s.uiTheme}
             saving={s.saving}
             onSelectTheme={(id) => void s.saveTheme(id)}

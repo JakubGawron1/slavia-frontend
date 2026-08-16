@@ -68,9 +68,6 @@ export function createStaffCalendarMutations(d: Deps) {
       description: form.description || null,
       assigned_athlete_ids:
         form.event_type === "zawody" ? d.form.assigned_athlete_ids : [],
-      plan_id: form.plan_id.trim() || null,
-      plan_week: form.plan_week ? Number(form.plan_week) : null,
-      plan_day: form.plan_day ? Number(form.plan_day) : null,
     };
     try {
       if (d.formMode === "create") {

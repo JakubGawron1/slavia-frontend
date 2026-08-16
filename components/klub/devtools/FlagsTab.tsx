@@ -65,60 +65,17 @@ function FlagRow({
   );
 }
 
-function FlagCategory({
-  title,
-  hint,
-  flags,
-  onToggle,
-  pending,
-}: {
-  title: string;
-  hint: string;
-  flags: FeatureFlag[];
-  onToggle: (flag: FeatureFlag) => void;
-  pending: boolean;
-}) {
-  return (
-    <section className="flex min-h-0 flex-col space-y-3">
-      <div className="shrink-0">
-        <h2 className="font-display text-xs tracking-[0.14em] text-paper/45 uppercase">
-          {title}
-        </h2>
-        <p className="mt-1 text-sm text-paper/50">{hint}</p>
-      </div>
-      {flags.length === 0 ? (
-        <p className="text-sm text-paper/45">Brak flag w tej kategorii.</p>
-      ) : (
-        <div className="max-h-[min(50vh,28rem)] space-y-3 overflow-y-auto overscroll-contain border border-paper/10 bg-paper/[0.02] p-3">
-          {flags.map((flag) => (
-            <FlagRow
-              key={flag.key}
-              flag={flag}
-              onToggle={onToggle}
-              pending={pending}
-            />
-          ))}
-        </div>
-      )}
-    </section>
-  );
-}
-
 type FlagsTabProps = {
-  stableFlags: FeatureFlag[];
-  experimentalFlags: FeatureFlag[];
+  flags: FeatureFlag[];
   flagsLoading: boolean;
-  totalFlags: number;
   rolloutStatuses: FlagRolloutStatus[];
   onToggle: (flag: FeatureFlag) => void;
   pending: boolean;
 };
 
 export function FlagsTab({
-  stableFlags,
-  experimentalFlags,
+  flags,
   flagsLoading,
-  totalFlags,
   rolloutStatuses,
   onToggle,
   pending,
@@ -127,9 +84,8 @@ export function FlagsTab({
     <div className="space-y-8">
       <div className="border border-paper/10 bg-paper/[0.03] px-4 py-3 text-sm text-paper/60">
         <p>
-          FE pyta backend o katalog flag (`GET /api/admin/flags`). Backend
-          zwraca experimental + stable — UI buduje się z tej listy.
-          Przełącznik zapisuje stan w DB (
+          FE pyta backend o katalog flag (`GET /api/admin/flags`). Przełącznik
+          zapisuje stan w DB (
           <span className="font-mono text-paper/80">
             PATCH /api/admin/flags/&#123;key&#125;
           </span>
@@ -149,27 +105,32 @@ export function FlagsTab({
         </dl>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
-        <FlagCategory
-          title="Experimental"
-          hint="Funkcje eksperymentalne / w trakcie rozwoju — domyślnie wyłączone."
-          flags={experimentalFlags}
-          onToggle={onToggle}
-          pending={pending}
-        />
-
-        <FlagCategory
-          title="Stable"
-          hint="Funkcje produkcyjne — bezpieczne do włączania na żywo."
-          flags={stableFlags}
-          onToggle={onToggle}
-          pending={pending}
-        />
-      </div>
-
-      {totalFlags === 0 && !flagsLoading ? (
-        <p className="text-sm text-paper/45">Brak flag w bazie.</p>
-      ) : null}
+      <section className="flex min-h-0 flex-col space-y-3">
+        <div className="shrink-0">
+          <h2 className="font-display text-xs tracking-[0.14em] text-paper/45 uppercase">
+            Flagi
+          </h2>
+          <p className="mt-1 text-sm text-paper/50">
+            Funkcje produkcyjne — bezpieczne do włączania na żywo.
+          </p>
+        </div>
+        {flagsLoading ? (
+          <p className="text-sm text-paper/45">Ładowanie flag…</p>
+        ) : flags.length === 0 ? (
+          <p className="text-sm text-paper/45">Brak flag w bazie.</p>
+        ) : (
+          <div className="max-h-[min(70vh,36rem)] space-y-3 overflow-y-auto overscroll-contain border border-paper/10 bg-paper/[0.02] p-3">
+            {flags.map((flag) => (
+              <FlagRow
+                key={flag.key}
+                flag={flag}
+                onToggle={onToggle}
+                pending={pending}
+              />
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }

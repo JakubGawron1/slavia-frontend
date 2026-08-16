@@ -5,7 +5,7 @@ import { PanelWhatsNewHost } from "@/components/changelog/PanelWhatsNewHost";
 
 export const metadata: Metadata = {
   title: "Panel zawodnika",
-  description: "Panel zawodnika CKS Slavia — wyniki, obecność, plany treningowe.",
+  description: "Panel zawodnika CKS Slavia — wyniki, obecność i kalendarz.",
 };
 
 export default function AthletePanelLayout({

@@ -2,13 +2,7 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { useListPublicFlags } from "@/lib/api/generated/default/default";
-import {
-  EXPERIMENTAL_PANEL_THEMES_FLAG,
-  getPanelTheme,
-  resolvePanelTheme,
-} from "@/lib/panel-themes";
-import { isFlagEnabled } from "@/lib/public-flags";
+import { getPanelTheme, resolvePanelTheme } from "@/lib/panel-themes";
 import { LoadingScene } from "@/components/loading/LoadingScene";
 import { SessionMissing } from "@/components/ui/SessionMissing";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
@@ -26,12 +20,7 @@ export function KlubShell({ children }: { children: ReactNode }) {
     setMobileNavOpen,
   } = useKlub();
 
-  const flagsQuery = useListPublicFlags({ query: { staleTime: 60_000 } });
-  const allowExperimental = isFlagEnabled(
-    flagsQuery.data?.data ?? [],
-    EXPERIMENTAL_PANEL_THEMES_FLAG,
-  );
-  const theme = resolvePanelTheme(user?.ui_theme, { allowExperimental });
+  const theme = resolvePanelTheme(user?.ui_theme);
   const layout = getPanelTheme(theme).layout;
   const experimentalLayout = layout !== "standard";
 

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
-import { useListPublicFlags } from "@/lib/api/generated/default/default";
 import {
   useRequestEmailVerification,
   useUpdateMe,
@@ -10,16 +9,11 @@ import { STAFF_ROLES } from "@/lib/klub-nav";
 import type { AuthUser } from "@/lib/auth";
 import { getStoredToken, hasAnyRole, storeSession } from "@/lib/auth";
 import {
-  EXPERIMENTAL_PANEL_THEMES_FLAG,
-  experimentalPanelThemes,
+  colorPanelThemes,
+  layoutPanelThemes,
   resolvePanelTheme,
-  stablePanelThemes,
   type PanelThemeId,
 } from "@/lib/panel-themes";
-import {
-  EXPERIMENTAL_NOTIFICATION_EMAILS_FLAG,
-  isFlagEnabled,
-} from "@/lib/public-flags";
 import { useToast } from "@/components/toast/ToastProvider";
 import type { NotificationPrefs } from "@/lib/api/generated/models";
 
@@ -30,22 +24,13 @@ export type AccountSettingsFormProps = {
 
 export function useAccountSettingsForm({ user, onUpdated }: AccountSettingsFormProps) {
   const toast = useToast();
-  const flagsQuery = useListPublicFlags({ query: { staleTime: 60_000 } });
-  const allowExperimental = isFlagEnabled(
-    flagsQuery.data?.data ?? [],
-    EXPERIMENTAL_PANEL_THEMES_FLAG,
-  );
-  const allowNotificationEmails = isFlagEnabled(
-    flagsQuery.data?.data ?? [],
-    EXPERIMENTAL_NOTIFICATION_EMAILS_FLAG,
-  );
-  const stableThemes = stablePanelThemes();
-  const experimentalThemes = allowExperimental ? experimentalPanelThemes() : [];
+  const colorThemes = colorPanelThemes();
+  const layoutThemes = layoutPanelThemes();
 
   const [displayName, setDisplayName] = useState(user.display_name);
   const [photoUrl, setPhotoUrl] = useState(user.photo_url ?? "");
   const [uiTheme, setUiTheme] = useState<PanelThemeId>(
-    resolvePanelTheme(user.ui_theme, { allowExperimental }),
+    resolvePanelTheme(user.ui_theme),
   );
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -58,7 +43,6 @@ export function useAccountSettingsForm({ user, onUpdated }: AccountSettingsFormP
 
   const [prefs, setPrefs] = useState<NotificationPrefs>(() => ({
     email_squad: user.notification_prefs?.email_squad ?? true,
-    email_training_plans: user.notification_prefs?.email_training_plans ?? true,
     email_contact: user.notification_prefs?.email_contact ?? true,
   }));
   const [changeEmail, setChangeEmail] = useState(
@@ -68,11 +52,9 @@ export function useAccountSettingsForm({ user, onUpdated }: AccountSettingsFormP
   useEffect(() => {
     setDisplayName(user.display_name);
     setPhotoUrl(user.photo_url ?? "");
-    setUiTheme(resolvePanelTheme(user.ui_theme, { allowExperimental }));
+    setUiTheme(resolvePanelTheme(user.ui_theme));
     setPrefs({
       email_squad: user.notification_prefs?.email_squad ?? true,
-      email_training_plans:
-        user.notification_prefs?.email_training_plans ?? true,
       email_contact: user.notification_prefs?.email_contact ?? true,
     });
     setChangeEmail(user.pending_email ?? user.email);
@@ -83,7 +65,6 @@ export function useAccountSettingsForm({ user, onUpdated }: AccountSettingsFormP
     user.notification_prefs,
     user.pending_email,
     user.email,
-    allowExperimental,
   ]);
 
   async function applyUserUpdate(updated: AuthUser, message: string) {
@@ -114,10 +95,7 @@ export function useAccountSettingsForm({ user, onUpdated }: AccountSettingsFormP
   }
 
   async function saveTheme(themeId: PanelThemeId) {
-    if (
-      themeId === resolvePanelTheme(user.ui_theme, { allowExperimental }) ||
-      saving
-    ) {
+    if (themeId === resolvePanelTheme(user.ui_theme) || saving) {
       return;
     }
     setError(null);
@@ -132,7 +110,7 @@ export function useAccountSettingsForm({ user, onUpdated }: AccountSettingsFormP
         "Zapisano motyw paneli — działa na wszystkich urządzeniach.",
       );
     } catch (err) {
-      setUiTheme(resolvePanelTheme(user.ui_theme, { allowExperimental }));
+      setUiTheme(resolvePanelTheme(user.ui_theme));
       const msg =
         err instanceof Error ? err.message : "Nie udało się zapisać motywu.";
       setError(msg);
@@ -188,8 +166,6 @@ export function useAccountSettingsForm({ user, onUpdated }: AccountSettingsFormP
     } catch (err) {
       setPrefs({
         email_squad: user.notification_prefs?.email_squad ?? true,
-        email_training_plans:
-          user.notification_prefs?.email_training_plans ?? true,
         email_contact: user.notification_prefs?.email_contact ?? true,
       });
       const msg =
@@ -237,10 +213,8 @@ export function useAccountSettingsForm({ user, onUpdated }: AccountSettingsFormP
     (photoUrl.trim() || "") !== (user.photo_url ?? "");
 
   return {
-    allowExperimental,
-    allowNotificationEmails,
-    stableThemes,
-    experimentalThemes,
+    colorThemes,
+    layoutThemes,
     displayName,
     setDisplayName,
     photoUrl,

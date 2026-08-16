@@ -18,7 +18,7 @@ export function NotificationsSection({
   return (
     <SettingsCategory
       title="Powiadomienia"
-      description="Maile o składzie, planach i kontakcie"
+      description="Maile o składzie i kontakcie"
     >
       <p className="text-sm text-paper/55">
         Powiadomienia w aplikacji (dzwonek) działają zawsze. Poniżej —
@@ -32,14 +32,6 @@ export function NotificationsSection({
           description="Przypisanie lub wypisanie ze składu zawodów."
           disabled={saving}
           onChange={(v) => onSavePrefs({ ...prefs, email_squad: v })}
-        />
-        <PrefToggle
-          id="pref-plans"
-          checked={prefs.email_training_plans ?? true}
-          title="Plany treningowe"
-          description="Przypisanie do planu treningowego."
-          disabled={saving}
-          onChange={(v) => onSavePrefs({ ...prefs, email_training_plans: v })}
         />
         {isStaff ? (
           <PrefToggle

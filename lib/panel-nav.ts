@@ -14,14 +14,12 @@ export type AthleteStatsLinks = {
   results_accepted: string;
   results_pending: string;
   attendance_month: string;
-  plans_active: string;
 };
 
 export const ATHLETE_STAT_LINKS: AthleteStatsLinks = {
   results_accepted: "/panel/wyniki",
   results_pending: "/panel/wyniki",
   attendance_month: "/panel/obecnosc",
-  plans_active: "/panel/plany",
 };
 
 export const PANEL_MODULES: PanelModule[] = [
@@ -36,13 +34,6 @@ export const PANEL_MODULES: PanelModule[] = [
     label: "Obecność (QR)",
     description: "Zeskanuj kod QR na treningu, aby zapisać obecność.",
     statKey: "attendance_month",
-  },
-  {
-    href: "/panel/plany",
-    label: "Plany treningowe",
-    description: "Podgląd planów i oznaczanie wykonanych ćwiczeń.",
-    statKey: "plans_active",
-    flag: "training_plans",
   },
   {
     href: "/panel/kalendarz",

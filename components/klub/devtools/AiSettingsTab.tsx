@@ -16,11 +16,12 @@ import {
   putAiSettings,
 } from "@/lib/api/generated/admin/admin";
 import { AiFreePlanLimitsSection } from "@/components/klub/devtools/AiFreePlanLimitsSection";
+import { AiGenerateSection } from "@/components/klub/devtools/AiGenerateSection";
 
 const STYLE_OPTIONS: { value: AiResponseStyle; label: string; hint: string }[] = [
-  { value: "concise", label: "Zwięzły", hint: "Mało ćwiczeń, krótkie notatki" },
-  { value: "balanced", label: "Zrównoważony", hint: "Typowa objętość olimpijska" },
-  { value: "detailed", label: "Szczegółowy", hint: "Więcej wskazówek w notatkach" },
+  { value: "concise", label: "Zwięzły", hint: "Krótko, konkretnie, bez ozdobników" },
+  { value: "balanced", label: "Zrównoważony", hint: "Jasna struktura, umiarkowana długość" },
+  { value: "detailed", label: "Szczegółowy", hint: "Pełniejsze wyjaśnienia i kontekst" },
   { value: "coach", label: "Trener klubowy", hint: "Konkretny język treningowy PL" },
 ];
 
@@ -53,10 +54,7 @@ export function AiSettingsTab() {
     response_style: "balanced",
     temperature: 0.35,
     max_tokens: 4096,
-    default_weeks: 4,
-    daily_drafts_limit: 100,
-    prefer_library_names: true,
-    include_warmup: true,
+    daily_generations_limit: 100,
     custom_instructions: null,
   });
 
@@ -127,10 +125,7 @@ export function AiSettingsTab() {
         response_style: form.response_style ?? "balanced",
         temperature: Number(form.temperature ?? 0.35),
         max_tokens: Number(form.max_tokens ?? 4096),
-        default_weeks: Number(form.default_weeks ?? 4),
-        daily_drafts_limit: Number(form.daily_drafts_limit ?? 100),
-        prefer_library_names: Boolean(form.prefer_library_names),
-        include_warmup: Boolean(form.include_warmup),
+        daily_generations_limit: Number(form.daily_generations_limit ?? 100),
         custom_instructions: form.custom_instructions?.trim() || null,
       });
       const data = res.data as AiSettingsResponse;
@@ -216,9 +211,9 @@ export function AiSettingsTab() {
 
         <AiFreePlanLimitsSection
           freeLimits={freeLimits}
-          dailyLimit={form.daily_drafts_limit ?? 100}
+          dailyLimit={form.daily_generations_limit ?? 100}
           usage={usage}
-          onDailyLimitChange={(n) => patch("daily_drafts_limit", n)}
+          onDailyLimitChange={(n) => patch("daily_generations_limit", n)}
         />
 
         <section className={boxClass}>
@@ -251,9 +246,9 @@ export function AiSettingsTab() {
 
         <section className={boxClass}>
           <h2 className="font-display text-xs tracking-[0.14em] text-paper/45 uppercase">
-            Generowanie
+            Parametry
           </h2>
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2">
             <div>
               <label htmlFor="ai-temp" className={fieldLabel}>
                 Temperature ({form.temperature ?? 0.35})
@@ -286,39 +281,7 @@ export function AiSettingsTab() {
                 }
               />
             </div>
-            <div>
-              <label htmlFor="ai-weeks" className={fieldLabel}>
-                Domyślne tygodnie
-              </label>
-              <input
-                id="ai-weeks"
-                className={inputClass}
-                type="number"
-                min={1}
-                max={16}
-                value={form.default_weeks ?? 4}
-                onChange={(e) =>
-                  patch("default_weeks", e.target.value ? Number(e.target.value) : 4)
-                }
-              />
-            </div>
           </div>
-          <label className="flex items-center gap-2 text-sm text-paper/70">
-            <input
-              type="checkbox"
-              checked={Boolean(form.prefer_library_names)}
-              onChange={(e) => patch("prefer_library_names", e.target.checked)}
-            />
-            Preferuj bibliotekę (własne ćwiczenia też OK, gdy brak w liście)
-          </label>
-          <label className="flex items-center gap-2 text-sm text-paper/70">
-            <input
-              type="checkbox"
-              checked={Boolean(form.include_warmup)}
-              onChange={(e) => patch("include_warmup", e.target.checked)}
-            />
-            Dodawaj rozgrzewkę / mobilność
-          </label>
           <div>
             <label htmlFor="ai-extra" className={fieldLabel}>
               Dodatkowe instrukcje
@@ -343,6 +306,11 @@ export function AiSettingsTab() {
           {saving ? "Zapisuję…" : "Zapisz ustawienia AI"}
         </button>
       </form>
+
+      <AiGenerateSection
+        keyConfigured={keyConfigured}
+        onUsage={(next) => setUsage(next)}
+      />
     </div>
   );
 }

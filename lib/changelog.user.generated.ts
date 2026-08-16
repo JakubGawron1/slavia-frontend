@@ -3,6 +3,32 @@ import type { UserChangelogEntry } from "@/lib/user-changelog";
 
 export const GENERATED_USER_CHANGELOG: UserChangelogEntry[] = [
   {
+    "version": "2.0.0.0+1",
+    "date": "2026-08-16",
+    "title": "Koniec planów treningowych w panelu",
+    "notes": [
+      "Moduł planów (kadra i zawodnik) został wyłączony — nie ma już listy programów, biblioteki ćwiczeń ani szkiców AI planu.",
+      "W ustawieniach zostają maile o składzie zawodów i formularzu kontaktowym.",
+      "Wszystkie motywy paneli (w tym układy Kapsuła, Studio, Dok) są dostępne od razu, bez osobnej flagi."
+    ]
+  },
+  {
+    "version": "2.0.0.1+3",
+    "date": "2026-08-16",
+    "title": "Obecność QR w czasie polskim",
+    "notes": [
+      "Godzina i dzień skanu kodu QR są liczone według Warszawy, nawet gdy serwer działa w UTC."
+    ]
+  },
+  {
+    "version": "2.0.0.0+2",
+    "date": "2026-08-16",
+    "title": "Panel zawodnika tylko w przeglądarce",
+    "notes": [
+      "Aplikacja mobilna Flutter nie jest już rozwijana — logowanie, kalendarz i wyniki zostają na stronie."
+    ]
+  },
+  {
     "version": "1.1.2.12+13",
     "date": "2026-08-14",
     "title": "Czyszczenie skrzynki powiadomień",

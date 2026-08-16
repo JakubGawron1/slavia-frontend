@@ -56,7 +56,14 @@ export function attendanceRecordStyle(status: string | null | undefined): {
   );
 }
 
-/** Czytelna data + godzina check-inu (lokalna strefa). */
+/** Czas klubowy — daty i godziny obecności zawsze w Europe/Warsaw. */
+const CLUB_TIME_ZONE = "Europe/Warsaw";
+
+const CLUB_DATE_FMT: Intl.DateTimeFormatOptions = {
+  timeZone: CLUB_TIME_ZONE,
+};
+
+/** Czytelna data + godzina check-inu (Warszawa, nie TZ przeglądarki / UTC serwera). */
 export function formatAttendanceCheckedAt(iso: string): {
   date: string;
   time: string;
@@ -66,16 +73,21 @@ export function formatAttendanceCheckedAt(iso: string): {
     if (Number.isNaN(d.getTime())) {
       return { date: iso, time: "" };
     }
-    let weekday = d.toLocaleDateString("pl-PL", { weekday: "long" });
+    let weekday = d.toLocaleDateString("pl-PL", {
+      ...CLUB_DATE_FMT,
+      weekday: "long",
+    });
     if (weekday) {
       weekday = weekday.charAt(0).toUpperCase() + weekday.slice(1);
     }
     const rest = d.toLocaleDateString("pl-PL", {
+      ...CLUB_DATE_FMT,
       day: "numeric",
       month: "long",
       year: "numeric",
     });
     const time = d.toLocaleTimeString("pl-PL", {
+      ...CLUB_DATE_FMT,
       hour: "2-digit",
       minute: "2-digit",
     });
@@ -83,6 +95,25 @@ export function formatAttendanceCheckedAt(iso: string): {
   } catch {
     return { date: iso, time: "" };
   }
+}
+
+export function formatAttendanceCheckedAtLabel(iso: string): string {
+  const { date, time } = formatAttendanceCheckedAt(iso);
+  return time ? `${date} ${time}` : date;
+}
+
+/** YYYY-MM-DD dnia skanu w Europe/Warsaw (nie prefiks UTC z ISO). */
+export function attendanceDayKey(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) {
+    return iso.slice(0, 10);
+  }
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: CLUB_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(d);
 }
 
 /** Frekwencja w siatce kadry: obecni / oczekiwani. */

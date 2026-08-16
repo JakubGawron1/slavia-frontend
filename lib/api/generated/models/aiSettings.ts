@@ -3,7 +3,7 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 1.1.3.0+1
+ * OpenAPI spec version: 2.0.0.0+1
  */
 import type { AiResponseStyle } from './aiResponseStyle';
 
@@ -14,13 +14,10 @@ export interface AiSettings {
   /** @nullable */
   custom_instructions?: string | null;
   /**
-     * Limit szkiców planu / dzień (UTC) — egzekwowany w aplikacji.
+     * Limit wygenerowań treści / dzień (UTC) — egzekwowany w aplikacji.
      * @minimum 0
      */
-  daily_drafts_limit?: number;
-  /** @minimum 0 */
-  default_weeks?: number;
-  include_warmup?: boolean;
+  daily_generations_limit?: number;
   /**
      * Domyślnie pod free TPM (≤ ~4k); clamp do TPM modelu gdy znany.
      * @minimum 0
@@ -28,7 +25,6 @@ export interface AiSettings {
   max_tokens?: number;
   /** ID modelu Groq; puste = fallback env / free default. */
   model?: string;
-  prefer_library_names?: boolean;
   response_style?: AiResponseStyle;
   temperature?: number;
 }

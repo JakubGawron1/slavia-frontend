@@ -3,7 +3,7 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 1.1.3.0+1
+ * OpenAPI spec version: 2.0.0.0+1
  */
 import {
   useMutation,
@@ -25,6 +25,8 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AiGenerateBody,
+  AiGenerateResponse,
   AiSettings,
   AiSettingsResponse,
   ErrorBody,
@@ -56,7 +58,100 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   return result;
 };
 
-export type listAiModelsResponse200 = {
+export type generateAiContentResponse200 = {
+  data: AiGenerateResponse
+  status: 200
+}
+
+export type generateAiContentResponse400 = {
+  data: ErrorBody
+  status: 400
+}
+
+export type generateAiContentResponse401 = {
+  data: ErrorBody
+  status: 401
+}
+
+export type generateAiContentResponse403 = {
+  data: ErrorBody
+  status: 403
+}
+
+export type generateAiContentResponseSuccess = (generateAiContentResponse200) & {
+  headers: Headers;
+};
+export type generateAiContentResponseError = (generateAiContentResponse400 | generateAiContentResponse401 | generateAiContentResponse403) & {
+  headers: Headers;
+};
+
+export type generateAiContentResponse = (generateAiContentResponseSuccess | generateAiContentResponseError)
+
+export const getGenerateAiContentUrl = () => {
+
+
+
+
+  return `/api/admin/ai-generate`
+}
+
+export const generateAiContent = async (aiGenerateBody: AiGenerateBody, options?: Parameters<typeof customFetch>[1]): Promise<generateAiContentResponse> => {
+
+  return customFetch<generateAiContentResponse>(getGenerateAiContentUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(aiGenerateBody)
+  }
+);}
+
+
+
+
+
+export const getGenerateAiContentMutationOptions = <TError = ErrorBody,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof generateAiContent>>, TError,{data: AiGenerateBody}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof generateAiContent>>, TError,{data: AiGenerateBody}, TContext> => {
+
+const mutationKey = ['generateAiContent'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof generateAiContent>>, {data: AiGenerateBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  generateAiContent(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type GenerateAiContentMutationResult = NonNullable<Awaited<ReturnType<typeof generateAiContent>>>
+    export type GenerateAiContentMutationBody = AiGenerateBody
+    export type GenerateAiContentMutationError = ErrorBody
+
+    export const useGenerateAiContent = <TError = ErrorBody,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof generateAiContent>>, TError,{data: AiGenerateBody}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof generateAiContent>>,
+        TError,
+        {data: AiGenerateBody},
+        TContext
+      > => {
+      return useMutation(getGenerateAiContentMutationOptions(options), queryClient);
+    }
+    export type listAiModelsResponse200 = {
   data: GroqModelsResponse
   status: 200
 }

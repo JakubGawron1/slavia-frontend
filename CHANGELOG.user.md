@@ -11,6 +11,20 @@ Format:
 - zdanie zrozumiałe dla zwykłego użytkownika
 ```
 
+## [2.0.0.1+3] - 2026-08-16
+### Obecność QR w czasie polskim
+- Godzina i dzień skanu kodu QR są liczone według Warszawy, nawet gdy serwer działa w UTC.
+
+## [2.0.0.0+2] - 2026-08-16
+### Panel zawodnika tylko w przeglądarce
+- Aplikacja mobilna Flutter nie jest już rozwijana — logowanie, kalendarz i wyniki zostają na stronie.
+
+## [2.0.0.0+1] - 2026-08-16
+### Koniec planów treningowych w panelu
+- Moduł planów (kadra i zawodnik) został wyłączony — nie ma już listy programów, biblioteki ćwiczeń ani szkiców AI planu.
+- W ustawieniach zostają maile o składzie zawodów i formularzu kontaktowym.
+- Wszystkie motywy paneli (w tym układy Kapsuła, Studio, Dok) są dostępne od razu, bez osobnej flagi.
+
 ## [1.2.0.0+1] - 2026-08-14
 ### Gotowe plany w katalogu
 - Trener może skopiować gotowy program 12 tygodni (poniedziałek, środa, piątek): rwanie, podrzut, przysiady albo kulturystyka — osobno dla początkujących i średniozaawansowanych.

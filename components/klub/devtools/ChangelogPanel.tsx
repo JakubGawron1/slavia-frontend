@@ -51,7 +51,7 @@ export function ChangelogPanel() {
         </p>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-3 lg:items-start">
+      <div className="grid gap-8 lg:grid-cols-2 lg:items-start">
         {CHANGELOG_CATEGORIES.map((cat) => {
           const entries = changelogByCategory(cat.id);
           return (

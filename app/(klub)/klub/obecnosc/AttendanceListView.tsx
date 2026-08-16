@@ -3,6 +3,7 @@ import type { CalendarEventFull } from "@/lib/events";
 import type { AttendanceRecordLocal } from "./useStaffObecnosc";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { FilterChip } from "@/components/ui/FilterChip";
+import { formatAttendanceCheckedAt, formatAttendanceCheckedAtLabel } from "@/lib/attendance-ui";
 
 type AttendanceListViewProps = {
   trainings: CalendarEventFull[];
@@ -112,7 +113,7 @@ export function AttendanceListView({
                       </span>
                     </span>
                     <span className="text-paper/45">
-                      {r.checked_at.slice(11, 19)}
+                      {formatAttendanceCheckedAt(r.checked_at).time}
                     </span>
                   </li>
                 ))}
@@ -134,7 +135,8 @@ export function AttendanceListView({
             <li key={r.id} className="px-3 py-2 text-sm">
               <span className="font-medium">{r.display_name}</span>
               <span className="ml-2 text-paper/45">
-                {r.status ?? "present"} · {r.checked_at}
+                {r.status ?? "present"} ·{" "}
+                {formatAttendanceCheckedAtLabel(r.checked_at)}
               </span>
             </li>
           ))}

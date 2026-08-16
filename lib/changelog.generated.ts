@@ -3,6 +3,82 @@ import type { ChangelogEntry } from "@/lib/changelog";
 
 export const GENERATED_CHANGELOG: ChangelogEntry[] = [
   {
+    "version": "2.0.0.0+1",
+    "date": "2026-08-16",
+    "category": "frontend",
+    "title": "Breaking: usunięcie planów treningowych",
+    "notes": [
+      "Znikają `/klub/plany` i `/panel/plany` (edytor, katalog, biblioteka, grupy, postęp, szkic AI).",
+      "Z kalendarza kadry znikają pola powiązania treningu z planem.",
+      "Flagi experimental i `training_plans` usunięte z DevTools; motywy układów dostępne bez flagi.",
+      "Powiadomienia e-mail: skład i kontakt (bez planów), zawsze wg ustawień konta."
+    ],
+    "breakingApi": true
+  },
+  {
+    "version": "2.0.0.0+1",
+    "date": "2026-08-16",
+    "category": "backend",
+    "title": "Breaking: usunięcie planów treningowych",
+    "notes": [
+      "Wycięto API planów, grup zawodników i biblioteki ćwiczeń (`/api/plans`, `/api/groups`, `/api/exercise-library`).",
+      "Flagi: `training_plans` oraz wszystkie experimental (asystent AI planów, placeholdery planów, motywy, maile, live scores, AI CMS).",
+      "Katalog flag przy starcie usuwa klucze spoza listy — DevTools pokazuje tylko flagi wired.",
+      "Maile o składzie i kontakcie idą wg preferencji użytkownika (bez flagi experimental)."
+    ],
+    "breakingApi": true
+  },
+  {
+    "version": "2.0.0.0+2",
+    "date": "2026-08-16",
+    "category": "frontend",
+    "title": "DX: usunięcie aplikacji Flutter",
+    "notes": [
+      "Workspace bez `slavia-mobile`; `sync:version` / `sync:changelog` tylko FE + BE.",
+      "DevTools: kolumna changelogu Mobile usunięta."
+    ]
+  },
+  {
+    "version": "2.0.0.0+1",
+    "date": "2026-08-16",
+    "category": "frontend",
+    "title": "Feature: DevTools AI",
+    "notes": [
+      "Zakładka AI: limity, styl odpowiedzi i generowanie treści (prompt → Groq)."
+    ],
+    "breakingApi": true
+  },
+  {
+    "version": "2.0.0.0+1",
+    "date": "2026-08-16",
+    "category": "backend",
+    "title": "Feature: DevTools AI — treść, nie plany",
+    "notes": [
+      "Ustawienia: model, limity Groq Free, dzienny limit generowań, styl odpowiedzi, temperature, max tokens, instrukcje.",
+      "`POST /api/admin/ai-generate` — playground treści dla superadmina (zużywa slot limitu)."
+    ],
+    "breakingApi": true
+  },
+  {
+    "version": "2.0.0.1+3",
+    "date": "2026-08-16",
+    "category": "frontend",
+    "title": "Fix: godziny obecności QR w czasie polskim",
+    "notes": [
+      "Lista skanów i agenda kadry grupują wejścia po dacie warszawskiej; godziny nie są już wycinane z UTC serwera."
+    ]
+  },
+  {
+    "version": "2.0.0.1+3",
+    "date": "2026-08-16",
+    "category": "backend",
+    "title": "Fix: skany QR — data i godzina w czasie warszawskim",
+    "notes": [
+      "Zapis i odczyt `checked_at` w `Europe/Warsaw` (RFC3339 z offsetem), nie UTC procesu.",
+      "Filtr dnia, duplikaty pending i statystyka miesiąca liczą datę klubową; stare wpisy UTC są konwertowane przy liście."
+    ]
+  },
+  {
     "version": "1.1.3.2+3",
     "date": "2026-08-14",
     "category": "backend",
@@ -298,15 +374,6 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
     ]
   },
   {
-    "version": "1.1.1.16+17",
-    "date": "2026-08-12",
-    "category": "mobile",
-    "title": "Feature: obciążenie `load_text` (sama sztanga)",
-    "notes": [
-      "`PlanExercise` / `PlanExerciseAlt`: pole `loadText`; subtitle planu pokazuje tekst zamiast kg/%."
-    ]
-  },
-  {
     "version": "1.1.2.3+4",
     "date": "2026-08-12",
     "category": "frontend",
@@ -477,15 +544,6 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
     ]
   },
   {
-    "version": "1.1.0.22+23",
-    "date": "2026-08-11",
-    "category": "mobile",
-    "title": "Feature: etykieta % PR ćwiczenia",
-    "notes": [
-      "Wyświetlanie `pct_of: exercise` jako „PR {nazwa}” + hint doboru kg."
-    ]
-  },
-  {
     "version": "1.1.0.27+28",
     "date": "2026-08-11",
     "category": "frontend",
@@ -561,30 +619,12 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
   {
     "version": "1.1.0.21+22",
     "date": "2026-08-11",
-    "category": "mobile",
-    "title": "Feature: plan sezonu + odpowiedź trenera",
-    "notes": [
-      "Pulpit: kafelek planu sezonu; plany: domyślny wybór sezonu + wyświetlanie `coach_reply`."
-    ]
-  },
-  {
-    "version": "1.1.0.21+22",
-    "date": "2026-08-11",
     "category": "frontend",
     "title": "Feature: plan sezonu + odpowiedź trenera na feedback",
     "notes": [
       "Pulpit zawodnika: kafelek aktywnego planu sezonu (`is_season_active`) z linkiem do `/panel/plany?plan=…`.",
       "Kadra: checkbox „Plan sezonu”, lista feedbacku + `PUT …/coach-reply`.",
       "Panel/mobile: wyświetlanie `coach_reply` / `coach_replied_at`."
-    ]
-  },
-  {
-    "version": "1.1.0.19+20",
-    "date": "2026-08-11",
-    "category": "mobile",
-    "title": "Feature: plany premium (odczyt/postęp)",
-    "notes": [
-      "Model tygodni/dni, zamienniki, warm-up, notatki trenera, feedback, badge ukończenia."
     ]
   },
   {
@@ -712,31 +752,11 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
   {
     "version": "1.1.1.12+13",
     "date": "2026-08-11",
-    "category": "mobile",
-    "title": "Fix: lista planów z `mine=true`",
-    "notes": [
-      "`AthleteRepository.plans()` woła `/api/plans?mine=true` — konta kadry nie dostają cudzych planów w widoku zawodnika."
-    ]
-  },
-  {
-    "version": "1.1.1.12+13",
-    "date": "2026-08-11",
     "category": "frontend",
     "title": "Fix: panel zawodnika tylko z własnymi planami",
     "notes": [
       "`listPlans({ mine: true })` w `useAthletePlanProgress` i na pulpicie panelu.",
       "Superadmin/Trener nie widzi cudzych przypisań w swoim panelu zawodnika."
-    ]
-  },
-  {
-    "version": "1.1.1.6+7",
-    "date": "2026-08-11",
-    "category": "mobile",
-    "title": "Fix: strzałka wstecz na podstronach",
-    "notes": [
-      "`DetailScaffold` / powiadomienia: zawsze `BackButton`; bez stacku → powrót na pulpit.",
-      "Pulpit: Sinclair / analiza toru / Co nowego / Ustawienia przez `push` (stack + gest wstecz).",
-      "Gest / Back myszy / Alt+←: z podstrony bez stacku też wraca na pulpit."
     ]
   },
   {
@@ -868,15 +888,6 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
     ]
   },
   {
-    "version": "1.1.0.6+6",
-    "date": "2026-08-07",
-    "category": "mobile",
-    "title": "Feature: stub analizy toru sztangi",
-    "notes": [
-      "Ekran `/panel/analiza-toru` + wpis w Więcej / pulpicie — kieruje do pełnego narzędzia web (tracking lokalny w przeglądarce)."
-    ]
-  },
-  {
     "version": "1.1.0.5+5",
     "date": "2026-08-07",
     "category": "frontend",
@@ -943,15 +954,6 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
     "notes": [
       "Panel `/panel/wyniki` i weryfikacja: zawodnik podaje tylko masę ciała; kategoria z wieku/płci profilu + tabeli 2026.",
       "Podgląd kategorii w formularzu (`U20 M 75` itd.)."
-    ]
-  },
-  {
-    "version": "1.0.0.3+20",
-    "date": "2026-08-05",
-    "category": "mobile",
-    "title": "Feature: data zawodów / treningu",
-    "notes": [
-      "Formularz wyników: wybór daty wydarzenia (wymagana) dla zawodów i rekordów treningowych."
     ]
   },
   {
@@ -1094,39 +1096,12 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
     ]
   },
   {
-    "version": "1.0.0.3+17",
-    "date": "2026-08-05",
-    "category": "mobile",
-    "title": "UX: kalendarz = agenda",
-    "notes": [
-      "Ekran kalendarza: lista wydarzeń według dni (bez siatki miesiąca), nawigacja miesiącami."
-    ]
-  },
-  {
-    "version": "1.0.0.3+19",
-    "date": "2026-08-05",
-    "category": "mobile",
-    "title": "UX: kategoria wagowa z profilu",
-    "notes": [
-      "Przy zawodach tylko masa ciała — kategoria wyliczana na serwerze z wieku/płci w profilu."
-    ]
-  },
-  {
     "version": "1.0.0.3+16",
     "date": "2026-08-05",
     "category": "frontend",
     "title": "UX: rekord treningowy bez nazwy",
     "notes": [
       "Panel `/panel/wyniki`: przy rodzaju „Rekord treningowy” brak pola nazwy — wysyłane jako „Trening”."
-    ]
-  },
-  {
-    "version": "1.0.0.3+16",
-    "date": "2026-08-05",
-    "category": "mobile",
-    "title": "UX: rekord treningowy bez nazwy",
-    "notes": [
-      "Formularz wyników: przy „Trening” brak pola nazwy (wysyłane jako „Trening”); masa/miejsce/kategoria tylko przy zawodach."
     ]
   },
   {
@@ -1193,54 +1168,12 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
     ]
   },
   {
-    "version": "1.0.0.2+10",
-    "date": "2026-08-04",
-    "category": "mobile",
-    "title": "Feature: nawigacja wstecz (desktop + Android)",
-    "notes": [
-      "Przycisk Back myszy, Alt+← / BrowserBack — `pop` ze stacku GoRouter.",
-      "Systemowy wstecz: z zakładki wraca na pulpit; podstrony mają `BackButton`.",
-      "`DetailScaffold` dla Sinclair / Co nowego / Ustawienia."
-    ]
-  },
-  {
-    "version": "1.0.0.2+4",
-    "date": "2026-08-04",
-    "category": "mobile",
-    "title": "Fix: build Windows bez Firebase C++ SDK",
-    "notes": [
-      "Usunięto `firebase_core` / `firebase_messaging` z `pubspec` — CMake padał na extract `firebase_cpp_sdk_windows_*.zip`.",
-      "Push: inbox + lokalne toasty; FCM odłożone na plugin Android-only."
-    ]
-  },
-  {
-    "version": "1.0.0.2+7",
-    "date": "2026-08-04",
-    "category": "mobile",
-    "title": "Fix: logowanie Windows — komunikat zamiast „ciszy”",
-    "notes": [
-      "Konto bez roli `zawodnik` (np. superadmin) pokazuje błąd zamiast wracać na `/login` bez informacji.",
-      "GoRouter nie jest odtwarzany przy każdej zmianie auth (stabilniejsza nawigacja po loginie).",
-      "Czytelniejsze komunikaty przy braku połączenia z API."
-    ]
-  },
-  {
     "version": "1.0.0.2+12",
     "date": "2026-08-04",
     "category": "frontend",
     "title": "Fix: SettingsCategory i typy details",
     "notes": [
       "`SettingsCategory`: stan `open` zamiast nieobsługiwanego w typach React `defaultOpen` na `<details>` (build TypeScript)."
-    ]
-  },
-  {
-    "version": "1.0.0.2+5",
-    "date": "2026-08-04",
-    "category": "mobile",
-    "title": "Fix: Windows build bez ATL",
-    "notes": [
-      "Usunięto `flutter_secure_storage` i `flutter_local_notifications` (wymagały `atlbase.h` / `atlstr.h` w VS Build Tools).",
-      "Sesja JWT: `shared_preferences`; powiadomienia: inbox in-app (bez natywnych toastów)."
     ]
   },
   {
@@ -1343,17 +1276,6 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
     ]
   },
   {
-    "version": "1.0.0.2+3",
-    "date": "2026-08-03",
-    "category": "mobile",
-    "title": "Aplikacja Flutter dla zawodników",
-    "notes": [
-      "Klient Android/Windows: logowanie z zapisem JWT, pulpit, wyniki, obecność QR, kalendarz, plany, ustawienia (upload zdjęcia), Sinclair, Co nowego, skrzynka powiadomień.",
-      "Push FCM na Androidzie (rejestracja `/api/devices`); Windows: inbox + lokalne toasty przy pollingu.",
-      "Motyw Material 3 z brandem klubowym; `applicationId` `pl.cksslavia.zawodnik`."
-    ]
-  },
-  {
     "version": "1.0.0",
     "date": "2026-08-03",
     "category": "frontend",
@@ -1433,24 +1355,6 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
     ]
   },
   {
-    "version": "1.0.0.1+1",
-    "date": "2026-08-03",
-    "category": "mobile",
-    "title": "Sync wersji poprawki",
-    "notes": [
-      "`Slavia.toml` dopuszcza `X.Y.Z.W+build`; mobile dostaje kompatybilne `semver3+build` (np. `1.0.1+1`)."
-    ]
-  },
-  {
-    "version": "1.0.0",
-    "date": "2026-08-03",
-    "category": "mobile",
-    "title": "Wersja z monorepo",
-    "notes": [
-      "`pubspec.yaml` version: `X.Y.Z+build` — część `X.Y.Z` z `Slavia.toml`, build zachowywany."
-    ]
-  },
-  {
     "version": "1.0.0",
     "date": "2026-08-03",
     "category": "backend",
@@ -1491,15 +1395,6 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
       "Kolorystyczna notacja obecności w kalendarzu zawodnika i kadry.",
       "StaffCalendar: frekwencja, lista obecności w modalu, link do `/klub/obecnosc`.",
       "DevTools: flagi (stable/experimental), statystyki, mapa tras, debug sesji."
-    ]
-  },
-  {
-    "version": "1.0.0",
-    "date": "2026-07-15",
-    "category": "mobile",
-    "title": "Bootstrap Flutter",
-    "notes": [
-      "Szablon aplikacji `slavia_mobile` (Flutter) — baza pod klienta mobilnego API."
     ]
   }
 ];

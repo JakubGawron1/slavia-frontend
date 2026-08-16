@@ -7,18 +7,16 @@ import { subheadingClass } from "./styles";
 type ThemeOption = (typeof PANEL_THEMES)[number];
 
 type AppearanceSectionProps = {
-  stableThemes: readonly ThemeOption[];
-  experimentalThemes: readonly ThemeOption[];
-  allowExperimental: boolean;
+  colorThemes: readonly ThemeOption[];
+  layoutThemes: readonly ThemeOption[];
   uiTheme: PanelThemeId;
   saving: boolean;
   onSelectTheme: (id: PanelThemeId) => void;
 };
 
 export function AppearanceSection({
-  stableThemes,
-  experimentalThemes,
-  allowExperimental,
+  colorThemes,
+  layoutThemes,
   uiTheme,
   saving,
   onSelectTheme,
@@ -33,28 +31,23 @@ export function AppearanceSection({
         <p className="text-sm text-paper/55">
           Wybór jest zapisany na koncie i działa na każdym urządzeniu.
         </p>
-        <p className={`mt-5 ${subheadingClass}`}>Motywy stable</p>
+        <p className={`mt-5 ${subheadingClass}`}>Kolorystyka</p>
         <ThemeGrid
-          themes={stableThemes}
+          themes={colorThemes}
           selectedId={uiTheme}
           saving={saving}
           onSelect={onSelectTheme}
         />
-        {allowExperimental ? (
-          <>
-            <p className={`mt-6 ${subheadingClass}`}>Motywy experimental</p>
-            <p className="mt-2 text-sm text-paper/55">
-              Zmieniają też układ i geometrię UI. Dostępne przez flagę
-              DevTools.
-            </p>
-            <ThemeGrid
-              themes={experimentalThemes}
-              selectedId={uiTheme}
-              saving={saving}
-              onSelect={onSelectTheme}
-            />
-          </>
-        ) : null}
+        <p className={`mt-6 ${subheadingClass}`}>Układy</p>
+        <p className="mt-2 text-sm text-paper/55">
+          Zmieniają też geometrię UI — kapsuła, studio, dok, ramka albo wstęga.
+        </p>
+        <ThemeGrid
+          themes={layoutThemes}
+          selectedId={uiTheme}
+          saving={saving}
+          onSelect={onSelectTheme}
+        />
       </SettingsCategory>
 
       <SettingsCategory title="Prywatność" description="Zgody RODO i cookies">

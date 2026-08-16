@@ -14,6 +14,7 @@ import {
 } from "@/lib/api/generated/default/default";
 import { useToast } from "@/components/toast/ToastProvider";
 import type { CalendarEventFull } from "@/lib/events";
+import { attendanceDayKey } from "@/lib/attendance-ui";
 
 export type AttendanceSessionLocal = {
   token: string;
@@ -32,10 +33,6 @@ export type AttendanceRecordLocal = {
   status?: string;
   source?: string;
 };
-
-function dayKey(iso: string) {
-  return iso.slice(0, 10);
-}
 
 export function useStaffObecnosc() {
   const search = useSearchParams();
@@ -150,7 +147,7 @@ export function useStaffObecnosc() {
   const byDay = useMemo(() => {
     const map = new Map<string, AttendanceRecordLocal[]>();
     for (const r of filtered) {
-      const k = dayKey(r.checked_at);
+      const k = attendanceDayKey(r.checked_at);
       const list = map.get(k) ?? [];
       list.push(r);
       map.set(k, list);

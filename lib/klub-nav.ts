@@ -57,13 +57,6 @@ export const KLUB_NAV: KlubNavCategory[] = [
     label: "Trening",
     items: [
       {
-        href: "/klub/plany",
-        label: "Plany treningowe",
-        description: "Tygodnie, biblioteka ćwiczeń, katalog i grupy.",
-        roles: ["trener", "superadmin"],
-        flag: "training_plans",
-      },
-      {
         href: "/klub/kalendarz",
         label: "Kalendarz zawodów",
         description: "Treningi, zawody, skład i rezygnacje.",
@@ -149,7 +142,6 @@ export const PUBLIC_ROUTE_MAP = [
   { path: "/panel", label: "Panel zawodnika" },
   { path: "/panel/wyniki", label: "Zgłaszanie wyników" },
   { path: "/panel/obecnosc", label: "Skaner obecności" },
-  { path: "/panel/plany", label: "Plany (zawodnik)" },
   { path: "/panel/kalendarz", label: "Kalendarz (zawodnik)" },
   { path: "/panel/kalkulator-sinclair", label: "Kalkulator Sinclair (zawodnik)" },
   { path: "/panel/co-nowego", label: "Co nowego (zawodnik)" },

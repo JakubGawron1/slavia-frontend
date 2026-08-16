@@ -46,10 +46,8 @@ export default function DevToolsPage() {
 
       {d.tab === "flags" ? (
         <FlagsTab
-          stableFlags={d.stableFlags}
-          experimentalFlags={d.experimentalFlags}
+          flags={d.flags}
           flagsLoading={d.flagsLoading}
-          totalFlags={d.flags.length}
           rolloutStatuses={d.rolloutStatuses}
           onToggle={d.toggleFlag}
           pending={d.togglePending}

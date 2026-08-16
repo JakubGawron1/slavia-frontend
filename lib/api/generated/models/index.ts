@@ -3,10 +3,11 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 1.1.3.0+1
+ * OpenAPI spec version: 2.0.0.0+1
  */
 
-export * from './aiDraftBody';
+export * from './aiGenerateBody';
+export * from './aiGenerateResponse';
 export * from './aiResponseStyle';
 export * from './aiSettings';
 export * from './aiSettingsResponse';
@@ -14,7 +15,6 @@ export * from './aiUsageStatus';
 export * from './approveAttendanceBody';
 export * from './assignedAthleteBrief';
 export * from './athleteCalendarEvent';
-export * from './athleteGroup';
 export * from './athleteProfile';
 export * from './athleteStats';
 export * from './attendanceRecord';
@@ -26,7 +26,6 @@ export * from './cmsBlock';
 export * from './cmsPage';
 export * from './cmsPageBody';
 export * from './cmsStatus';
-export * from './coachReplyBody';
 export * from './competitionResult';
 export * from './completeInviteBody';
 export * from './confirmEmailBody';
@@ -40,8 +39,6 @@ export * from './deviceToken';
 export * from './errorBody';
 export * from './eventBody';
 export * from './eventWithdrawal';
-export * from './exerciseLibraryItem';
-export * from './exerciseTagsBody';
 export * from './featureFlag';
 export * from './flagKind';
 export * from './flagRolloutStatus';
@@ -49,15 +46,12 @@ export * from './forgotPasswordBody';
 export * from './groqFreePlanLimits';
 export * from './groqModelInfo';
 export * from './groqModelsResponse';
-export * from './groupBody';
 export * from './healthResponse';
 export * from './imageProvider';
-export * from './libraryItemBody';
 export * from './listAttendanceParams';
 export * from './listEventsParams';
 export * from './listLogsParams';
 export * from './listMyEventsParams';
-export * from './listPlansParams';
 export * from './listPublicEventsParams';
 export * from './listResultsParams';
 export * from './loginRequest';
@@ -66,17 +60,8 @@ export * from './logLevel';
 export * from './notification';
 export * from './notificationPrefs';
 export * from './okResponse';
-export * from './pctOfLift';
-export * from './planBody';
-export * from './planDay';
-export * from './planExercise';
-export * from './planExerciseAlt';
-export * from './planProgressEntry';
-export * from './planSet';
-export * from './planWeek';
 export * from './previewStartBody';
 export * from './profileBody';
-export * from './progressBody';
 export * from './publicCalendarEvent';
 export * from './publicFlag';
 export * from './publicUser';
@@ -92,8 +77,6 @@ export * from './sendTestEmailBody';
 export * from './sendTestEmailResponse';
 export * from './siteStats';
 export * from './systemLog';
-export * from './trainingPlan';
-export * from './trainingPlanProgress';
 export * from './trainingScheduleDefaults';
 export * from './unreadCountResponse';
 export * from './unregisterDeviceBody';

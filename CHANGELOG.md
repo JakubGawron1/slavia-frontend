@@ -12,6 +12,24 @@ Format sekcji:
 
 Opcjonalnie po dacie: `!breaking` (breaking API).
 
+## [2.0.0.1+3] - 2026-08-16
+### Fix: godziny obecności QR w czasie polskim
+- Lista skanów i agenda kadry grupują wejścia po dacie warszawskiej; godziny nie są już wycinane z UTC serwera.
+
+## [2.0.0.0+2] - 2026-08-16
+### DX: usunięcie aplikacji Flutter
+- Workspace bez `slavia-mobile`; `sync:version` / `sync:changelog` tylko FE + BE.
+- DevTools: kolumna changelogu Mobile usunięta.
+
+## [2.0.0.0+1] - 2026-08-16 !breaking
+### Breaking: usunięcie planów treningowych
+- Znikają `/klub/plany` i `/panel/plany` (edytor, katalog, biblioteka, grupy, postęp, szkic AI).
+- Z kalendarza kadry znikają pola powiązania treningu z planem.
+- Flagi experimental i `training_plans` usunięte z DevTools; motywy układów dostępne bez flagi.
+- Powiadomienia e-mail: skład i kontakt (bez planów), zawsze wg ustawień konta.
+### Feature: DevTools AI
+- Zakładka AI: limity, styl odpowiedzi i generowanie treści (prompt → Groq).
+
 ## [1.2.0.0+1] - 2026-08-14
 ### Feature: gotowe programy w katalogu
 - Katalog planów ma 7 szablonów 12-tyg. (Pn / Śr / Pt): rwanie, podrzut, przysiady, kulturystyka — początkujący i średniozaawansowany.

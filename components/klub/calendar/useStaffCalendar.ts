@@ -204,9 +204,6 @@ export function useStaffCalendar() {
       location: ev.location ?? "",
       description: ev.description ?? "",
       assigned_athlete_ids: [...ev.assigned_athlete_ids],
-      plan_id: ev.plan_id ?? "",
-      plan_week: ev.plan_week != null ? String(ev.plan_week) : "",
-      plan_day: ev.plan_day != null ? String(ev.plan_day) : "",
     });
   }
 

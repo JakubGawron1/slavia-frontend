@@ -17,7 +17,6 @@ import {
 import { useHealth } from "@/lib/api/generated/admin/admin";
 import type {
   FeatureFlag,
-  FlagKind,
   FlagRolloutStatus,
   SiteStats,
 } from "@/lib/api/generated/models";
@@ -31,10 +30,6 @@ export type DevToolsTab =
   | "debug"
   | "changelog"
   | "rq";
-
-export function flagsByKind(flags: FeatureFlag[], kind: FlagKind): FeatureFlag[] {
-  return flags.filter((f) => f.kind === kind);
-}
 
 export function useDevTools() {
   const toast = useToast();
@@ -51,8 +46,6 @@ export function useDevTools() {
   const updateFlagMutation = useUpdateFlag();
 
   const flags = (flagsQuery.data?.data as FeatureFlag[] | undefined) ?? [];
-  const stableFlags = flagsByKind(flags, "stable");
-  const experimentalFlags = flagsByKind(flags, "experimental");
   const stats = (statsQuery.data?.data as SiteStats | undefined) ?? null;
   const health =
     healthOverride ??
@@ -124,8 +117,6 @@ export function useDevTools() {
     tabs,
     error,
     setActionError,
-    stableFlags,
-    experimentalFlags,
     flags,
     flagsLoading: flagsQuery.isLoading,
     stats,

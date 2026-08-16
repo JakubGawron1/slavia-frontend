@@ -1,10 +1,8 @@
-export const EXPERIMENTAL_PANEL_THEMES_FLAG = "experimental_panel_themes";
-
-/** Max. motywów w każdej kategorii (stable / experimental). */
+/** Max. motywów w każdej kategorii (kolorystyka / układy). */
 export const PANEL_THEMES_PER_CATEGORY_MAX = 10;
 
 export const PANEL_THEMES = [
-  // —— Stable (10) ——
+  // —— Kolorystyka (układ standard) ——
   {
     id: "classic",
     label: "Klasyczny",
@@ -86,7 +84,7 @@ export const PANEL_THEMES = [
     swatch: { ink: "#070b14", paper: "#e6ebf4", brand: "#8aa0c2", accent: "#0e1420" },
   },
 
-  // —— Experimental (10) ——
+  // —— Układy (kapsuła / studio / dok / ramka / wstęga) ——
   {
     id: "capsule",
     label: "Kapsuła",
@@ -180,33 +178,17 @@ export function getPanelTheme(id: PanelThemeId) {
   return THEME_BY_ID.get(id) ?? THEME_BY_ID.get(DEFAULT_PANEL_THEME)!;
 }
 
-export function isExperimentalTheme(id: string): boolean {
-  return THEME_BY_ID.get(id as PanelThemeId)?.experimental === true;
-}
-
-export function resolvePanelTheme(
-  value?: string | null,
-  opts?: { allowExperimental?: boolean },
-): PanelThemeId {
-  const allowExperimental = opts?.allowExperimental ?? false;
+export function resolvePanelTheme(value?: string | null): PanelThemeId {
   if (value && THEME_BY_ID.has(value as PanelThemeId)) {
-    const id = value as PanelThemeId;
-    if (isExperimentalTheme(id) && !allowExperimental) {
-      return DEFAULT_PANEL_THEME;
-    }
-    return id;
+    return value as PanelThemeId;
   }
   return DEFAULT_PANEL_THEME;
 }
 
-export function visiblePanelThemes(allowExperimental: boolean) {
-  return PANEL_THEMES.filter((t) => !t.experimental || allowExperimental);
-}
-
-export function stablePanelThemes() {
+export function colorPanelThemes() {
   return PANEL_THEMES.filter((t) => !t.experimental);
 }
 
-export function experimentalPanelThemes() {
+export function layoutPanelThemes() {
   return PANEL_THEMES.filter((t) => t.experimental);
 }

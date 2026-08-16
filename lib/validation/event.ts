@@ -9,9 +9,6 @@ export const eventFormSchema = z
     time: z.string(),
     location: z.string(),
     description: z.string(),
-    plan_id: z.string(),
-    plan_week: z.string(),
-    plan_day: z.string(),
   })
   .superRefine((v, ctx) => {
     if (v.end_date && v.end_date < v.date) {
@@ -20,25 +17,5 @@ export const eventFormSchema = z
         path: ["end_date"],
         message: "Data końca nie może być wcześniejsza niż data startu.",
       });
-    }
-    if (v.plan_week.trim()) {
-      const n = Number(v.plan_week);
-      if (!Number.isFinite(n) || n < 1) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["plan_week"],
-          message: "Tydzień planu musi być liczbą ≥ 1.",
-        });
-      }
-    }
-    if (v.plan_day.trim()) {
-      const n = Number(v.plan_day);
-      if (!Number.isFinite(n) || n < 1) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["plan_day"],
-          message: "Dzień planu musi być liczbą ≥ 1.",
-        });
-      }
     }
   });

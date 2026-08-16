@@ -3,7 +3,7 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 1.1.3.0+1
+ * OpenAPI spec version: 2.0.0.0+1
  */
 
 export interface AthleteStats {
@@ -30,10 +30,6 @@ export interface AthleteStats {
   bodyweight_kg?: number | null;
   /** @nullable */
   category?: string | null;
-  /** @minimum 0 */
-  plans_active: number;
-  /** @minimum 0 */
-  plans_completed_exercises: number;
   /** @minimum 0 */
   results_accepted: number;
   /** @minimum 0 */

@@ -55,7 +55,7 @@ export function AiFreePlanLimitsSection({
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
           <label htmlFor="ai-daily" className={fieldLabel}>
-            Limit szkiców / dzień (app)
+            Limit generowań / dzień (app)
           </label>
           <input
             id="ai-daily"
@@ -78,10 +78,10 @@ export function AiFreePlanLimitsSection({
               Zużycie dziś ({usage.date_utc})
             </p>
             <p className="mt-2 font-mono text-lg">
-              {usage.drafts_used} / {usage.drafts_limit}
+              {usage.generations_used} / {usage.generations_limit}
             </p>
             <p className="text-xs text-paper/45">
-              Pozostało: {usage.drafts_remaining}
+              Pozostało: {usage.generations_remaining}
             </p>
           </div>
         ) : null}

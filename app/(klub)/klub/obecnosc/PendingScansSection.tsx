@@ -1,4 +1,5 @@
 import type { CalendarEventFull } from "@/lib/events";
+import { formatAttendanceCheckedAtLabel } from "@/lib/attendance-ui";
 import type { AttendanceRecordLocal } from "./useStaffObecnosc";
 
 type PendingScansSectionProps = {
@@ -38,7 +39,7 @@ export function PendingScansSection({
             <div>
               <p className="font-medium">{r.display_name}</p>
               <p className="text-xs text-paper/45">
-                {r.checked_at.slice(0, 19).replace("T", " ")}
+                {formatAttendanceCheckedAtLabel(r.checked_at)}
                 {r.event_id
                   ? ` · trening ${
                       trainings.find((t) => t.id === r.event_id)?.title ??

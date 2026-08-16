@@ -5,8 +5,9 @@
  * API panelu klubowego CKS Slavia Ruda Śląska
  * OpenAPI spec version: 2.0.0.0+1
  */
+import type { AiUsageStatus } from './aiUsageStatus';
 
-export interface UnreadCountResponse {
-  /** @minimum 0 */
-  count: number;
+export interface AiGenerateResponse {
+  text: string;
+  usage: AiUsageStatus;
 }

@@ -125,46 +125,6 @@ export function EventFormDialog({
                 }
               />
             </label>
-            {form.event_type === "trening" ? (
-              <>
-                <label className="text-sm text-paper/70 sm:col-span-2">
-                  ID planu treningowego (opcjonalnie)
-                  <input
-                    className={fieldClass}
-                    placeholder="UUID planu"
-                    value={form.plan_id}
-                    onChange={(e) =>
-                      onChange({ ...form, plan_id: e.target.value })
-                    }
-                  />
-                </label>
-                <label className="text-sm text-paper/70">
-                  Tydzień planu
-                  <input
-                    className={fieldClass}
-                    type="number"
-                    min={1}
-                    value={form.plan_week}
-                    onChange={(e) =>
-                      onChange({ ...form, plan_week: e.target.value })
-                    }
-                  />
-                </label>
-                <label className="text-sm text-paper/70">
-                  Dzień (1–7)
-                  <input
-                    className={fieldClass}
-                    type="number"
-                    min={1}
-                    max={7}
-                    value={form.plan_day}
-                    onChange={(e) =>
-                      onChange({ ...form, plan_day: e.target.value })
-                    }
-                  />
-                </label>
-              </>
-            ) : null}
           </div>
           {form.event_type === "zawody" ? (
             <fieldset className="space-y-2">
