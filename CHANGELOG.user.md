@@ -11,6 +11,40 @@ Format:
 - zdanie zrozumiałe dla zwykłego użytkownika
 ```
 
+## [2.2.0.0+2] - 2026-08-22
+### Herb w karcie przeglądarki
+- W karcie przeglądarki i na ikonie na telefonie widać herb CKS Slavia.
+
+## [2.2.0.0+1] - 2026-08-22
+### Analiza techniki z filmu
+- W panelu zawodnika i w klubie możesz wgrać film rwania, zarzutu, podrzutu albo akcesorium. Dostajesz opis, co jest dobrze, co poprawić i jakie ćwiczenia dodać — bez rysowania po filmie.
+- Superadmin włącza to flagą „Analiza techniki (AI)” w DevTools. Film zostaje na telefonie; na serwer idą tylko zdjęcia klatek.
+
+## [2.1.0.0+5] - 2026-08-22
+### Szkic AI układa cały plan, nie tylko pierwszy tydzień
+- Trener opisuje cel, dni i ewentualnie zawodnika albo grupę. AI oddaje przepis, a system rozpisuje wszystkie tygodnie (w tym lżejsze).
+- Edytor sam zapisuje szkic. Zawodnik z grupy widzi kilogramy ze swoich rekordów, nie jedną sztangę dla wszystkich.
+
+## [2.1.0.0+4] - 2026-08-22
+### Kreator, edytor i obowiązkowe ćwiczenia
+- Po ułożeniu planu w kreatorze od razu otwiera się edytor. Można też wejść prosto do pustego edytora, bez kreatora.
+- Ćwiczenia z kreatora są oznaczone jako Must do (bursztynowe, obowiązkowe). W edytorze da się to włączyć lub wyłączyć przy każdym ćwiczeniu — zawodnik widzi to samo oznaczenie.
+- Publikacja zamyka edytor. Jeśli nie podasz daty startu, plan zaczyna się od dziś.
+
+## [2.1.0.0+2] - 2026-08-16
+### Szablony w katalogu
+- Kadra może dodać własny szablon, poprawić gotowiec i usunąć ten, którego klub nie używa.
+### Edytor planu
+- Układ jak dziennik treningowy: karty dni, chipy tygodni, kopiowanie schowane pod spodem.
+
+## [2.1.0.0+1] - 2026-08-16
+### Wracają plany treningowe
+- Trener układa program w czterech krokach (tytuł, dni, ćwiczenia, kto trenuje), bierze gotowiec z katalogu albo prosi o szkic AI — wszystko trafia do edytora jednego tygodnia.
+- W edytorze widać jeden tydzień naraz; dzień (np. poniedziałek) i cały tydzień można skopiować na wybrany lub na wszystkie tygodnie.
+- Zawodnik widzi dzisiejszy trening z kilogramami na pulpicie i w zakładce Plan.
+- Rekordy przysiadu i innych ćwiczeń zgłasza się osobno od wyników dwuboju; kadra akceptuje je w Rekordach ćwiczeń.
+- Kalendarz treningu można spiąć z dniem planu.
+
 ## [2.0.0.1+3] - 2026-08-16
 ### Obecność QR w czasie polskim
 - Godzina i dzień skanu kodu QR są liczone według Warszawy, nawet gdy serwer działa w UTC.

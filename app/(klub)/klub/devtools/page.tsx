@@ -48,7 +48,6 @@ export default function DevToolsPage() {
         <FlagsTab
           flags={d.flags}
           flagsLoading={d.flagsLoading}
-          rolloutStatuses={d.rolloutStatuses}
           onToggle={d.toggleFlag}
           pending={d.togglePending}
         />

@@ -1,7 +1,6 @@
 "use client";
 
-import { AccountSettingsForm } from "@/components/settings/AccountSettingsForm";
-import { PageHeader } from "@/components/ui/PageHeader";
+import { AccountSettingsPage } from "@/components/settings/AccountSettingsPage";
 import { useKlub } from "@/components/klub/KlubProvider";
 
 export default function KlubUstawieniaPage() {
@@ -9,14 +8,9 @@ export default function KlubUstawieniaPage() {
   if (!user) return null;
 
   return (
-    <div className="animate-rise space-y-6">
-      <PageHeader
-        eyebrow="Konto"
-        title="Ustawienia"
-        description="Profil, e-mail, hasło, powiadomienia, wygląd paneli i prywatność — sekcje możesz zwijać i rozwijać."
-      />
-
-      <AccountSettingsForm user={user} onUpdated={(updated) => refreshUser(updated)} />
-    </div>
+    <AccountSettingsPage
+      user={user}
+      onUpdated={(updated) => refreshUser(updated)}
+    />
   );
 }

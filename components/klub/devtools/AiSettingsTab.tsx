@@ -17,6 +17,7 @@ import {
 } from "@/lib/api/generated/admin/admin";
 import { AiFreePlanLimitsSection } from "@/components/klub/devtools/AiFreePlanLimitsSection";
 import { AiGenerateSection } from "@/components/klub/devtools/AiGenerateSection";
+import { AiModelFields } from "@/components/klub/devtools/AiModelFields";
 
 const STYLE_OPTIONS: { value: AiResponseStyle; label: string; hint: string }[] = [
   { value: "concise", label: "Zwięzły", hint: "Krótko, konkretnie, bez ozdobników" },
@@ -35,6 +36,9 @@ function defaultsFromResponse(res: AiSettingsResponse): AiSettings {
   return {
     ...res.settings,
     model: res.settings.model?.trim() || res.env_model_fallback || "llama-3.1-8b-instant",
+    vision_model:
+      res.settings.vision_model?.trim() ||
+      "meta-llama/llama-4-scout-17b-16e-instruct",
   };
 }
 
@@ -51,6 +55,7 @@ export function AiSettingsTab() {
   const [usage, setUsage] = useState<AiUsageStatus | null>(null);
   const [form, setForm] = useState<AiSettings>({
     model: "llama-3.1-8b-instant",
+    vision_model: "meta-llama/llama-4-scout-17b-16e-instruct",
     response_style: "balanced",
     temperature: 0.35,
     max_tokens: 4096,
@@ -122,6 +127,9 @@ export function AiSettingsTab() {
     try {
       const res = await putAiSettings({
         model: form.model?.trim() || "llama-3.1-8b-instant",
+        vision_model:
+          form.vision_model?.trim() ||
+          "meta-llama/llama-4-scout-17b-16e-instruct",
         response_style: form.response_style ?? "balanced",
         temperature: Number(form.temperature ?? 0.35),
         max_tokens: Number(form.max_tokens ?? 4096),
@@ -172,42 +180,16 @@ export function AiSettingsTab() {
       ) : null}
 
       <form onSubmit={(ev) => void onSave(ev)} className="space-y-5">
-        <section className={boxClass}>
-          <h2 className="font-display text-xs tracking-[0.14em] text-paper/45 uppercase">
-            Model Groq
-          </h2>
-          {modelsError ? <p className="text-sm text-paper/55">{modelsError}</p> : null}
-          <div>
-            <label htmlFor="ai-model" className={fieldLabel}>
-              Aktywny model
-            </label>
-            <select
-              id="ai-model"
-              className={inputClass}
-              value={form.model ?? ""}
-              onChange={(e) => onModelChange(e.target.value)}
-            >
-              {envFallback && !models.some((m) => m.id === envFallback) ? (
-                <option value={envFallback}>{envFallback} (fallback env)</option>
-              ) : null}
-              {models.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.id}
-                  {m.free_plan_limits
-                    ? ` · free ${m.free_plan_limits.rpd.toLocaleString("pl-PL")} RPD`
-                    : ""}
-                </option>
-              ))}
-            </select>
-          </div>
-          <button
-            type="button"
-            className="border border-paper/25 px-3 py-1.5 font-display text-[11px] tracking-[0.12em] text-paper/65 uppercase"
-            onClick={() => void load()}
-          >
-            Odśwież
-          </button>
-        </section>
+        <AiModelFields
+          models={models}
+          modelsError={modelsError}
+          envFallback={envFallback}
+          model={form.model ?? ""}
+          visionModel={form.vision_model ?? ""}
+          onModelChange={onModelChange}
+          onVisionModelChange={(id) => patch("vision_model", id)}
+          onRefresh={() => void load()}
+        />
 
         <AiFreePlanLimitsSection
           freeLimits={freeLimits}

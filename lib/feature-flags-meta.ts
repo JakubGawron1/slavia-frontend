@@ -1,9 +1,47 @@
 /**
- * Etykiety UI dla statusu wdrożenia flagi.
+ * Etykiety UI dla metadanych flagi.
  * Same flagi (klucz, kind, opis, rollout_status) pochodzą z API backendu.
  */
 
-import type { FlagRolloutStatus } from "@/lib/api/generated/models";
+import type {
+  FlagAudience,
+  FlagKind,
+  FlagRolloutStatus,
+} from "@/lib/api/generated/models";
+
+export const FLAG_KIND_LABELS: Record<FlagKind, { label: string; hint: string }> =
+  {
+    stable: {
+      label: "Stabilne",
+      hint: "Gotowa funkcja — ten sam przełącznik co experimental.",
+    },
+    experimental: {
+      label: "Eksperymentalne",
+      hint: "Testy na żywych kontach — po włączeniu funkcja trafia do użytkowników.",
+    },
+  };
+
+export const FLAG_AUDIENCE_LABELS: Record<
+  FlagAudience,
+  { label: string; hint: string }
+> = {
+  public: {
+    label: "witryna",
+    hint: "Czyta GET /api/flags/public — publiczna strona klubu.",
+  },
+  panels: {
+    label: "panele",
+    hint: "Klub i panel zawodnika — GET /api/flags/panels (logowanie).",
+  },
+  both: {
+    label: "oba",
+    hint: "Ta sama flaga na witrynie i w panelach.",
+  },
+  internal: {
+    label: "serwer",
+    hint: "Tylko backend — nie wychodzi do klientów.",
+  },
+};
 
 export const FLAG_ROLLOUT_LABELS: Record<
   FlagRolloutStatus,

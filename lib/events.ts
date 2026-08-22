@@ -1,10 +1,27 @@
-/** Typy kalendarza — spójne z backendem CalendarEvent / DTO. */
+/** Widok UI kalendarza + mapowanie DTO z Orval. */
+
+import type {
+  AthleteCalendarEvent,
+  CalendarEvent,
+  EventWithdrawal,
+  PublicCalendarEvent,
+  TrainingScheduleDefaults,
+  WithdrawalStatus,
+} from "@/lib/api/generated/models";
+
+export type {
+  AthleteCalendarEvent,
+  CalendarEvent,
+  TrainingScheduleDefaults,
+  WithdrawalStatus,
+};
+
+/** Alias historyczny — DTO kadry to `CalendarEvent` z Orval. */
+export type CalendarEventFull = CalendarEvent;
 
 export type EventType = "zawody" | "trening" | "zebranie" | "inne";
 
 export type EventStatus = "scheduled" | "cancelled";
-
-export type WithdrawalStatus = "pending" | "accepted" | "rejected";
 
 export type ClubEvent = {
   id: string;
@@ -25,68 +42,6 @@ export type ClubEvent = {
   attendance_counts?: { present: number; expected: number };
 };
 
-export type CalendarEventFull = {
-  id: string;
-  title: string;
-  event_type: string;
-  date: string;
-  end_date?: string | null;
-  time?: string | null;
-  location?: string | null;
-  description?: string | null;
-  status: string;
-  cancellation_note?: string | null;
-  club_assigned: boolean;
-  source: string;
-  locked: boolean;
-  all_athletes: boolean;
-  assigned_athlete_ids: string[];
-  withdrawals: Array<{
-    athlete_id: string;
-    user_id?: string | null;
-    reason: string;
-    at: string;
-    status: WithdrawalStatus;
-  }>;
-  created_by: string;
-  created_at: string;
-  updated_at: string;
-};
-
-export type AssignedAthleteBrief = {
-  id: string;
-  display_name: string;
-};
-
-export type AthleteCalendarEvent = {
-  id: string;
-  title: string;
-  event_type: string;
-  date: string;
-  end_date?: string | null;
-  time?: string | null;
-  location?: string | null;
-  description?: string | null;
-  status: string;
-  cancellation_note?: string | null;
-  club_assigned: boolean;
-  all_athletes: boolean;
-  assigned_athletes: AssignedAthleteBrief[];
-  i_am_assigned: boolean;
-  roster_announced: boolean;
-  my_withdrawal_status?: string | null;
-  attendance_status?: string | null;
-};
-
-export type TrainingScheduleDefaults = {
-  weekdays: number[];
-  time: string;
-  end_time: string;
-  location: string;
-  title: string;
-  attendance_buffer_minutes: number;
-};
-
 export const EVENT_TYPE_LABELS: Record<EventType, string> = {
   zawody: "Zawody",
   trening: "Trening",
@@ -96,6 +51,14 @@ export const EVENT_TYPE_LABELS: Record<EventType, string> = {
 
 export function eventTypeLabel(type: string): string {
   return EVENT_TYPE_LABELS[mapPublicType(type)];
+}
+
+export function eventAssignedIds(e: CalendarEvent): string[] {
+  return e.assigned_athlete_ids ?? [];
+}
+
+export function eventWithdrawals(e: CalendarEvent): EventWithdrawal[] {
+  return e.withdrawals ?? [];
 }
 
 export type EventsQuery = {
@@ -110,18 +73,7 @@ function mapPublicType(t: string): EventType {
   return "inne";
 }
 
-export function publicApiToClubEvent(raw: {
-  id: string;
-  title: string;
-  event_type: string;
-  date: string;
-  end_date?: string | null;
-  time?: string | null;
-  location?: string | null;
-  description?: string | null;
-  status?: string;
-  cancellation_note?: string | null;
-}): ClubEvent {
+export function publicApiToClubEvent(raw: PublicCalendarEvent): ClubEvent {
   const end = raw.end_date?.trim();
   return {
     id: raw.id,
@@ -137,7 +89,7 @@ export function publicApiToClubEvent(raw: {
   };
 }
 
-export function fullToClubEvent(e: CalendarEventFull): ClubEvent {
+export function fullToClubEvent(e: CalendarEvent): ClubEvent {
   return publicApiToClubEvent(e);
 }
 
@@ -160,18 +112,7 @@ export async function getEvents(query: EventsQuery = {}): Promise<ClubEvent[]> {
       });
 
       if (response.ok) {
-        const data = (await response.json()) as Array<{
-          id: string;
-          title: string;
-          event_type: string;
-          date: string;
-          end_date?: string | null;
-          time?: string | null;
-          location?: string | null;
-          description?: string | null;
-          status?: string;
-          cancellation_note?: string | null;
-        }>;
+        const data = (await response.json()) as PublicCalendarEvent[];
         return data
           .map(publicApiToClubEvent)
           .sort(

@@ -1,74 +1,53 @@
-import { FLAG_ROLLOUT_LABELS } from "@/lib/feature-flags-meta";
-import type { FeatureFlag, FlagRolloutStatus } from "@/lib/api/generated/models";
+"use client";
 
-function RolloutBadge({ status }: { status: FlagRolloutStatus }) {
-  const meta = FLAG_ROLLOUT_LABELS[status];
-  const tone =
-    status === "wired"
-      ? "border-emerald-500/45 bg-emerald-500/15 text-emerald-100"
-      : status === "partial"
-        ? "border-amber-500/40 bg-amber-500/12 text-amber-100"
-        : status === "planned"
-          ? "border-paper/20 bg-paper/5 text-paper/55"
-          : "border-paper/25 bg-paper/[0.04] text-paper/65";
+import { useMemo, useState } from "react";
+import { FilterChip } from "@/components/ui/FilterChip";
+import {
+  FLAG_AUDIENCE_LABELS,
+  FLAG_KIND_LABELS,
+  FLAG_ROLLOUT_LABELS,
+} from "@/lib/feature-flags-meta";
+import type { FeatureFlag, FlagModule } from "@/lib/api/generated/models";
+import { FlagsLegend } from "@/components/klub/devtools/FlagsLegend";
+import {
+  canToggle,
+  FlagRow,
+} from "@/components/klub/devtools/FlagRow";
+import { queryActive } from "@/components/klub/devtools/FlagBadges";
 
-  return (
-    <span
-      title={meta.hint}
-      className={`inline-flex items-center border px-2 py-0.5 font-display text-[10px] tracking-[0.12em] uppercase ${tone}`}
-    >
-      {meta.label}
-    </span>
-  );
-}
+const MODULES: { id: FlagModule; label: string }[] = [
+  { id: "witryna", label: "Witryna" },
+  { id: "kalendarz", label: "Kalendarz" },
+  { id: "trening", label: "Trening" },
+  { id: "komunikacja", label: "Komunikacja" },
+  { id: "ui", label: "UI" },
+];
 
-function FlagRow({
-  flag,
-  onToggle,
-  pending,
-}: {
-  flag: FeatureFlag;
-  onToggle: (flag: FeatureFlag) => void;
-  pending: boolean;
-}) {
-  return (
-    <div className="flex flex-wrap items-start justify-between gap-4 border border-paper/10 px-4 py-4">
-      <div className="min-w-0 max-w-xl space-y-2">
-        <div className="flex flex-wrap items-center gap-2">
-          <p className="font-medium text-paper">{flag.label}</p>
-          <RolloutBadge status={flag.rollout_status} />
-        </div>
-        <p className="text-sm leading-relaxed text-paper/60">
-          {flag.description}
-        </p>
-        <p className="font-mono text-[11px] text-paper/35">
-          {flag.key}
-          {flag.client_visible ? " · client" : " · server"}
-          {flag.updated_at
-            ? ` · aktualizacja ${new Date(flag.updated_at).toLocaleString("pl-PL")}`
-            : null}
-        </p>
-      </div>
-      <button
-        type="button"
-        onClick={() => onToggle(flag)}
-        disabled={pending}
-        className={
-          flag.enabled
-            ? "shrink-0 bg-brand px-3 py-1.5 font-display text-[11px] tracking-[0.12em] uppercase disabled:opacity-50"
-            : "shrink-0 border border-paper/25 px-3 py-1.5 font-display text-[11px] tracking-[0.12em] uppercase disabled:opacity-50"
-        }
-      >
-        {flag.enabled ? "Włączone" : "Wyłączone"}
-      </button>
-    </div>
-  );
+function flagSearchHaystack(flag: FeatureFlag): string {
+  const rollout = FLAG_ROLLOUT_LABELS[flag.rollout_status];
+  const moduleLabel =
+    MODULES.find((m) => m.id === flag.module)?.label ?? flag.module;
+  const parts = [
+    flag.label,
+    flag.key,
+    flag.description,
+    flag.module,
+    moduleLabel,
+    flag.kind,
+    FLAG_KIND_LABELS[flag.kind].label,
+    flag.audience,
+    FLAG_AUDIENCE_LABELS[flag.audience].label,
+    flag.rollout_status,
+    rollout.label,
+    flag.enabled ? "włączone" : "wyłączone",
+  ];
+  if (!canToggle(flag)) parts.push("w przygotowaniu");
+  return parts.join(" ").toLowerCase();
 }
 
 type FlagsTabProps = {
   flags: FeatureFlag[];
   flagsLoading: boolean;
-  rolloutStatuses: FlagRolloutStatus[];
   onToggle: (flag: FeatureFlag) => void;
   pending: boolean;
 };
@@ -76,61 +55,143 @@ type FlagsTabProps = {
 export function FlagsTab({
   flags,
   flagsLoading,
-  rolloutStatuses,
   onToggle,
   pending,
 }: FlagsTabProps) {
+  const [moduleFilter, setModuleFilter] = useState<FlagModule | "all">("all");
+  const [q, setQ] = useState("");
+
+  function onBadgeSearch(term: string) {
+    setQ((prev) => (queryActive(prev, term) ? "" : term));
+  }
+
+  const filtered = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    return flags.filter((f) => {
+      if (moduleFilter !== "all" && f.module !== moduleFilter) return false;
+      if (!needle) return true;
+      return flagSearchHaystack(f).includes(needle);
+    });
+  }, [flags, moduleFilter, q]);
+
+  const byModule = useMemo(() => {
+    const map = new Map<FlagModule, FeatureFlag[]>();
+    for (const mod of MODULES) map.set(mod.id, []);
+    for (const flag of filtered) {
+      const list = map.get(flag.module) ?? [];
+      list.push(flag);
+      map.set(flag.module, list);
+    }
+    return map;
+  }, [filtered]);
+
   return (
     <div className="space-y-8">
-      <div className="border border-paper/10 bg-paper/[0.03] px-4 py-3 text-sm text-paper/60">
-        <p>
-          FE pyta backend o katalog flag (`GET /api/admin/flags`). Przełącznik
-          zapisuje stan w DB (
-          <span className="font-mono text-paper/80">
-            PATCH /api/admin/flags/&#123;key&#125;
-          </span>
-          ). Flagi z <span className="font-mono text-paper/80">client_visible</span>{" "}
-          trafiają też do witryny/paneli przez{" "}
-          <span className="font-mono text-paper/80">/api/flags/public</span>.
-        </p>
-        <dl className="mt-3 grid gap-2 sm:grid-cols-2">
-          {rolloutStatuses.map((status) => (
-            <div key={status} className="flex items-start gap-2">
-              <RolloutBadge status={status} />
-              <span className="text-xs leading-snug text-paper/40">
-                {FLAG_ROLLOUT_LABELS[status].hint}
-              </span>
-            </div>
-          ))}
-        </dl>
+      <FlagsLegend query={q} onBadgeSearch={onBadgeSearch} />
+
+      <div className="flex flex-wrap items-center gap-2">
+        <FilterChip
+          active={moduleFilter === "all"}
+          onClick={() => setModuleFilter("all")}
+          label="Wszystkie"
+        />
+        {MODULES.map((m) => (
+          <FilterChip
+            key={m.id}
+            active={moduleFilter === m.id}
+            onClick={() => setModuleFilter(m.id)}
+            label={m.label}
+          />
+        ))}
+        <label className="ml-auto text-sm text-paper/60">
+          Szukaj
+          <input
+            className="mt-1 w-full min-w-[12rem] border border-paper/20 bg-chrome/60 px-3 py-1.5 text-sm outline-none focus:border-brand sm:w-56"
+            value={q}
+            placeholder="nazwa, klucz, badge…"
+            onChange={(e) => setQ(e.target.value)}
+          />
+        </label>
       </div>
 
-      <section className="flex min-h-0 flex-col space-y-3">
-        <div className="shrink-0">
-          <h2 className="font-display text-xs tracking-[0.14em] text-paper/45 uppercase">
-            Flagi
-          </h2>
-          <p className="mt-1 text-sm text-paper/50">
-            Funkcje produkcyjne — bezpieczne do włączania na żywo.
-          </p>
-        </div>
-        {flagsLoading ? (
-          <p className="text-sm text-paper/45">Ładowanie flag…</p>
-        ) : flags.length === 0 ? (
-          <p className="text-sm text-paper/45">Brak flag w bazie.</p>
-        ) : (
-          <div className="max-h-[min(70vh,36rem)] space-y-3 overflow-y-auto overscroll-contain border border-paper/10 bg-paper/[0.02] p-3">
-            {flags.map((flag) => (
-              <FlagRow
-                key={flag.key}
-                flag={flag}
-                onToggle={onToggle}
-                pending={pending}
-              />
-            ))}
-          </div>
-        )}
-      </section>
+      {flagsLoading ? (
+        <p className="text-sm text-paper/45">Ładowanie flag…</p>
+      ) : flags.length === 0 ? (
+        <p className="text-sm text-paper/45">Brak flag w bazie.</p>
+      ) : filtered.length === 0 ? (
+        <p className="text-sm text-paper/45">
+          Brak flag pasujących do wyszukiwania.
+        </p>
+      ) : (
+        MODULES.filter(
+          (m) => moduleFilter === "all" || moduleFilter === m.id,
+        ).map((m) => {
+          const items = byModule.get(m.id) ?? [];
+          if (items.length === 0) return null;
+          const live = items.filter(canToggle);
+          const stable = live.filter((f) => f.kind !== "experimental");
+          const experimental = live.filter((f) => f.kind === "experimental");
+          const planned = items.filter((f) => !canToggle(f));
+          return (
+            <section key={m.id} className="space-y-3">
+              <h2 className="font-display text-xs tracking-[0.14em] text-paper/45 uppercase">
+                {m.label}
+              </h2>
+              {stable.length > 0 ? (
+                <div className="space-y-2">
+                  <p className="font-display text-[10px] tracking-[0.14em] text-paper/35 uppercase">
+                    Stabilne
+                  </p>
+                  {stable.map((flag) => (
+                    <FlagRow
+                      key={flag.key}
+                      flag={flag}
+                      onToggle={onToggle}
+                      pending={pending}
+                      query={q}
+                      onBadgeSearch={onBadgeSearch}
+                    />
+                  ))}
+                </div>
+              ) : null}
+              {experimental.length > 0 ? (
+                <div className="space-y-2">
+                  <p className="font-display text-[10px] tracking-[0.14em] text-paper/35 uppercase">
+                    Eksperymentalne — testy na żywych kontach
+                  </p>
+                  {experimental.map((flag) => (
+                    <FlagRow
+                      key={flag.key}
+                      flag={flag}
+                      onToggle={onToggle}
+                      pending={pending}
+                      query={q}
+                      onBadgeSearch={onBadgeSearch}
+                    />
+                  ))}
+                </div>
+              ) : null}
+              {planned.length > 0 ? (
+                <div className="space-y-2">
+                  <p className="font-display text-[10px] tracking-[0.14em] text-paper/35 uppercase">
+                    W przygotowaniu
+                  </p>
+                  {planned.map((flag) => (
+                    <FlagRow
+                      key={flag.key}
+                      flag={flag}
+                      onToggle={onToggle}
+                      pending={pending}
+                      query={q}
+                      onBadgeSearch={onBadgeSearch}
+                    />
+                  ))}
+                </div>
+              ) : null}
+            </section>
+          );
+        })
+      )}
     </div>
   );
 }

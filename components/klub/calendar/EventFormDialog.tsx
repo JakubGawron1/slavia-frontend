@@ -1,7 +1,12 @@
 import { FormEvent } from "react";
 import { Modal } from "@/components/ui/Modal";
-import type { AthleteProfile } from "@/lib/api/generated/models";
+import type { AthleteProfile, TrainingPlan } from "@/lib/api/generated/models";
 import type { FormState } from "@/components/klub/calendar/useStaffCalendar";
+import {
+  useListPanelFlags,
+  useListPlans,
+} from "@/lib/api/generated/default/default";
+import { isFlagEnabled, TRAINING_PLANS_FLAG } from "@/lib/panel-flags";
 
 const fieldClass =
   "mt-1 w-full border border-paper/20 bg-chrome/60 px-3 py-2 text-sm text-paper outline-none focus:border-brand";
@@ -21,6 +26,18 @@ export function EventFormDialog({
   onSubmit: (e: FormEvent) => void;
   onClose: () => void;
 }) {
+  const flagsQuery = useListPanelFlags({ query: { staleTime: 60_000 } });
+  const plansQuery = useListPlans(
+    { status: "published" },
+    {
+      query: {
+        enabled: isFlagEnabled(flagsQuery.data?.data, TRAINING_PLANS_FLAG),
+      },
+    },
+  );
+  const plans = (plansQuery.data?.data as TrainingPlan[] | undefined) ?? [];
+  const plansOn = isFlagEnabled(flagsQuery.data?.data, TRAINING_PLANS_FLAG);
+
   return (
     <Modal
       open={!!form}
@@ -170,9 +187,30 @@ export function EventFormDialog({
               </div>
             </fieldset>
           ) : (
-            <p className="text-sm text-paper/50">
-              Trening: automatycznie wszyscy zawodnicy.
-            </p>
+            <div className="space-y-3">
+              <p className="text-sm text-paper/50">
+                Trening: automatycznie wszyscy zawodnicy.
+              </p>
+              {plansOn ? (
+                <label className="text-sm text-paper/70">
+                  Plan treningowy (opcjonalnie)
+                  <select
+                    className={fieldClass}
+                    value={form.plan_id}
+                    onChange={(e) =>
+                      onChange({ ...form, plan_id: e.target.value })
+                    }
+                  >
+                    <option value="">Bez przypięcia — auto z planu sezonu</option>
+                    {plans.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.title}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ) : null}
+            </div>
           )}
           <div className="flex gap-2 pt-2">
             <button

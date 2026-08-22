@@ -3,7 +3,7 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 2.0.0.0+1
+ * OpenAPI spec version: 2.2.0.1+1
  */
 import type { EventWithdrawal } from './eventWithdrawal';
 
@@ -31,6 +31,11 @@ export interface CalendarEvent {
   /** @nullable */
   location?: string | null;
   locked: boolean;
+  /**
+     * Opcjonalne przypięcie dnia planu (override auto-mapowania z `starts_on`).
+     * @nullable
+     */
+  plan_id?: string | null;
   /** "seeded" | "manual" */
   source: string;
   /** "scheduled" | "cancelled" */

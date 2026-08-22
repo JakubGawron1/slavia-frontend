@@ -4,11 +4,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { getApiBaseUrl, getStoredToken, getStoredUser } from "@/lib/auth";
 import { KLUB_NAV, PUBLIC_ROUTE_MAP } from "@/lib/klub-nav";
-import { FLAG_ROLLOUT_LABELS } from "@/lib/feature-flags-meta";
 import { useKlub } from "@/components/klub/KlubProvider";
 import { useToast } from "@/components/toast/ToastProvider";
 import {
   getListFlagsQueryKey,
+  getListPanelFlagsQueryKey,
   getListPublicFlagsQueryKey,
   useListFlags,
   useSiteStats,
@@ -17,7 +17,6 @@ import {
 import { useHealth } from "@/lib/api/generated/admin/admin";
 import type {
   FeatureFlag,
-  FlagRolloutStatus,
   SiteStats,
 } from "@/lib/api/generated/models";
 import { SLAVIA_VERSION } from "@/lib/version";
@@ -77,6 +76,9 @@ export function useDevTools() {
       await queryClient.invalidateQueries({
         queryKey: getListPublicFlagsQueryKey(),
       });
+      await queryClient.invalidateQueries({
+        queryKey: getListPanelFlagsQueryKey(),
+      });
       toast.success(
         flag.enabled ? "Wyłączono flagę" : "Włączono flagę",
         flag.label,
@@ -106,8 +108,6 @@ export function useDevTools() {
     ),
   ];
 
-  const rolloutStatuses = Object.keys(FLAG_ROLLOUT_LABELS) as FlagRolloutStatus[];
-
   return {
     user,
     activeRole,
@@ -125,7 +125,6 @@ export function useDevTools() {
     onHealthUpdate,
     publicRoutes: PUBLIC_ROUTE_MAP,
     klubRoutes,
-    rolloutStatuses,
     toggleFlag: (flag: FeatureFlag) => void toggleFlag(flag),
     togglePending: updateFlagMutation.isPending,
     platformVersion: SLAVIA_VERSION,

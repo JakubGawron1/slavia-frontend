@@ -13,7 +13,7 @@ import { AgendaView } from "@/components/calendar/AgendaView";
 import { CalendarAside } from "@/components/calendar/CalendarAside";
 import { MonthGrid } from "@/components/calendar/MonthGrid";
 import { EventRow } from "@/components/calendar/EventRow";
-import { FilterChip } from "@/components/calendar/FilterChip";
+import { FilterChip } from "@/components/ui/FilterChip";
 import {
   EVENT_BAR,
   TONES,

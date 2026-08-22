@@ -45,6 +45,13 @@ export const KLUB_NAV: KlubNavCategory[] = [
         roles: ["trener", "admin", "superadmin"],
       },
       {
+        href: "/klub/rekordy",
+        label: "Rekordy ćwiczeń",
+        description: "Kolejka zgłoszeń 1RM i wpis rekordu za zawodnika.",
+        roles: ["trener", "admin", "superadmin"],
+        flag: "training_exercise_records",
+      },
+      {
         href: "/klub/obecnosc",
         label: "Obecność (QR)",
         description: "Kod QR treningu, skany i lista obecności.",
@@ -56,6 +63,20 @@ export const KLUB_NAV: KlubNavCategory[] = [
     id: "trening",
     label: "Trening",
     items: [
+      {
+        href: "/klub/plany",
+        label: "Plany treningowe",
+        description: "Kreator, katalog, szkic AI, biblioteka i grupy.",
+        roles: ["trener", "admin", "superadmin"],
+        flag: "training_plans",
+      },
+      {
+        href: "/klub/analiza",
+        label: "Analiza techniki",
+        description: "Film liftu → tekstowa ocena AI (bez rysowania na klatkach).",
+        roles: ["trener", "admin", "superadmin"],
+        flag: "lift_bar_path_ai",
+      },
       {
         href: "/klub/kalendarz",
         label: "Kalendarz zawodów",
@@ -141,6 +162,12 @@ export const PUBLIC_ROUTE_MAP = [
   { path: "/logowanie", label: "Logowanie" },
   { path: "/panel", label: "Panel zawodnika" },
   { path: "/panel/wyniki", label: "Zgłaszanie wyników" },
+  { path: "/panel/rekordy", label: "Rekordy ćwiczeń (zawodnik)" },
+  { path: "/panel/plany", label: "Plany treningowe (zawodnik)" },
+  { path: "/panel/analiza", label: "Analiza techniki (zawodnik)" },
+  { path: "/klub/plany", label: "Plany treningowe (klub)" },
+  { path: "/klub/analiza", label: "Analiza techniki (klub)" },
+  { path: "/klub/rekordy", label: "Rekordy ćwiczeń (klub)" },
   { path: "/panel/obecnosc", label: "Skaner obecności" },
   { path: "/panel/kalendarz", label: "Kalendarz (zawodnik)" },
   { path: "/panel/kalkulator-sinclair", label: "Kalkulator Sinclair (zawodnik)" },

@@ -29,6 +29,7 @@ export type FormState = {
   location: string;
   description: string;
   assigned_athlete_ids: string[];
+  plan_id: string;
 };
 
 export const emptyForm = (date?: string): FormState => ({
@@ -41,6 +42,7 @@ export const emptyForm = (date?: string): FormState => ({
   location: "ul. Konopnickiej 13, Ruda Śląska",
   description: "",
   assigned_athlete_ids: [],
+  plan_id: "",
 });
 
 export type CtxMenu = {

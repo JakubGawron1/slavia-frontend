@@ -1,6 +1,5 @@
 import type { FormEvent } from "react";
-import { ResultCategoryPreview } from "@/components/results/ResultCategoryPreview";
-import { resultInputClass } from "@/components/results/shared";
+import { ResultFormFields } from "@/components/results/ResultFormFields";
 import type { WynikKind } from "./usePanelWyniki";
 
 type WynikFormProps = {
@@ -22,9 +21,6 @@ type WynikFormProps = {
   profileReady: boolean;
   onSubmit: (e: FormEvent) => void;
 };
-
-const fieldLabelClass =
-  "font-display text-[11px] tracking-[0.12em] text-paper/50 uppercase";
 
 export function WynikForm({
   kind,
@@ -72,76 +68,22 @@ export function WynikForm({
           Rekord treningowy
         </button>
       </div>
-      {kind === "competition" ? (
-        <label className="flex flex-col gap-1.5 sm:col-span-2">
-          <span className={fieldLabelClass}>Nazwa zawodów</span>
-          <input
-            className={resultInputClass}
-            value={eventName}
-            onChange={(e) => onEventNameChange(e.target.value)}
-            required
-          />
-        </label>
-      ) : null}
-      <label className="flex flex-col gap-1.5 sm:col-span-2">
-        <span className={fieldLabelClass}>
-          {kind === "competition" ? "Data zawodów" : "Data treningu"}
-        </span>
-        <input
-          className={resultInputClass}
-          type="date"
-          value={eventDate}
-          onChange={(e) => onEventDateChange(e.target.value)}
-          required
-        />
-      </label>
-      <label className="flex flex-col gap-1.5">
-        <span className={fieldLabelClass}>Rwanie (kg)</span>
-        <input
-          className={resultInputClass}
-          type="number"
-          step="0.5"
-          value={snatch}
-          onChange={(e) => onSnatchChange(e.target.value)}
-        />
-      </label>
-      <label className="flex flex-col gap-1.5">
-        <span className={fieldLabelClass}>Podrzut (kg)</span>
-        <input
-          className={resultInputClass}
-          type="number"
-          step="0.5"
-          value={cj}
-          onChange={(e) => onCjChange(e.target.value)}
-        />
-      </label>
-      {kind === "competition" ? (
-        <>
-          <label className="flex flex-col gap-1.5">
-            <span className={fieldLabelClass}>Aktualna masa ciała (kg)</span>
-            <input
-              className={resultInputClass}
-              type="number"
-              step="0.1"
-              value={bodyweight}
-              onChange={(e) => onBodyweightChange(e.target.value)}
-              required
-            />
-          </label>
-          <ResultCategoryPreview
-            category={previewCategory}
-            missingProfileInfo={!profileReady}
-          />
-          <label className="flex flex-col gap-1.5 sm:col-span-2">
-            <span className={fieldLabelClass}>Miejsce zawodów</span>
-            <input
-              className={resultInputClass}
-              value={venue}
-              onChange={(e) => onVenueChange(e.target.value)}
-            />
-          </label>
-        </>
-      ) : null}
+      <ResultFormFields
+        values={{ eventName, eventDate, snatch, cj, bodyweight, venue }}
+        onFieldChange={(key, value) => {
+          if (key === "eventName") onEventNameChange(value);
+          else if (key === "eventDate") onEventDateChange(value);
+          else if (key === "snatch") onSnatchChange(value);
+          else if (key === "cj") onCjChange(value);
+          else if (key === "bodyweight") onBodyweightChange(value);
+          else onVenueChange(value);
+        }}
+        showCompetitionMeta={kind === "competition"}
+        dateLabel={kind === "competition" ? "Data zawodów" : "Data treningu"}
+        previewCategory={previewCategory}
+        missingProfileInfo={!profileReady}
+        bodyweightPlaceholder="Aktualna masa ciała (kg)"
+      />
       <button
         type="submit"
         className="bg-brand px-4 py-2 font-display text-xs tracking-[0.12em] uppercase sm:col-span-2 sm:justify-self-start"

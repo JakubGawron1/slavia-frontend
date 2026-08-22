@@ -1,6 +1,8 @@
 import { Modal } from "@/components/ui/Modal";
 import {
+  eventAssignedIds,
   eventTypeLabel,
+  eventWithdrawals,
   type CalendarEventFull,
   type WithdrawalStatus,
 } from "@/lib/events";
@@ -51,6 +53,9 @@ export function EventDetailDialog({
             {detail.time ? ` · ${detail.time}` : ""}
             {detail.location ? ` · ${detail.location}` : ""}
           </p>
+          {detail.plan_id ? (
+            <p className="text-sm text-brand">Powiązany z planem treningowym</p>
+          ) : null}
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
@@ -99,7 +104,7 @@ export function EventDetailDialog({
 
           {detail.event_type === "zawody" ? (
             <CompetitionEntriesSection
-              assignedAthleteIds={detail.assigned_athlete_ids}
+              assignedAthleteIds={eventAssignedIds(detail)}
               profiles={profiles}
               missingForDetail={missingForDetail}
             />
@@ -107,11 +112,11 @@ export function EventDetailDialog({
             <AttendanceSection detailRoster={detailRoster} />
           )}
 
-          {detail.withdrawals.length > 0 ? (
+          {eventWithdrawals(detail).length > 0 ? (
             <div>
               <h3 className="font-display text-sm uppercase">Rezygnacje</h3>
               <ul className="mt-2 space-y-2">
-                {detail.withdrawals.map((w) => {
+                {eventWithdrawals(detail).map((w) => {
                   const p = profiles.find((x) => x.id === w.athlete_id);
                   const st = w.status as WithdrawalStatus;
                   return (

@@ -12,26 +12,9 @@ import {
 } from "@/lib/auth";
 import { STAFF_ROLES } from "@/lib/klub-nav";
 import { useListPublicFlags } from "@/lib/api/generated/default/default";
-import { isFlagEnabled } from "@/lib/public-flags";
-import type { PublicFlag } from "@/lib/api/generated/models";
+import { visibleSiteNav, type SiteNavLink } from "@/lib/site-nav";
 import { ClubMark } from "./ClubMark";
 import { SiteThemeToggle } from "./SiteThemeToggle";
-
-const NAV_LINKS = [
-  { href: "/blog", label: "Aktualności", flag: "public_blog" },
-  { href: "/zawodnicy", label: "Zawodnicy", flag: null },
-  { href: "/kalendarz", label: "Kalendarz", flag: "public_calendar" },
-  { href: "/ogloszenia", label: "Ogłoszenia", flag: "announcements_board" },
-  { href: "/kontakt", label: "Kontakt", flag: null },
-] as const;
-
-type NavLink = { href: string; label: string };
-
-function visibleNavLinks(flags: PublicFlag[] | undefined): NavLink[] {
-  return NAV_LINKS.filter(
-    (link) => !link.flag || isFlagEnabled(flags, link.flag),
-  );
-}
 
 const overlayPaths = new Set([
   "/",
@@ -97,7 +80,7 @@ function HeaderChrome({
   onToggle: () => void;
   onClose: () => void;
   user: AuthUser | null;
-  navLinks: NavLink[];
+  navLinks: SiteNavLink[];
 }) {
   const overlayHeader = overlayPaths.has(pathname);
   const isAuthActive = user
@@ -273,7 +256,7 @@ function HeaderInner() {
       onToggle={() => setOpen((v) => !v)}
       onClose={() => setOpen(false)}
       user={user}
-      navLinks={visibleNavLinks(navFlags)}
+      navLinks={visibleSiteNav(navFlags)}
     />
   );
 }
@@ -286,7 +269,7 @@ function HeaderFallback() {
       onToggle={() => {}}
       onClose={() => {}}
       user={null}
-      navLinks={visibleNavLinks(undefined)}
+      navLinks={visibleSiteNav(undefined)}
     />
   );
 }

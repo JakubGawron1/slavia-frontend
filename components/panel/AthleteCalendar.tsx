@@ -82,18 +82,7 @@ export function AthleteCalendar() {
   const clubEvents: ClubEvent[] = useMemo(
     () =>
       visible.map((e) => {
-        const base = publicApiToClubEvent({
-          id: e.id,
-          title: e.title,
-          event_type: e.event_type,
-          date: e.date,
-          end_date: e.end_date,
-          time: e.time,
-          location: e.location,
-          description: e.description,
-          status: e.status,
-          cancellation_note: e.cancellation_note,
-        });
+        const base = publicApiToClubEvent(e);
         const attendance_status = parseAttendanceStatus(e.attendance_status);
         return attendance_status ? { ...base, attendance_status } : base;
       }),
@@ -201,6 +190,12 @@ export function AthleteCalendar() {
             </p>
             {selected.description ? (
               <p className="text-sm text-paper/70">{selected.description}</p>
+            ) : null}
+            {selected.plan_title ? (
+              <p className="text-sm text-brand">
+                Plan: {selected.plan_title}
+                {selected.plan_week != null ? ` · T${selected.plan_week}` : ""}
+              </p>
             ) : null}
             {selected.cancellation_note ? (
               <p className="text-sm text-brand">

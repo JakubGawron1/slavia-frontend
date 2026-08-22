@@ -1,6 +1,6 @@
 {
   "name": "slavia-frontend",
-  "version": "2.0.0.1",
+  "version": "2.2.0.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -27,22 +27,31 @@
       "unrs-resolver",
       "@biomejs/biome",
       "lefthook"
-    ]
+    ],
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "eslint": "10",
+        "typescript": "7"
+      }
+    }
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@tanstack/react-query": "^5.101.4",
     "@tanstack/react-query-devtools": "^5.91.0",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "html5-qrcode": "^2.3.8",
-    "next": "16.3.0",
+    "next": "16.3.1",
     "qrcode": "^1.5.4",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "zod": "^3.25.76"
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4",
+    "@biomejs/biome": "^2.5.8",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^26.2.0",
     "@types/qrcode": "^1.5.6",
@@ -50,9 +59,9 @@
     "@types/react-dom": "^19.2.4",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^10.8.1",
-    "eslint-config-next": "16.3.0",
-    "knip": "^5.61.3",
-    "lefthook": "^1.11.13",
+    "eslint-config-next": "16.3.1",
+    "knip": "^6.32.2",
+    "lefthook": "^2.1.10",
     "orval": "^8.24.0",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2"

@@ -3,7 +3,7 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 2.0.0.0+1
+ * OpenAPI spec version: 2.2.0.1+1
  */
 import type { AiResponseStyle } from './aiResponseStyle';
 
@@ -27,4 +27,6 @@ export interface AiSettings {
   model?: string;
   response_style?: AiResponseStyle;
   temperature?: number;
+  /** Model wizyjny (analiza liftu). Puste = Llama 4 Scout. */
+  vision_model?: string;
 }

@@ -3,7 +3,7 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 2.0.0.0+1
+ * OpenAPI spec version: 2.2.0.1+1
  */
 import type { AssignedAthleteBrief } from './assignedAthleteBrief';
 
@@ -27,6 +27,20 @@ export interface AthleteCalendarEvent {
   location?: string | null;
   /** @nullable */
   my_withdrawal_status?: string | null;
+  /** @nullable */
+  plan_id?: string | null;
+  /** @nullable */
+  plan_title?: string | null;
+  /**
+     * @minimum 0
+     * @nullable
+     */
+  plan_week?: number | null;
+  /**
+     * @minimum 0
+     * @nullable
+     */
+  plan_weekday?: number | null;
   roster_announced: boolean;
   status: string;
   /** @nullable */

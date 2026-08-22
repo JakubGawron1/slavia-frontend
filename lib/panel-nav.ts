@@ -24,10 +24,28 @@ export const ATHLETE_STAT_LINKS: AthleteStatsLinks = {
 
 export const PANEL_MODULES: PanelModule[] = [
   {
+    href: "/panel/plany",
+    label: "Plan treningowy",
+    description: "Twój aktualny mikrocykl — dzień i serie z obciążeniem.",
+    flag: "training_plans",
+  },
+  {
+    href: "/panel/analiza",
+    label: "Analiza techniki",
+    description: "Wgraj film liftu — AI oceni technikę tekstem, bez rysowania na filmie.",
+    flag: "lift_bar_path_ai",
+  },
+  {
     href: "/panel/wyniki",
-    label: "Wyniki i rekordy",
-    description: "Zgłoś wyniki zawodów lub rekordy treningowe do weryfikacji.",
+    label: "Wyniki dwuboju",
+    description: "Zgłoś wyniki zawodów (rwanie / podrzut) do weryfikacji.",
     statKey: "results_pending",
+  },
+  {
+    href: "/panel/rekordy",
+    label: "Rekordy ćwiczeń",
+    description: "Zgłoś 1RM przysiadu i innych ćwiczeń — osobno od dwuboju.",
+    flag: "training_exercise_records",
   },
   {
     href: "/panel/obecnosc",

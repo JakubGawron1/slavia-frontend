@@ -5,6 +5,8 @@ import { type AttendanceViewStatus } from "@/lib/attendance-ui";
 import { toDateKey } from "@/lib/calendar";
 import {
   fullToClubEvent,
+  eventAssignedIds,
+  eventWithdrawals,
   type CalendarEventFull,
   type ClubEvent,
   type TrainingScheduleDefaults,
@@ -106,7 +108,7 @@ export function useStaffCalendar() {
       if (ev.event_type !== "trening") return base;
 
       const withdrawnIds = new Set(
-        ev.withdrawals
+        eventWithdrawals(ev)
           .filter((w) => w.status === "accepted")
           .map((w) => w.athlete_id),
       );
@@ -145,7 +147,7 @@ export function useStaffCalendar() {
 
   const missingForDetail = useMemo(() => {
     if (!detail || detail.event_type !== "zawody") return [];
-    return activeAthletes.filter((p) => !detail.assigned_athlete_ids.includes(p.id));
+    return activeAthletes.filter((p) => !eventAssignedIds(detail).includes(p.id));
   }, [detail, activeAthletes]);
 
   const detailRoster = useMemo((): RosterAttendanceRow[] => {
@@ -162,7 +164,7 @@ export function useStaffCalendar() {
     );
 
     const withdrawn = new Map(
-      detail.withdrawals
+      eventWithdrawals(detail)
         .filter((w) => w.status === "accepted")
         .map((w) => [w.athlete_id, true]),
     );
@@ -203,7 +205,8 @@ export function useStaffCalendar() {
       time: ev.time ?? "",
       location: ev.location ?? "",
       description: ev.description ?? "",
-      assigned_athlete_ids: [...ev.assigned_athlete_ids],
+      assigned_athlete_ids: [...eventAssignedIds(ev)],
+      plan_id: ev.plan_id ?? "",
     });
   }
 

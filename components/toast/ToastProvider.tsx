@@ -10,7 +10,11 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { useListPublicFlags } from "@/lib/api/generated/default/default";
+import { usePathname } from "next/navigation";
+import {
+  useListPanelFlags,
+  useListPublicFlags,
+} from "@/lib/api/generated/default/default";
 import { isFlagEnabled, UI_TOASTS_FLAG } from "@/lib/public-flags";
 
 export type ToastTone = "success" | "error" | "info";
@@ -128,9 +132,17 @@ function ToastCard({
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<ToastItem[]>([]);
-  const flagsQuery = useListPublicFlags({ query: { staleTime: 60_000 } });
+  const pathname = usePathname() ?? "";
+  const inPanels =
+    pathname.startsWith("/klub") || pathname.startsWith("/panel");
+  const publicFlags = useListPublicFlags({
+    query: { enabled: !inPanels, staleTime: 60_000 },
+  });
+  const panelFlags = useListPanelFlags({
+    query: { enabled: inPanels, staleTime: 60_000 },
+  });
   const toastsEnabled = isFlagEnabled(
-    flagsQuery.data?.data,
+    inPanels ? panelFlags.data?.data : publicFlags.data?.data,
     UI_TOASTS_FLAG,
     true,
   );

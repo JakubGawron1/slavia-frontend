@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useMemo } from "react";
 import {
   useAthleteStats,
-  useListPublicFlags,
+  useListPanelFlags,
+  useListPlans,
   useListResults,
 } from "@/lib/api/generated/default/default";
 import { useListPublicProfiles } from "@/lib/api/generated/public/public";
@@ -12,13 +13,15 @@ import type {
   AthleteProfile,
   AthleteStats,
   CompetitionResult,
+  TrainingPlan,
 } from "@/lib/api/generated/models";
 import { formatKg, resultEventInstant } from "@/lib/athletes";
 import {
   ATHLETE_STAT_LINKS,
   PANEL_MODULES,
 } from "@/lib/panel-nav";
-import { isFlagEnabled } from "@/lib/public-flags";
+import { isFlagEnabled } from "@/lib/panel-flags";
+import { CurrentPlanTile } from "@/components/plans/athlete/AthletePlansHome";
 import { ProgressChart } from "@/components/zawodnicy/ProgressChart";
 import { usePanel } from "@/components/panel/PanelProvider";
 import { InlineStatus } from "@/components/ui/InlineStatus";
@@ -114,8 +117,20 @@ export default function PanelHomePage() {
     { query: { queryKey: ["/api/results", { mine: true }, scopeKey] } },
   );
   const profilesQuery = useListPublicProfiles({ query: { staleTime: 60_000 } });
-  const flagsQuery = useListPublicFlags({ query: { staleTime: 60_000 } });
+  const flagsQuery = useListPanelFlags({ query: { staleTime: 60_000 } });
   const flags = flagsQuery.data?.data;
+  const plansQuery = useListPlans(
+    { mine: true },
+    {
+      query: {
+        enabled: isFlagEnabled(flags, "training_plans"),
+        staleTime: 30_000,
+      },
+    },
+  );
+  const currentPlan = (
+    (plansQuery.data?.data as TrainingPlan[] | undefined) ?? []
+  ).find((p) => p.is_current && p.status === "published");
   const modules = PANEL_MODULES.filter(
     (mod) => !mod.flag || isFlagEnabled(flags, mod.flag),
   );
@@ -168,6 +183,8 @@ export default function PanelHomePage() {
       />
 
       {error ? <InlineStatus kind="error">{error}</InlineStatus> : null}
+
+      {currentPlan ? <CurrentPlanTile plan={currentPlan} /> : null}
 
       <section aria-label="Wyniki sportowe">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">

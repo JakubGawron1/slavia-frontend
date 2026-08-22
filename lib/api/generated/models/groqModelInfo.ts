@@ -3,7 +3,7 @@
  * Do not edit manually.
  * CKS Slavia API
  * API panelu klubowego CKS Slavia Ruda Śląska
- * OpenAPI spec version: 2.0.0.0+1
+ * OpenAPI spec version: 2.2.0.1+1
  */
 import type { GroqFreePlanLimits } from './groqFreePlanLimits';
 
@@ -14,4 +14,6 @@ export interface GroqModelInfo {
   id: string;
   /** @nullable */
   owned_by?: string | null;
+  /** Przyjmuje obrazy (analiza liftu). `false` = tylko tekst (szkice, playground). */
+  supports_vision?: boolean;
 }

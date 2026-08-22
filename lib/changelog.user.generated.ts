@@ -3,6 +3,50 @@ import type { UserChangelogEntry } from "@/lib/user-changelog";
 
 export const GENERATED_USER_CHANGELOG: UserChangelogEntry[] = [
   {
+    "version": "2.2.0.0+1",
+    "date": "2026-08-22",
+    "title": "Analiza techniki z filmu",
+    "notes": [
+      "W panelu zawodnika i w klubie możesz wgrać film rwania, zarzutu, podrzutu albo akcesorium. Dostajesz opis, co jest dobrze, co poprawić i jakie ćwiczenia dodać — bez rysowania po filmie.",
+      "Superadmin włącza to flagą „Analiza techniki (AI)” w DevTools. Film zostaje na telefonie; na serwer idą tylko zdjęcia klatek."
+    ]
+  },
+  {
+    "version": "2.2.0.0+2",
+    "date": "2026-08-22",
+    "title": "Herb w karcie przeglądarki",
+    "notes": [
+      "W karcie przeglądarki i na ikonie na telefonie widać herb CKS Slavia."
+    ]
+  },
+  {
+    "version": "2.1.0.0+4",
+    "date": "2026-08-22",
+    "title": "Kreator, edytor i obowiązkowe ćwiczenia",
+    "notes": [
+      "Po ułożeniu planu w kreatorze od razu otwiera się edytor. Można też wejść prosto do pustego edytora, bez kreatora.",
+      "Ćwiczenia z kreatora są oznaczone jako Must do (bursztynowe, obowiązkowe). W edytorze da się to włączyć lub wyłączyć przy każdym ćwiczeniu — zawodnik widzi to samo oznaczenie.",
+      "Publikacja zamyka edytor. Jeśli nie podasz daty startu, plan zaczyna się od dziś."
+    ]
+  },
+  {
+    "version": "2.1.0.0+5",
+    "date": "2026-08-22",
+    "title": "Szkic AI układa cały plan, nie tylko pierwszy tydzień",
+    "notes": [
+      "Trener opisuje cel, dni i ewentualnie zawodnika albo grupę. AI oddaje przepis, a system rozpisuje wszystkie tygodnie (w tym lżejsze).",
+      "Edytor sam zapisuje szkic. Zawodnik z grupy widzi kilogramy ze swoich rekordów, nie jedną sztangę dla wszystkich."
+    ]
+  },
+  {
+    "version": "2.1.0.0+2",
+    "date": "2026-08-16",
+    "title": "Edytor planu",
+    "notes": [
+      "Układ jak dziennik treningowy: karty dni, chipy tygodni, kopiowanie schowane pod spodem."
+    ]
+  },
+  {
     "version": "2.0.0.0+1",
     "date": "2026-08-16",
     "title": "Koniec planów treningowych w panelu",
@@ -26,6 +70,26 @@ export const GENERATED_USER_CHANGELOG: UserChangelogEntry[] = [
     "title": "Panel zawodnika tylko w przeglądarce",
     "notes": [
       "Aplikacja mobilna Flutter nie jest już rozwijana — logowanie, kalendarz i wyniki zostają na stronie."
+    ]
+  },
+  {
+    "version": "2.1.0.0+2",
+    "date": "2026-08-16",
+    "title": "Szablony w katalogu",
+    "notes": [
+      "Kadra może dodać własny szablon, poprawić gotowiec i usunąć ten, którego klub nie używa."
+    ]
+  },
+  {
+    "version": "2.1.0.0+1",
+    "date": "2026-08-16",
+    "title": "Wracają plany treningowe",
+    "notes": [
+      "Trener układa program w czterech krokach (tytuł, dni, ćwiczenia, kto trenuje), bierze gotowiec z katalogu albo prosi o szkic AI — wszystko trafia do edytora jednego tygodnia.",
+      "W edytorze widać jeden tydzień naraz; dzień (np. poniedziałek) i cały tydzień można skopiować na wybrany lub na wszystkie tygodnie.",
+      "Zawodnik widzi dzisiejszy trening z kilogramami na pulpicie i w zakładce Plan.",
+      "Rekordy przysiadu i innych ćwiczeń zgłasza się osobno od wyników dwuboju; kadra akceptuje je w Rekordach ćwiczeń.",
+      "Kalendarz treningu można spiąć z dniem planu."
     ]
   },
   {

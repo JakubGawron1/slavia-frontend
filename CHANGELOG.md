@@ -12,6 +12,67 @@ Format sekcji:
 
 Opcjonalnie po dacie: `!breaking` (breaking API).
 
+## [2.2.0.1+2] - 2026-08-22
+### Fix: analiza liftu — 3 klatki
+- Z wycinka filmu idą 3 JPEG (start, środek, koniec), nie 8–10. Limit modelu wizyjnego Groq.
+
+## [2.2.0.1+1] - 2026-08-22
+### Fix: DevTools AI — osobne listy modeli
+- Select tekstowy: tylko czat bez obrazów. Select wizyjny: tylko modele z obrazami.
+- Zapisany ID spoza listy: „niedostępny” + prośba o wybór (model zdjęty z Groq albo zły typ).
+
+## [2.2.0.0+3] - 2026-08-22
+### UX: pełna legenda badge’y flag
+- DevTools hero: oprócz wdrożenia — rodzaj (Stabilne / Eksperymentalne) i audience (witryna, panele, oba, serwer); klik filtruje jak na kartach.
+
+## [2.2.0.0+2] - 2026-08-22
+### Polish: herb jako ikona karty
+- `favicon.ico` z herbu (16/32/48) zamiast domyślnej ikony Next.js; `icon.png` i `apple-icon.png` z przezroczystym tłem.
+
+## [2.2.0.0+1] - 2026-08-22
+### Feature: analiza techniki liftu
+- `/klub/analiza` i `/panel/analiza`: wgranie filmu, przycięcie fragmentu, raport tekstowy (bez rysowania na klatkach).
+- DevTools → AI: osobny select modelu wizyjnego (`vision_model`).
+- Flaga experimental `lift_bar_path_ai` (OFF) — pozycje w nav kadry i kafelku zawodnika.
+
+## [2.1.0.0+5] - 2026-08-22
+### Feature: szkic AI — przepis i autozapis
+- `/klub/plany/szkic-ai`: brief (dni planu vs sesje Slavi, zawodnik/grupa, data zawodów), podgląd przepisu, potem edytor.
+- Edytor autozapisuje szkic (debounce PUT/POST + kopia localStorage). Przy % widać podgląd kg z PR / mediany grupy.
+
+## [2.1.0.0+4] - 2026-08-22
+### UX: kreator → edytor, Must do, publikacja
+- Po szkicu z kreatora od razu edytor (`replace`); „Edytor od zera” bez kreatora.
+- Ćwiczenia z kreatora to `role: main` (Must do, bursztyn); w edytorze przełącznik + rola.
+- Publikuj zamyka edytor; pusta data startu = dziś (Warszawa). Zapisz szkicu zostaje w edytorze.
+
+## [2.1.0.0+3] - 2026-08-22
+### UX: wyszukiwanie flag po badge’ach
+- DevTools: szukaj po statusie wdrożenia, audience i „eksperymentalne”; klik badge’a ustawia filtr.
+
+## [2.1.0.0+2] - 2026-08-16
+### Feature: katalog szablonów
+- Katalog: nowy szablon (kreator), edycja w edytorze, usuwanie. Status „Katalog” w edytorze.
+### DX: sprzątanie duplikatów
+- Wspólne pola formularzy rekordów (`RecordFormFields`) i dwuboju (`ResultFormFields`).
+- Typy kalendarza DTO z Orval; `lib/events` zostawia `ClubEvent` i mapowanie UI.
+- Peer ESLint 10 / TypeScript 7: `peerDependencyRules` (pluginy Next i typedoc/Orval jeszcze nie deklarują tych wersji).
+- Edytor: bez sticky hero/stopki — nic nie nachodzi na serie; „Zapisz” obok przełącznika tygodnia.
+### UX: edytor jak dziennik
+- Karty dnia i ćwiczenia (akcent roli), chipy T1–Tn, kopiowanie w `<details>`, uchwyt DnD na karcie, serie bez ramek.
+
+## [2.1.0.0+1] - 2026-08-16
+### Feature: plany treningowe v1
+- `/klub/plany`: taby Aktywne / Katalog / Archiwum / Biblioteka / Grupy; kreator 4 kroków, edytor jednego tygodnia (przełącznik T1–Tn), LoadPicker, RPE, zamienniki, DnD.
+- Kopiowanie: dzień → wybrany tydzień, dzień → wszystkie te same dni, tydzień → wybrany tydzień, tydzień → wszystkie tygodnie.
+- Osobny szkic AI (`/klub/plany/szkic-ai`) — nie jest krokiem kreatora; wynik otwiera niezapisany edytor.
+- Zawodnik: `/panel/plany` (dziś + resolved kg), kafelek aktualnego planu na pulpicie.
+- Rekordy ćwiczeń: `/panel/rekordy` i `/klub/rekordy` — osobno od dwuboju.
+- Flagi: `audience` zamiast `client_visible`; klub/panel czyta `GET /api/flags/panels`; DevTools karty po module, experimental z toggle.
+- Kalendarz kadry: opcjonalne `plan_id` na treningu.
+- Kreator: unikalne klucze React przy kilku ćwiczeniach o tej samej nazwie.
+- Kreator: „+ ćwiczenie” dopisuje wiersz do listy z ekranu (nie nadpisuje pierwszego ćwiczenia).
+
 ## [2.0.0.1+3] - 2026-08-16
 ### Fix: godziny obecności QR w czasie polskim
 - Lista skanów i agenda kadry grupują wejścia po dacie warszawskiej; godziny nie są już wycinane z UTC serwera.

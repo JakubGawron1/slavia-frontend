@@ -3,6 +3,135 @@ import type { ChangelogEntry } from "@/lib/changelog";
 
 export const GENERATED_CHANGELOG: ChangelogEntry[] = [
   {
+    "version": "2.2.0.0+1",
+    "date": "2026-08-22",
+    "category": "frontend",
+    "title": "Feature: analiza techniki liftu",
+    "notes": [
+      "`/klub/analiza` i `/panel/analiza`: wgranie filmu, przycięcie fragmentu, raport tekstowy (bez rysowania na klatkach).",
+      "DevTools → AI: osobny select modelu wizyjnego (`vision_model`).",
+      "Flaga experimental `lift_bar_path_ai` (OFF) — pozycje w nav kadry i kafelku zawodnika."
+    ]
+  },
+  {
+    "version": "2.2.0.0+1",
+    "date": "2026-08-22",
+    "category": "backend",
+    "title": "Feature: analiza techniki liftu (Groq vision)",
+    "notes": [
+      "`POST /api/lifts/analyze` — klatki JPEG + lift → raport tekstowy (plusy / minusy / akcesoria). Film nie jest zapisywany.",
+      "Flaga experimental `lift_bar_path_ai` (domyślnie OFF). `any_panel`. Slot dzienny AI jak przy szkicu.",
+      "`ai_settings.vision_model` (domyślnie Llama 4 Scout), osobno od modelu tekstowego."
+    ]
+  },
+  {
+    "version": "2.1.0.0+4",
+    "date": "2026-08-22",
+    "category": "backend",
+    "title": "Feature: data startu przy publikacji",
+    "notes": [
+      "`POST/PUT /api/plans`: status `published` bez `starts_on` dostaje dzisiejszą datę klubową (`Europe/Warsaw`). Podana data zostaje."
+    ]
+  },
+  {
+    "version": "2.1.0.0+5",
+    "date": "2026-08-22",
+    "category": "backend",
+    "title": "Feature: szkic AI — przepis + kompilator",
+    "notes": [
+      "`POST /api/plans/ai-draft` zwraca `AiDraftResponse` `{ recipe, plan }`. Groq pisze mikrocykl T1 + fale; Rust składa T1–Tn, deloady, `club_session`.",
+      "`group_id` daje rozrzut PR grupy (nie 12 profili). Jedna naprawa JSON. json_object Groq.",
+      "GET planu piecze `resolved_kg` (zawodnik: własne PR i zamiana %→kg; kadra: podgląd z zawodnika/mediany grupy). `PlanDay.club_session` pod przyszły kalendarz."
+    ]
+  },
+  {
+    "version": "2.1.0.0+5",
+    "date": "2026-08-22",
+    "category": "frontend",
+    "title": "Feature: szkic AI — przepis i autozapis",
+    "notes": [
+      "`/klub/plany/szkic-ai`: brief (dni planu vs sesje Slavi, zawodnik/grupa, data zawodów), podgląd przepisu, potem edytor.",
+      "Edytor autozapisuje szkic (debounce PUT/POST + kopia localStorage). Przy % widać podgląd kg z PR / mediany grupy."
+    ]
+  },
+  {
+    "version": "2.2.0.1+2",
+    "date": "2026-08-22",
+    "category": "frontend",
+    "title": "Fix: analiza liftu — 3 klatki",
+    "notes": [
+      "Z wycinka filmu idą 3 JPEG (start, środek, koniec), nie 8–10. Limit modelu wizyjnego Groq."
+    ]
+  },
+  {
+    "version": "2.2.0.1+1",
+    "date": "2026-08-22",
+    "category": "frontend",
+    "title": "Fix: DevTools AI — osobne listy modeli",
+    "notes": [
+      "Select tekstowy: tylko czat bez obrazów. Select wizyjny: tylko modele z obrazami.",
+      "Zapisany ID spoza listy: „niedostępny” + prośba o wybór (model zdjęty z Groq albo zły typ)."
+    ]
+  },
+  {
+    "version": "2.2.0.1+1",
+    "date": "2026-08-22",
+    "category": "backend",
+    "title": "Fix: listy modeli Groq (tekst vs wizja)",
+    "notes": [
+      "`GET /api/admin/ai-models`: `supports_vision` na każdym modelu. Select tekstowy i wizyjny nie dzielą jednej listy.",
+      "Błąd Groq „model does not exist” / „prompt must be a string” tłumaczony na PL (DevTools + analiza liftu)."
+    ]
+  },
+  {
+    "version": "2.2.0.1+2",
+    "date": "2026-08-22",
+    "category": "backend",
+    "title": "Fix: max 3 klatki do Groq vision",
+    "notes": [
+      "Analiza liftu: 2–3 JPEG (FE: start / środek / koniec wycinka). Groq Llama 4 / Qwen 3.6 odrzuca >3 obrazy.",
+      "Komunikat PL przy `Too many images provided`."
+    ]
+  },
+  {
+    "version": "2.2.0.0+2",
+    "date": "2026-08-22",
+    "category": "frontend",
+    "title": "Polish: herb jako ikona karty",
+    "notes": [
+      "`favicon.ico` z herbu (16/32/48) zamiast domyślnej ikony Next.js; `icon.png` i `apple-icon.png` z przezroczystym tłem."
+    ]
+  },
+  {
+    "version": "2.1.0.0+4",
+    "date": "2026-08-22",
+    "category": "frontend",
+    "title": "UX: kreator → edytor, Must do, publikacja",
+    "notes": [
+      "Po szkicu z kreatora od razu edytor (`replace`); „Edytor od zera” bez kreatora.",
+      "Ćwiczenia z kreatora to `role: main` (Must do, bursztyn); w edytorze przełącznik + rola.",
+      "Publikuj zamyka edytor; pusta data startu = dziś (Warszawa). Zapisz szkicu zostaje w edytorze."
+    ]
+  },
+  {
+    "version": "2.2.0.0+3",
+    "date": "2026-08-22",
+    "category": "frontend",
+    "title": "UX: pełna legenda badge’y flag",
+    "notes": [
+      "DevTools hero: oprócz wdrożenia — rodzaj (Stabilne / Eksperymentalne) i audience (witryna, panele, oba, serwer); klik filtruje jak na kartach."
+    ]
+  },
+  {
+    "version": "2.1.0.0+3",
+    "date": "2026-08-22",
+    "category": "frontend",
+    "title": "UX: wyszukiwanie flag po badge’ach",
+    "notes": [
+      "DevTools: szukaj po statusie wdrożenia, audience i „eksperymentalne”; klik badge’a ustawia filtr."
+    ]
+  },
+  {
     "version": "2.0.0.0+1",
     "date": "2026-08-16",
     "category": "frontend",
@@ -27,6 +156,28 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
       "Maile o składzie i kontakcie idą wg preferencji użytkownika (bez flagi experimental)."
     ],
     "breakingApi": true
+  },
+  {
+    "version": "2.1.0.0+2",
+    "date": "2026-08-16",
+    "category": "frontend",
+    "title": "DX: sprzątanie duplikatów",
+    "notes": [
+      "Wspólne pola formularzy rekordów (`RecordFormFields`) i dwuboju (`ResultFormFields`).",
+      "Typy kalendarza DTO z Orval; `lib/events` zostawia `ClubEvent` i mapowanie UI.",
+      "Peer ESLint 10 / TypeScript 7: `peerDependencyRules` (pluginy Next i typedoc/Orval jeszcze nie deklarują tych wersji).",
+      "Edytor: bez sticky hero/stopki — nic nie nachodzi na serie; „Zapisz” obok przełącznika tygodnia."
+    ]
+  },
+  {
+    "version": "2.1.0.0+2",
+    "date": "2026-08-16",
+    "category": "backend",
+    "title": "DX: sprzątanie duplikatów",
+    "notes": [
+      "Wspólny `handlers/access` (`staff` / `any_panel` / `require_flag`) zamiast kopii w groups/library/records/events.",
+      "Usunięte martwe `ResolvedLoad` / `TrainingPlanView` / `resolve_load` / `best_pr_kg` — resolved kg zostaje na FE (`resolveLoad.ts`)."
+    ]
   },
   {
     "version": "2.0.0.0+2",
@@ -60,6 +211,56 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
     "breakingApi": true
   },
   {
+    "version": "2.1.0.0+2",
+    "date": "2026-08-16",
+    "category": "frontend",
+    "title": "Feature: katalog szablonów",
+    "notes": [
+      "Katalog: nowy szablon (kreator), edycja w edytorze, usuwanie. Status „Katalog” w edytorze."
+    ]
+  },
+  {
+    "version": "2.1.0.0+2",
+    "date": "2026-08-16",
+    "category": "backend",
+    "title": "Feature: katalog szablonów",
+    "notes": [
+      "CRUD szablonów: PUT/DELETE `catalog`, POST ze statusem `catalog`; seed 7 programów tylko raz (`meta.plan_catalog_seeded`)."
+    ]
+  },
+  {
+    "version": "2.1.0.0+1",
+    "date": "2026-08-16",
+    "category": "frontend",
+    "title": "Feature: plany treningowe v1",
+    "notes": [
+      "`/klub/plany`: taby Aktywne / Katalog / Archiwum / Biblioteka / Grupy; kreator 4 kroków, edytor jednego tygodnia (przełącznik T1–Tn), LoadPicker, RPE, zamienniki, DnD.",
+      "Kopiowanie: dzień → wybrany tydzień, dzień → wszystkie te same dni, tydzień → wybrany tydzień, tydzień → wszystkie tygodnie.",
+      "Osobny szkic AI (`/klub/plany/szkic-ai`) — nie jest krokiem kreatora; wynik otwiera niezapisany edytor.",
+      "Zawodnik: `/panel/plany` (dziś + resolved kg), kafelek aktualnego planu na pulpicie.",
+      "Rekordy ćwiczeń: `/panel/rekordy` i `/klub/rekordy` — osobno od dwuboju.",
+      "Flagi: `audience` zamiast `client_visible`; klub/panel czyta `GET /api/flags/panels`; DevTools karty po module, experimental z toggle.",
+      "Kalendarz kadry: opcjonalne `plan_id` na treningu.",
+      "Kreator: unikalne klucze React przy kilku ćwiczeniach o tej samej nazwie.",
+      "Kreator: „+ ćwiczenie” dopisuje wiersz do listy z ekranu (nie nadpisuje pierwszego ćwiczenia)."
+    ]
+  },
+  {
+    "version": "2.1.0.0+1",
+    "date": "2026-08-16",
+    "category": "backend",
+    "title": "Feature: plany treningowe v1",
+    "notes": [
+      "API: `/api/plans` (CRUD, skeleton, copy, ai-draft), `/api/groups`, `/api/exercise-library`, `/api/exercise-records`.",
+      "`LoadSpec` (kg | % PR | sztanga | zawodnik), RPE na serii, katalog 7 szablonów 12-tyg., seed biblioteki.",
+      "`ExerciseRecord` osobno od `CompetitionResult` (kolejka pending/accepted, 1RM).",
+      "`CalendarEvent.plan_id` + resolwowanie tygodnia z `starts_on`.",
+      "Flagi: `audience` (`public|panels|both|internal`) + `module`; `GET /api/flags/public` vs `GET /api/flags/panels` (auth); `training_plans` ON, `training_plans_ai` experimental OFF.",
+      "`PlanBody.origin` — szkic AI zapisuje się z pochodzeniem `ai`.",
+      "`PlanSkeletonBody.include_warmup_sets` domyślnie wyłączone — bez drabinki W-setów przy tworzeniu szkicu."
+    ]
+  },
+  {
     "version": "2.0.0.1+3",
     "date": "2026-08-16",
     "category": "frontend",
@@ -76,6 +277,15 @@ export const GENERATED_CHANGELOG: ChangelogEntry[] = [
     "notes": [
       "Zapis i odczyt `checked_at` w `Europe/Warsaw` (RFC3339 z offsetem), nie UTC procesu.",
       "Filtr dnia, duplikaty pending i statystyka miesiąca liczą datę klubową; stare wpisy UTC są konwertowane przy liście."
+    ]
+  },
+  {
+    "version": "2.1.0.0+2",
+    "date": "2026-08-16",
+    "category": "frontend",
+    "title": "UX: edytor jak dziennik",
+    "notes": [
+      "Karty dnia i ćwiczenia (akcent roli), chipy T1–Tn, kopiowanie w `<details>`, uchwyt DnD na karcie, serie bez ramek."
     ]
   },
   {

@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useListPublicFlags } from "@/lib/api/generated/default/default";
+import { useListPanelFlags } from "@/lib/api/generated/default/default";
 import { filterNavForRole, ROLE_LABELS } from "@/lib/klub-nav";
-import { isFlagEnabled } from "@/lib/public-flags";
+import { isFlagEnabled } from "@/lib/panel-flags";
 import { useKlub } from "./KlubProvider";
 import { RoleSwitcher } from "./RoleSwitcher";
 import { ClubMark } from "@/components/ClubMark";
@@ -31,7 +31,7 @@ function NavBody({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   const { user, activeRole, collapsedCategories, toggleCategory, viewAs } =
     useKlub();
-  const flagsQuery = useListPublicFlags({ query: { staleTime: 60_000 } });
+  const flagsQuery = useListPanelFlags({ query: { staleTime: 60_000 } });
   const flags = flagsQuery.data?.data;
   if (!user) return null;
 
